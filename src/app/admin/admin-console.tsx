@@ -25,6 +25,7 @@ import {
   Search,
   Settings2,
   ShieldCheck,
+  Star,
   Store as StoreIcon,
   Truck,
   Users,
@@ -936,7 +937,7 @@ export function AdminConsole({
                   </div>
                   <div className="mt-3 flex items-center justify-between text-[10px] font-bold text-ink/40">
                     <span>{driver.deliveries} deliveries</span>
-                    <span>★ {driver.rating}</span>
+                    <span className="inline-flex items-center gap-1"><Star size={11} className="fill-saffron text-saffron" /> {driver.rating}</span>
                   </div>
                   <div className="mt-3">
                     <div className="flex justify-between text-[10px] font-extrabold">
@@ -1793,8 +1794,10 @@ function DriverEditModal({
         <div className="flex items-start justify-between gap-3">
           <div>
             <h2 className="text-lg font-extrabold">{driver.name}</h2>
-            <p className="text-[10px] font-bold text-ink/40">
-              {driver.citySlug} · {driver.deliveries} deliveries · ★ {driver.rating}
+            <p className="flex items-center gap-1 text-[10px] font-bold text-ink/40">
+              {driver.citySlug} · {driver.deliveries} deliveries ·
+              <Star size={10} className="fill-saffron text-saffron" />
+              {driver.rating}
             </p>
           </div>
           <button

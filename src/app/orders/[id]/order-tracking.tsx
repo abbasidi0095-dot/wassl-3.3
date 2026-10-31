@@ -238,7 +238,7 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
             </div>
           ) : (
             <div className="card flex items-center gap-3 p-4">
-              <span className="grid h-11 w-11 place-items-center rounded-2xl bg-saffron/20 text-xl">🛵</span>
+              <span className="grid h-11 w-11 place-items-center rounded-2xl bg-saffron/20 text-saffron-deep"><Bike size={20} /></span>
               <div>
                 <div className="text-sm font-extrabold">Finding your driver</div>
                 <div className="mt-0.5 text-[10px] font-bold text-ink/40">

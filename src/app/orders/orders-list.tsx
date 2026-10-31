@@ -6,15 +6,20 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   ArrowRight,
+  Banknote,
   Bike,
+  CarTaxiFront,
   Clock3,
+  MapPin,
   PackageCheck,
   ReceiptText,
   RotateCcw,
   Search,
 } from "lucide-react";
 import { useCart } from "@/components/cart-provider";
-import { STATUS_META, type OrderStatus, type SelectedModifier } from "@/lib/types";
+import { STATUS_META, type OrderStatus, type SelectedModifier, type TaxiRide } from "@/lib/types";
+import { TAXI_STATUS_TEXT } from "@/lib/taxi-status";
+import { useI18n } from "@/components/locale-provider";
 import { money, timeAgo } from "@/lib/utils";
 
 type SummaryLine = {
@@ -48,7 +53,10 @@ type Summary = {
 export function OrdersList() {
   const router = useRouter();
   const { addItem, clear } = useCart();
+  const { t } = useI18n();
+  const [tab, setTab] = useState<"orders" | "taxi">("orders");
   const [orders, setOrders] = useState<Summary[]>([]);
+  const [rides, setRides] = useState<TaxiRide[]>([]);
   const [loading, setLoading] = useState(true);
   const [code, setCode] = useState("");
 
@@ -75,6 +83,12 @@ export function OrdersList() {
         if (accountResponse.ok) {
           const data = (await accountResponse.json()) as { orders: Summary[] };
           for (const order of data.orders) byId.set(order.id, order);
+        }
+
+        const ridesResponse = await fetch("/api/taxi/rides", { cache: "no-store" });
+        if (ridesResponse.ok) {
+          const data = (await ridesResponse.json()) as { rides?: TaxiRide[] };
+          if (active) setRides(data.rides ?? []);
         }
 
         if (active) {
@@ -130,7 +144,30 @@ export function OrdersList() {
 
   return (
     <div className="mt-7">
-      <form onSubmit={openCode} className="card-flat flex max-w-xl gap-2 p-2">
+      <div className="flex flex-wrap gap-2">
+        {[
+          { id: "orders" as const, label: t("Deliveries"), count: orders.length },
+          { id: "taxi" as const, label: t("Taxi rides"), count: rides.length },
+        ].map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => setTab(item.id)}
+            className={`inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-[11px] font-extrabold transition ${
+              tab === item.id
+                ? "bg-ink text-on-dark"
+                : "border border-ink/10 bg-white/60 text-ink/55 hover:text-ink"
+            }`}
+          >
+            {item.id === "taxi" ? <CarTaxiFront size={14} /> : <ReceiptText size={14} />}
+            {item.label}
+            <span className="rounded-full bg-white/15 px-1.5 py-0.5 text-[9px]">{item.count}</span>
+          </button>
+        ))}
+      </div>
+
+      {tab === "orders" ? (
+        <form onSubmit={openCode} className="card-flat mt-4 flex max-w-xl gap-2 p-2">
         <div className="relative flex-1">
           <Search
             size={15}
@@ -144,10 +181,13 @@ export function OrdersList() {
           />
         </div>
         <button type="submit" className="btn btn-primary btn-sm">
-          Track <ArrowRight size={13} />
+          {t("Track")} <ArrowRight size={13} className="rtl:-scale-x-100" />
         </button>
-      </form>
+        </form>
+      ) : null}
 
+      {tab === "orders" ? (
+        <>
       {loading ? (
         <div className="mt-5 grid gap-3">
           <div className="card h-24 animate-pulse" />
@@ -234,13 +274,103 @@ export function OrdersList() {
           </Link>
         </div>
       )}
+        </>
+      ) : rides.length ? (
+        <div className="mt-5 grid gap-3">
+          {rides.map((ride) => {
+            const active = !["completed", "cancelled"].includes(ride.status);
+            return (
+              <Link
+                key={ride.id}
+                href={`/taxi/${ride.id}`}
+                className={`card flex flex-wrap items-center gap-4 p-4 transition hover:border-teal/25 ${
+                  active ? "" : "opacity-80"
+                }`}
+              >
+                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-teal/10 text-teal">
+                  <CarTaxiFront size={20} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="truncate text-sm font-extrabold">
+                      {ride.pickupLabel} → {ride.dropoffLabel}
+                    </span>
+                    <span className="pill">
+                      <span className="status-dot" /> {t(TAXI_STATUS_TEXT[ride.status])}
+                    </span>
+                  </div>
+                  <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] font-bold text-ink/40">
+                    <span>{ride.distanceKm.toFixed(1)} km</span>
+                    <span>·</span>
+                    <span>{timeAgo(ride.createdAt)}</span>
+                    {ride.driverName ? (
+                      <>
+                        <span>·</span>
+                        <span>{ride.driverName}</span>
+                      </>
+                    ) : null}
+                  </div>
+                </div>
+                <div className="text-end">
+                  <div className="text-base font-extrabold">{money(ride.fare)}</div>
+                  <div className="mt-1 inline-flex items-center gap-1 text-[10px] font-extrabold text-teal">
+                    {t(active ? "Track" : "View")} <ArrowRight size={11} className="rtl:-scale-x-100" />
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="card mt-5 grid place-items-center px-6 py-16 text-center">
+          <span className="grid h-16 w-16 place-items-center rounded-2xl bg-teal/10 text-teal">
+            <CarTaxiFront size={26} />
+          </span>
+          <h2 className="mt-4 text-2xl font-extrabold tracking-tight">
+            {t("No taxi rides yet")}
+          </h2>
+          <p className="mt-2 max-w-sm text-sm leading-6 text-ink/50">
+            {t("Your taxi trips will appear here once you request a ride.")}
+          </p>
+          <Link href="/taxi" className="btn btn-primary mt-5">
+            {t("Request a taxi")} <ArrowRight size={14} className="rtl:-scale-x-100" />
+          </Link>
+        </div>
+      )}
 
       <div className="mt-6 grid gap-3 sm:grid-cols-3">
-        {[
-          { icon: Clock3, label: "Live status", text: "Updates without refreshing." },
-          { icon: Bike, label: "Driver details", text: "Call or WhatsApp after assignment." },
-          { icon: ReceiptText, label: "Cash receipt", text: "See the exact amount before arrival." },
-        ].map((item) => (
+        {(tab === "taxi"
+          ? [
+              {
+                icon: CarTaxiFront,
+                label: t("Live ride status"),
+                text: t("Updates without refreshing."),
+              },
+              {
+                icon: Bike,
+                label: t("Driver details"),
+                text: t("Call the driver after assignment."),
+              },
+              {
+                icon: Banknote,
+                label: t("Cash fare"),
+                text: t("Pay the driver at the end of the trip."),
+              },
+            ]
+          : [
+              { icon: Clock3, label: t("Live status"), text: t("Updates without refreshing.") },
+              {
+                icon: Bike,
+                label: t("Driver details"),
+                text: t("Call or WhatsApp after assignment."),
+              },
+              {
+                icon: ReceiptText,
+                label: t("Cash receipt"),
+                text: t("See the exact amount before arrival."),
+              },
+            ]
+        ).map((item) => (
           <div key={item.label} className="rounded-2xl border border-ink/10 bg-white/45 p-4">
             <item.icon size={16} className="text-teal" />
             <div className="mt-2 text-[11px] font-extrabold">{item.label}</div>

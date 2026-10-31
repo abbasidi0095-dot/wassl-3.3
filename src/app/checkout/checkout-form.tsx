@@ -13,6 +13,7 @@ import {
   MapPin,
   Phone,
   ShieldCheck,
+  ShoppingBag,
   Tag,
   X,
 } from "lucide-react";
@@ -255,7 +256,7 @@ export function CheckoutForm({
   if (!items.length) {
     return (
       <div className="card mt-8 grid place-items-center px-6 py-14 text-center">
-        <div className="text-4xl">🛒</div>
+        <span className="grid h-16 w-16 place-items-center rounded-2xl bg-teal/10 text-teal"><ShoppingBag size={26} /></span>
         <h2 className="mt-3 text-2xl font-extrabold tracking-tight">{t("Nothing to check out")}</h2>
         <p className="mt-2 text-sm text-ink/45">{t("Add a few items from a local store first.")}</p>
         <Link href="/city/dakhla" className="btn btn-primary mt-5">

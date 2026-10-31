@@ -535,7 +535,7 @@ export function DriverDashboard({
                 })}
                 {!active.length ? (
                   <div className="rounded-2xl border border-dashed border-ink/15 px-4 py-8 text-center">
-                    <div className="text-2xl">🛵</div>
+                    <div className="grid place-items-center text-teal/60"><Bike size={26} /></div>
                     <div className="mt-2 text-sm font-extrabold">No active deliveries</div>
                     <p className="mt-1 text-[11px] text-ink/40">
                       Dispatch will assign an order when one is ready in {driver.citySlug}.

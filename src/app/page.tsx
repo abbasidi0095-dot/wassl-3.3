@@ -16,6 +16,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { StoreBrowser } from "@/components/store-browser";
 import { MapView } from "@/components/map-view";
+import { ProductTile } from "@/components/product-icon";
 import { getCities, getPriorityCities, getStores } from "@/lib/db";
 import { getTranslator } from "@/lib/i18n-server";
 import { money } from "@/lib/utils";
@@ -277,7 +278,7 @@ export default async function HomePage() {
                   <span className="pill pill-warm">COD</span>
                 </div>
                 <div className="mt-3 flex items-center gap-3">
-                  <span className="grid h-12 w-12 place-items-center rounded-xl bg-saffron/20 text-2xl">🍔</span>
+                  <ProductTile name="Dakhla Smash" category="Burgers" className="h-12 w-12 rounded-xl" iconSize={22} />
                   <div>
                     <div className="text-sm font-extrabold">Dakhla Smash × 1</div>
                     <div className="text-[11px] text-ink/40">Loaded Fries × 1 · Lemonade</div>

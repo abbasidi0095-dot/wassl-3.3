@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowRight, MapPin, Store, Truck } from "lucide-react";
+import { ArrowRight, MapPin, Sprout, Store, Truck } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { StoreBrowser } from "@/components/store-browser";
@@ -129,8 +129,8 @@ export default async function CityPage({
             <StoreBrowser stores={stores} />
           ) : (
             <div className="card grid place-items-center px-6 py-16 text-center">
-              <span className="grid h-16 w-16 place-items-center rounded-2xl bg-saffron/15 text-3xl">
-                🌱
+              <span className="grid h-16 w-16 place-items-center rounded-2xl bg-saffron/15 text-saffron-deep">
+                <Sprout size={28} />
               </span>
               <h2 className="mt-5 text-3xl font-extrabold tracking-[-0.05em]">
                 {city.name} is on the map.
