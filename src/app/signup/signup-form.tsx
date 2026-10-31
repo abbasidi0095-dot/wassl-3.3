@@ -145,7 +145,7 @@ export function SignupForm({
               }}
               className={`rounded-xl px-2 py-2.5 text-[11px] font-extrabold transition ${
                 role === item.id
-                  ? "bg-teal text-white shadow-sm"
+                  ? "bg-teal text-on-dark shadow-sm"
                   : "bg-cream text-ink/55 hover:bg-ink/5"
               }`}
             >

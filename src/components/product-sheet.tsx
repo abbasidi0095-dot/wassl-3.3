@@ -212,7 +212,7 @@ export function ProductSheet({
                           <span
                             className={`grid h-4 w-4 shrink-0 place-items-center border ${
                               group.max === 1 ? "rounded-full" : "rounded"
-                            } ${checked ? "border-teal bg-teal text-white" : "border-ink/25"}`}
+                            } ${checked ? "border-teal bg-teal text-on-dark" : "border-ink/25"}`}
                           >
                             {checked ? <Check size={10} strokeWidth={3} /> : null}
                           </span>

@@ -204,7 +204,7 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
 
           {order.driver ? (
             <div className="card flex flex-wrap items-center gap-3 p-4">
-              <span className="grid h-12 w-12 place-items-center rounded-2xl bg-teal text-white">
+              <span className="grid h-12 w-12 place-items-center rounded-2xl bg-teal text-on-dark">
                 <Bike size={22} />
               </span>
               <div className="min-w-0 flex-1">
@@ -273,7 +273,7 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
                         <span
                           className={`relative z-10 mt-0.5 grid h-[19px] w-[19px] shrink-0 place-items-center rounded-full border-2 ${
                             done
-                              ? "border-teal bg-teal text-white"
+                              ? "border-teal bg-teal text-on-dark"
                               : "border-ink/15 bg-paper text-transparent"
                           }`}
                         >
@@ -376,12 +376,12 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
             ) : null}
           </div>
 
-          <div className="rounded-2xl bg-ink p-5 text-white">
-            <div className="flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-wider text-white/40">
+          <div className="rounded-2xl bg-ink p-5 text-on-dark">
+            <div className="flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-wider text-on-dark/40">
               <ShieldCheck size={13} className="text-saffron" /> Wassl support
             </div>
             <p className="mt-2 text-sm font-extrabold">Something wrong with your order?</p>
-            <p className="mt-1 text-[11px] leading-5 text-white/50">
+            <p className="mt-1 text-[11px] leading-5 text-on-dark/50">
               Call us and we will contact the store and driver directly.
             </p>
             <a href="tel:+212660000000" className="btn btn-saffron mt-4 w-full">

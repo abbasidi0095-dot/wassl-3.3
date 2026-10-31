@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { ArrowUpRight, LogOut } from "lucide-react";
 import type { Session } from "@/lib/types";
 import { Logo } from "./logo";
+import { ThemeToggle } from "./theme-toggle";
 
 export function StaffHeader({
   session,
@@ -52,6 +53,7 @@ export function StaffHeader({
             <div className="text-[11px] font-extrabold leading-4">{session.name}</div>
             <div className="text-[9px] text-ink/35">On shift</div>
           </div>
+          <ThemeToggle className="h-9 w-9" />
           <button
             type="button"
             onClick={logout}

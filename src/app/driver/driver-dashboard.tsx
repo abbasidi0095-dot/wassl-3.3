@@ -557,8 +557,8 @@ export function DriverDashboard({
               <h2 className="text-lg font-extrabold tracking-[-0.04em]">COD wallet</h2>
               <Banknote size={19} className="text-teal" />
             </div>
-            <div className="mt-4 rounded-2xl bg-ink p-4 text-white">
-              <div className="text-[9px] font-extrabold uppercase tracking-wider text-white/40">
+            <div className="mt-4 rounded-2xl bg-ink p-4 text-on-dark">
+              <div className="text-[9px] font-extrabold uppercase tracking-wider text-on-dark/40">
                 Cash currently with you
               </div>
               <div className="mt-1 text-3xl font-extrabold tracking-[-0.05em]">
@@ -572,7 +572,7 @@ export function DriverDashboard({
                   }}
                 />
               </div>
-              <div className="mt-1.5 flex justify-between text-[9px] font-bold text-white/40">
+              <div className="mt-1.5 flex justify-between text-[9px] font-bold text-on-dark/40">
                 <span>Limit {money(driver.cashLimit)}</span>
                 <span>{money(cashLeft)} left</span>
               </div>
@@ -688,7 +688,7 @@ export function DriverDashboard({
       </div>
 
       {toast ? (
-        <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full bg-ink px-4 py-2 text-xs font-bold text-white shadow-2xl">
+        <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full bg-ink px-4 py-2 text-xs font-bold text-on-dark shadow-2xl">
           {toast}
         </div>
       ) : null}

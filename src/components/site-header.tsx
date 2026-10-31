@@ -17,6 +17,7 @@ import {
 import type { City } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Logo } from "./logo";
+import { ThemeToggle } from "./theme-toggle";
 import { useCart } from "./cart-provider";
 
 type AccountInfo = {
@@ -128,6 +129,8 @@ export function SiteHeader({
               />
             </label>
 
+            <ThemeToggle />
+
             <Link
               href="/cart"
               className="relative grid h-10 w-10 place-items-center rounded-xl border border-ink/10 bg-white/70 text-ink transition hover:bg-white"
@@ -135,7 +138,7 @@ export function SiteHeader({
             >
               <ShoppingBag size={18} />
               {count > 0 ? (
-                <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-coral px-1 text-[10px] font-extrabold text-white">
+                <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-coral px-1 text-[10px] font-extrabold text-on-dark">
                   {count}
                 </span>
               ) : null}
@@ -143,7 +146,7 @@ export function SiteHeader({
 
             <Link
               href={account ? accountHref(account) : "/login"}
-              className="hidden h-10 items-center gap-2 rounded-xl bg-ink px-3.5 text-xs font-extrabold text-white transition hover:bg-teal-dark sm:flex"
+              className="hidden h-10 items-center gap-2 rounded-xl bg-ink px-3.5 text-xs font-extrabold text-on-dark transition hover:bg-teal-dark sm:flex"
             >
               {account?.role === "customer" ? (
                 <UserRound size={15} />
@@ -269,7 +272,7 @@ export function SiteHeader({
               <item.icon size={18} />
               {item.label}
               {item.badge ? (
-                <span className="absolute right-2 top-0 grid h-4 min-w-4 place-items-center rounded-full bg-coral px-1 text-[8px] text-white">
+                <span className="absolute right-2 top-0 grid h-4 min-w-4 place-items-center rounded-full bg-coral px-1 text-[8px] text-on-dark">
                   {item.badge}
                 </span>
               ) : null}

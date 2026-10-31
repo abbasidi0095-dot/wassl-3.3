@@ -145,7 +145,7 @@ export function StoreBrowser({ stores }: { stores: StoreType[] }) {
             }}
             className={`whitespace-nowrap rounded-full border px-3.5 py-2 text-[11px] font-extrabold transition ${
               category === item.value
-                ? "border-teal bg-teal text-white"
+                ? "border-teal bg-teal text-on-dark"
                 : "border-ink/10 bg-white/60 text-ink/55 hover:border-teal/30 hover:text-ink"
             }`}
           >
@@ -159,7 +159,7 @@ export function StoreBrowser({ stores }: { stores: StoreType[] }) {
           type="button"
           onClick={() => setTag("all")}
           className={`whitespace-nowrap rounded-full px-2.5 py-1 text-[10px] font-extrabold transition ${
-            tag === "all" ? "bg-ink text-white" : "bg-white/60 text-ink/45 hover:text-ink"
+            tag === "all" ? "bg-ink text-on-dark" : "bg-white/60 text-ink/45 hover:text-ink"
           }`}
         >
           All cuisines
@@ -170,7 +170,7 @@ export function StoreBrowser({ stores }: { stores: StoreType[] }) {
             type="button"
             onClick={() => setTag(tag === item ? "all" : item)}
             className={`whitespace-nowrap rounded-full px-2.5 py-1 text-[10px] font-extrabold transition ${
-              tag === item ? "bg-ink text-white" : "bg-white/60 text-ink/45 hover:text-ink"
+              tag === item ? "bg-ink text-on-dark" : "bg-white/60 text-ink/45 hover:text-ink"
             }`}
           >
             {item}

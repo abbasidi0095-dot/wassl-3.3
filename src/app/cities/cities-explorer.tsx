@@ -47,7 +47,7 @@ export function CitiesExplorer({ cities }: { cities: City[] }) {
               onClick={() => setFilter(item.value)}
               className={`rounded-xl border px-3.5 py-2 text-[11px] font-extrabold transition ${
                 filter === item.value
-                  ? "border-teal bg-teal text-white"
+                  ? "border-teal bg-teal text-on-dark"
                   : "border-ink/10 bg-white/60 text-ink/55"
               }`}
             >

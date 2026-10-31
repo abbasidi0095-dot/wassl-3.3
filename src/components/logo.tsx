@@ -11,7 +11,7 @@ export function Logo({
     <Link href="/" className="flex items-center gap-2.5" aria-label="Wassl home">
       <span
         className={`grid h-10 w-10 place-items-center rounded-2xl ${
-          light ? "bg-white/15 text-white" : "bg-teal text-white"
+          light ? "bg-white/15 text-on-dark" : "bg-teal text-on-dark"
         } shadow-lg shadow-teal/20`}
       >
         <svg width="23" height="23" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -34,14 +34,14 @@ export function Logo({
         <span className="flex items-baseline gap-2">
           <span
             className={`text-[21px] font-extrabold tracking-[-0.06em] ${
-              light ? "text-white" : "text-ink"
+              light ? "text-on-dark" : "text-ink"
             }`}
           >
             Wassl
           </span>
           <span
             className={`arabic text-[15px] font-semibold ${
-              light ? "text-white/70" : "text-teal"
+              light ? "text-on-dark/70" : "text-teal"
             }`}
           >
             وصّل

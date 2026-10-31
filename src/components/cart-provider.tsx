@@ -164,7 +164,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     <CartContext.Provider value={value}>
       {children}
       {lastAdded ? (
-        <div className="fixed bottom-24 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-ink px-4 py-2 text-xs font-bold text-white shadow-2xl md:bottom-8">
+        <div className="fixed bottom-24 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-ink px-4 py-2 text-xs font-bold text-on-dark shadow-2xl md:bottom-8">
           Added {lastAdded} to cart
         </div>
       ) : null}

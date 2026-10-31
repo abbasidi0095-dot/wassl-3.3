@@ -191,7 +191,7 @@ export function AccountsManager({
             onClick={() => setPendingOnly((value) => !value)}
             className={`rounded-xl border px-3 py-1.5 text-[10px] font-extrabold transition ${
               pendingOnly
-                ? "border-ink bg-ink text-white"
+                ? "border-ink bg-ink text-on-dark"
                 : "border-ink/10 bg-white/60 text-ink/50"
             }`}
           >

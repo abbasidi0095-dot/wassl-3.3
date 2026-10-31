@@ -82,7 +82,7 @@ export default async function HomePage() {
           <div className="animate-rise-delay relative">
             <div className="absolute -left-3 -top-3 z-10 hidden rounded-2xl border border-ink/10 bg-paper/95 p-3 shadow-xl backdrop-blur sm:block">
               <div className="flex items-center gap-2">
-                <span className="grid h-9 w-9 place-items-center rounded-xl bg-teal text-white">
+                <span className="grid h-9 w-9 place-items-center rounded-xl bg-teal text-on-dark">
                   <Bike size={17} />
                 </span>
                 <div>
@@ -179,7 +179,7 @@ export default async function HomePage() {
 
         <section className="container-wassl mt-16 lg:mt-24">
           <div className="grid gap-4 md:grid-cols-5">
-            <div className="card relative overflow-hidden bg-ink p-6 text-white md:col-span-2">
+            <div className="card relative overflow-hidden bg-ink p-6 text-on-dark md:col-span-2">
               <div
                 className="absolute inset-0 opacity-40"
                 style={{
@@ -194,7 +194,7 @@ export default async function HomePage() {
                   <br />
                   to the Atlantic.
                 </h2>
-                <p className="mt-3 text-sm leading-6 text-white/55">
+                <p className="mt-3 text-sm leading-6 text-on-dark/55">
                   Five priority cities, one local operating model. Each city gets
                   its own stores, drivers, zones and delivery fees.
                 </p>
@@ -297,7 +297,7 @@ export default async function HomePage() {
                   <span className="btn btn-ghost btn-sm">View details</span>
                 </div>
               </div>
-              <div className="absolute -bottom-4 -right-3 rounded-2xl bg-teal p-3 text-white shadow-xl">
+              <div className="absolute -bottom-4 -right-3 rounded-2xl bg-teal p-3 text-on-dark shadow-xl">
                 <div className="flex items-center gap-2 text-[10px] font-extrabold">
                   <Sparkles size={13} className="text-saffron" />
                   Settled weekly

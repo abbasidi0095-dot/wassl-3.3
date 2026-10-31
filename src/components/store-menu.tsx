@@ -123,7 +123,7 @@ export function StoreMenu({
               }}
               className={`whitespace-nowrap rounded-full px-3.5 py-2 text-[11px] font-extrabold transition ${
                 active === category && !query
-                  ? "bg-teal text-white"
+                  ? "bg-teal text-on-dark"
                   : "bg-white/70 text-ink/55 hover:text-ink"
               }`}
             >
@@ -231,7 +231,7 @@ export function StoreMenu({
                         type="button"
                         disabled={!product.available || !store.isOpen}
                         onClick={() => quickAdd(product)}
-                        className="grid h-8 w-8 place-items-center rounded-xl bg-ink text-white transition hover:bg-teal disabled:cursor-not-allowed disabled:bg-ink/20"
+                        className="grid h-8 w-8 place-items-center rounded-xl bg-ink text-on-dark transition hover:bg-teal disabled:cursor-not-allowed disabled:bg-ink/20"
                         aria-label={`Add ${product.name} to cart`}
                       >
                         <Plus size={16} />
@@ -258,7 +258,7 @@ export function StoreMenu({
         <div className="fixed inset-x-3 bottom-[calc(78px+env(safe-area-inset-bottom))] z-30 md:hidden">
           <a
             href="/cart"
-            className="flex items-center justify-between gap-3 rounded-2xl bg-ink px-4 py-3 text-white shadow-2xl"
+            className="flex items-center justify-between gap-3 rounded-2xl bg-ink px-4 py-3 text-on-dark shadow-2xl"
           >
             <span className="text-xs font-extrabold">
               {count} {count === 1 ? "item" : "items"} ·{" "}

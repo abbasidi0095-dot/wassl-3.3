@@ -268,7 +268,7 @@ export function CheckoutForm({
       <div className="space-y-4">
         <section className="card p-5">
           <div className="flex items-center gap-2">
-            <span className="grid h-8 w-8 place-items-center rounded-xl bg-teal text-white">
+            <span className="grid h-8 w-8 place-items-center rounded-xl bg-teal text-on-dark">
               <MapPin size={15} />
             </span>
             <div>

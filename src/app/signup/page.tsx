@@ -20,7 +20,7 @@ export default async function SignupPage({
 
   return (
     <main className="grid min-h-screen bg-cream lg:grid-cols-[1.05fr_0.95fr]">
-      <section className="relative hidden overflow-hidden bg-ink p-10 text-white lg:flex lg:flex-col lg:justify-between">
+      <section className="relative hidden overflow-hidden bg-ink p-10 text-on-dark lg:flex lg:flex-col lg:justify-between">
         <div
           className="pointer-events-none absolute inset-0 opacity-30"
           style={{
@@ -40,7 +40,7 @@ export default async function SignupPage({
             <br />
             Grow local.
           </h1>
-          <p className="mt-5 max-w-md text-sm leading-6 text-white/60">
+          <p className="mt-5 max-w-md text-sm leading-6 text-on-dark/60">
             Customers order in a minute. Store owners and drivers join a
             vetted network — every partner account is reviewed by Wassl
             operations before it goes live.
@@ -53,14 +53,14 @@ export default async function SignupPage({
             ].map(([value, label]) => (
               <div key={label} className="rounded-2xl border border-white/10 bg-white/5 p-4">
                 <div className="text-2xl font-extrabold tracking-tight">{value}</div>
-                <div className="mt-1 text-[10px] font-bold uppercase tracking-wider text-white/40">
+                <div className="mt-1 text-[10px] font-bold uppercase tracking-wider text-on-dark/40">
                   {label}
                 </div>
               </div>
             ))}
           </div>
         </div>
-        <p className="relative text-[11px] text-white/30">
+        <p className="relative text-[11px] text-on-dark/30">
           Dakhla · Laâyoune · Boujdour · Esmara · Tarfaya
         </p>
       </section>

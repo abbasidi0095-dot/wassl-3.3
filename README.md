@@ -409,12 +409,12 @@ This is a demo, deliberately scoped. Before a real pilot:
 
 ## Mobile apps (iOS + Android)
 
-Wassl 3.2.3 ships as a Capacitor native shell around the production Next.js app
+Wassl 3.3.0 ships as a Capacitor native shell around the production Next.js app
 (app ID `ma.wassl.app`). The native projects live in `android/` and `ios/`; the
 shell loads `https://wassl-ma.fly.dev` so auth, live orders, maps and dashboards
 stay identical to the web app. Native additions: splash/icons, safe-area layout,
-offline fallback, deep links, Android back handling, haptic add-to-cart and push
-token registration.
+offline fallback, deep links, Android back handling, haptic add-to-cart, dark
+mode with native status-bar sync, and push token registration.
 
 ```bash
 npm run mobile:sync

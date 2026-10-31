@@ -546,7 +546,7 @@ export function AdminConsole({
           >
             <Users size={14} /> Accounts
             {pendingUsers.length ? (
-              <span className="ml-1 grid h-5 min-w-5 place-items-center rounded-full bg-coral px-1 text-[9px] font-extrabold text-white">
+              <span className="ml-1 grid h-5 min-w-5 place-items-center rounded-full bg-coral px-1 text-[9px] font-extrabold text-on-dark">
                 {pendingUsers.length}
               </span>
             ) : null}
@@ -610,7 +610,7 @@ export function AdminConsole({
             onClick={() => setTab(item.id)}
             className={`inline-flex items-center gap-2 whitespace-nowrap rounded-xl px-3.5 py-2 text-[11px] font-extrabold transition ${
               tab === item.id
-                ? "bg-ink text-white"
+                ? "bg-ink text-on-dark"
                 : "border border-ink/10 bg-white/50 text-ink/55 hover:text-ink"
             }`}
           >
@@ -621,7 +621,7 @@ export function AdminConsole({
       </div>
 
       {toast ? (
-        <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full bg-ink px-4 py-2 text-xs font-bold text-white shadow-2xl">
+        <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full bg-ink px-4 py-2 text-xs font-bold text-on-dark shadow-2xl">
           {toast}
         </div>
       ) : null}
@@ -669,7 +669,7 @@ export function AdminConsole({
                 type="button"
                 onClick={confirmCancel}
                 disabled={cancelReason.trim().length < 3 || busy === cancelTarget.id}
-                className="btn btn-sm bg-red-600 text-white disabled:opacity-40"
+                className="btn btn-sm bg-red-600 text-on-dark disabled:opacity-40"
               >
                 Cancel order
               </button>
@@ -1004,7 +1004,7 @@ export function AdminConsole({
                   onClick={() => setCityFilter(item.value)}
                   className={`rounded-xl border px-3 py-1.5 text-[10px] font-extrabold transition ${
                     cityFilter === item.value
-                      ? "border-ink bg-ink text-white"
+                      ? "border-ink bg-ink text-on-dark"
                       : "border-ink/10 bg-white/60 text-ink/50"
                   }`}
                 >

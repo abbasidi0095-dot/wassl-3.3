@@ -85,13 +85,13 @@ export default async function StorePage({
                     {openState.open ? "Open now" : openState.label} · {openState.detail}
                   </span>
                   {store.dataOrigin === "marocapis" ? (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-ink/35 px-3 py-1.5 text-[9px] font-extrabold uppercase tracking-wider text-white/90 backdrop-blur">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-ink/35 px-3 py-1.5 text-[9px] font-extrabold uppercase tracking-wider text-on-dark/90 backdrop-blur">
                       <BadgeCheck size={11} /> Verified listing
                     </span>
                   ) : null}
                 </div>
-                <div className="text-white">
-                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] font-extrabold uppercase tracking-[0.16em] text-white/60">
+                <div className="text-on-dark">
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] font-extrabold uppercase tracking-[0.16em] text-on-dark/60">
                     <span>{categoryLabel(store.category)}</span>
                     <span>·</span>
                     <span>{city.name}</span>
@@ -106,9 +106,9 @@ export default async function StorePage({
                     {store.name}
                   </h1>
                   {store.nameAr ? (
-                    <p className="arabic mt-1 text-sm text-white/65">{store.nameAr}</p>
+                    <p className="arabic mt-1 text-sm text-on-dark/65">{store.nameAr}</p>
                   ) : null}
-                  <p className="mt-2 max-w-xl text-[12px] leading-5 text-white/70">
+                  <p className="mt-2 max-w-xl text-[12px] leading-5 text-on-dark/70">
                     {store.tagline}
                   </p>
                 </div>

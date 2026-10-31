@@ -38,9 +38,12 @@ export function NativeShell() {
       const { StatusBar, Style } = statusPlugin;
       const { PushNotifications } = pushPlugin;
 
+      const dark = document.documentElement.classList.contains("dark");
       void SplashScreen.hide().catch(() => {});
-      void StatusBar.setStyle({ style: Style.Dark }).catch(() => {});
-      void StatusBar.setBackgroundColor({ color: "#f7f3eb" }).catch(() => {});
+      void StatusBar.setStyle({ style: dark ? Style.Light : Style.Dark }).catch(() => {});
+      void StatusBar.setBackgroundColor({ color: dark ? "#0b1211" : "#f7f3eb" }).catch(
+        () => {},
+      );
 
       const back = await App.addListener("backButton", ({ canGoBack }) => {
         if (canGoBack) window.history.back();
@@ -104,7 +107,7 @@ export function NativeShell() {
   return (
     <div
       role="status"
-      className="fixed inset-x-0 top-0 z-[100] flex items-center justify-center gap-2 bg-ink px-3 py-2 text-[11px] font-extrabold text-white"
+      className="fixed inset-x-0 top-0 z-[100] flex items-center justify-center gap-2 bg-ink px-3 py-2 text-[11px] font-extrabold text-on-dark"
     >
       <WifiOff size={13} className="text-saffron" />
       No connection — waiting for the network
