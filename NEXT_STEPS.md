@@ -89,4 +89,4 @@ RESTAURANT_DATA_SOURCE=locked   # or "live" if you want the live provider
 - [x] Provisioned 1GB persistent Fly Volume (`wassl_data`) mounted at `/data`
 - [x] Created `fly.toml` with HTTPS enforcement, health check probing, and single-machine placement
 - [x] Configured Resend email API key, Supabase keys, and production secrets via `fly secrets set`
-- [x] Deployed successfully to **https://wassl-ma.fly.dev**
+- [x] Deployed successfully to **https://wassl-34-preview.fly.dev**

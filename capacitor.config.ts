@@ -9,7 +9,7 @@ import type { CapacitorConfig } from "@capacitor/cli";
  *
  * Build:  npm run mobile:sync && npx cap open ios|android
  */
-const serverUrl = process.env.CAPACITOR_SERVER_URL || "https://wassl-ma.fly.dev";
+const serverUrl = process.env.CAPACITOR_SERVER_URL || "https://wassl-34-preview.fly.dev";
 
 const config: CapacitorConfig = {
   appId: "ma.wassl.app",

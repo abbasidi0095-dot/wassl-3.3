@@ -6,8 +6,8 @@
 	<string>development</string>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>applinks:wassl-ma.fly.dev</string>
-		<string>webcredentials:wassl-ma.fly.dev</string>
+		<string>applinks:wassl-34-preview.fly.dev</string>
+		<string>webcredentials:wassl-34-preview.fly.dev</string>
 	</array>
 </dict>
 </plist>

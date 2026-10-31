@@ -1,4 +1,4 @@
-app = "wassl-ma"
+app = "wassl-34-preview"
 primary_region = "cdg"
 kill_signal = "SIGINT"
 kill_timeout = 10
@@ -10,7 +10,7 @@ kill_timeout = 10
   PORT = "3000"
   HOSTNAME = "0.0.0.0"
   WASSL_DATA_DIR = "/data"
-  NEXT_PUBLIC_SITE_URL = "https://wassl-ma.fly.dev"
+  NEXT_PUBLIC_SITE_URL = "https://wassl-34-preview.fly.dev"
 
 [[mounts]]
   source = "wassl_data"
