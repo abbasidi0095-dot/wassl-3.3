@@ -26,7 +26,7 @@ This repository contains the **Wassl** delivery marketplace demo with Phase 2 ha
 - [ ] Persist OTP codes in Postgres/Redis before relying on the fallback in a multi-instance deployment
 
 ## 🔌 2. Plug in User-Provided Restaurant APIs
-- [x] Resend transactional email integration ready (set `RESEND_API_KEY` in the deployment secrets)
+- [x] Resend transactional email integration ready (set `RESEND key` in the deployment secrets)
 - [ ] In `src/lib/data-source/marocapis.ts`, replace the mock `normalise()` function with your real provider
 - [ ] Update `src/data/restaurants.locked.json` generation (`scripts/import-restaurants.mjs`) to call your API instead of/as well as MarocAPIs
 - [ ] Re-run `node --env-file=.env.local scripts/import-restaurants.mjs` to publish a new locked snapshot

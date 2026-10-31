@@ -1,14 +1,22 @@
-# Wassl · وصّل
+# Wassl · وصّل — v10.0.0
 
-**From the store to your door.** · **من المتجر إلى بابك.**
+**From the store to your door. From the curb to your destination.**
+**من المتجر إلى بابك، ومن الرصيف إلى وجهتك.**
 
-A web-first delivery marketplace for Morocco, built around the Southern corridor:
-**Dakhla, Laâyoune, Boujdour, Esmara and Tarfaya** first, with every Moroccan city in
-the directory.
+A web-first delivery and ride-hailing platform for Morocco, built around the
+Southern corridor: **Dakhla, Laâyoune, Boujdour, Esmara and Tarfaya** first, with
+every Moroccan city in the directory.
 
-One platform brand, four workspaces: **customer storefront**, **store dashboard**,
-**driver app** and **admin dispatch console**. Cash on delivery (COD) only.
-Live order tracking over SSE and MapLibre maps.
+One platform brand, five experiences: **customer storefront**, **Wassl Taxi**,
+**store dashboard**, **driver app** and **admin dispatch console**. Cash on
+delivery and cash fares only. Live order/ride tracking, a persistent activity
+dock, web push notifications, four languages (EN/FR/ES/AR) with RTL, and light
+and dark themes.
+
+- **Live:** <https://wassl-34-preview.fly.dev>
+- **Repository:** <https://github.com/abbasidi0095-dot/wassl-v10.0.0>
+- **Agent guide:** [AGENTS.md](AGENTS.md) — architecture, constraints and the
+  complete change history written for future agents.
 
 > This is a working demo environment with a production-ready persistence path. It
 > runs on a local JSON store by default and switches to Postgres (including
@@ -17,10 +25,73 @@ Live order tracking over SSE and MapLibre maps.
 
 ---
 
+---
+
+## Release history
+
+### 10.0.0 — 31 October 2026 — consolidated release
+- New public repository snapshot containing the full platform.
+- Customer delivery and **Wassl Taxi** in one app, with persistent live tracking,
+  web push notifications, in-app notification centre and cash settlement.
+- Four-language UI (English, French, Spanish, Arabic) with RTL layout.
+- Light/dark themes, Capacitor iOS/Android shells, Fly deployment and CI builds.
+- Operator credentials moved to `admin@wassl.ma` (see the deployment secrets
+  for the current password).
+
+### 3.5.1 — order activity & emoji cleanup
+- Orders page split into **Deliveries** and **Taxi rides** tabs with counts,
+  route/status/fare/driver history and a direct track/view link.
+- Removed every visible emoji: home order demo, empty checkout, empty city,
+  driver/tracking states and admin rating stars now use Lucide icons or
+  `ProductTile`. Verified no visible emoji on customer/staff pages.
+- Version bumps for Android (code 5) and iOS (build 5).
+
+### 3.5.0 — live activity + notifications
+- Persistent **ongoing tracker** for active orders and taxi rides: live progress,
+  amount, age, expandable multi-activity list, minimise-to-pill, auto-hide on the
+  tracking page or on completion; cart bar moves up while it is visible.
+- **Notification centre** with unread badge, persisted history, mark-all-read,
+  clear, test and enable-alerts actions.
+- **Web Push**: `public/sw.js`, VAPID keys, `/api/push/*`, subscriptions stored in
+  `Database.pushSubscriptions`, localized push on order creation/status changes
+  and taxi status changes.
+- Confetti on delivery/completion, shimmer progress, press feedback, live pulses.
+- Version 3.5.0 (Android code 4, iOS build 4).
+
+### 3.4.0 — Wassl Taxi + four languages
+- Ride-hailing vertical: customer request with map pickup/drop-off, haversine
+  distance and transparent fare, tracking timeline, driver queue and admin
+  operations table; cash added to the driver wallet.
+- SSR locale provider backed by the `wassl.locale` cookie; EN/FR/ES/AR
+  dictionaries; language switcher on customer/auth screens.
+- Arabic RTL: `dir=rtl`, Noto Kufi Arabic, corrected typography, logical
+  `ms/me/ps/pe/start/end` and `text-start/end` utilities across the app.
+- Version 3.4.0 (Android code 3, iOS build 3).
+
+### 3.3.0 — real dark mode + native shell
+- Runtime theme tokens, `html.dark` palette, dark bridges for cards/inputs/
+  status tones, FOUC guard, theme toggle in customer and staff headers,
+  `localStorage` persistence, PWA theme colour and native status-bar sync.
+- Capacitor iOS/Android shell: app ID `ma.wassl.app`, splash/icons, safe-area
+  layout, offline fallback, deep-link files, Android back handling, haptics,
+  push token registration, CI workflows.
+- Version 3.3.0 (Android code 2, iOS build 2).
+
+### 3.2.3 — admin, add-item and mobile fit
+- Admin store create/edit, driver approval/activation, accounts pending banner
+  and new `/api/admin/stores` + `/api/admin/drivers` endpoints.
+- Merchant **Add item** flow (`POST /api/products`, `createProduct`, audit log)
+  and responsive menu rows replacing the overflowing table.
+- Storefront upsell cards fit mobile, `.input` moved to `@layer components`, and
+  anchor styles moved to `@layer base` to fix Tailwind overrides.
+- HD store photography and the first mobile overflow pass.
+
+---
+
 ## Quick start
 
 ```bash
-cd wassl-2
+cd wassl-v10.0.0
 npm install
 npm run dev          # http://localhost:3000
 npm test             # Vitest unit + integration tests
@@ -422,7 +493,7 @@ This is a demo, deliberately scoped. Before a real pilot:
 
 ## Mobile apps (iOS + Android)
 
-Wassl 3.5.1 ships as a Capacitor native shell around the production Next.js app
+Wassl 10.0.0 ships as a Capacitor native shell around the production Next.js app
 (app ID `ma.wassl.app`). The native projects live in `android/` and `ios/`; the
 shell loads `https://wassl-34-preview.fly.dev` so auth, live orders, maps and dashboards
 stay identical to the web app. Native additions: splash/icons, safe-area layout,

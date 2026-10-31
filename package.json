@@ -1,6 +1,6 @@
 {
   "name": "wassl",
-  "version": "3.5.1",
+  "version": "10.0.0",
   "private": true,
   "description": "Wassl — hyperlocal delivery for Southern Morocco",
   "scripts": {
