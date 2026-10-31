@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
+  CarTaxiFront,
   ChevronDown,
   LayoutDashboard,
   MapPin,
@@ -17,7 +18,9 @@ import {
 import type { City } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Logo } from "./logo";
+import { LanguageSwitcher } from "./language-switcher";
 import { ThemeToggle } from "./theme-toggle";
+import { useI18n } from "./locale-provider";
 import { useCart } from "./cart-provider";
 
 type AccountInfo = {
@@ -45,6 +48,7 @@ export function SiteHeader({
   const router = useRouter();
   const pathname = usePathname();
   const { count } = useCart();
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [account, setAccount] = useState<AccountInfo | null | undefined>(undefined);
 
@@ -67,9 +71,10 @@ export function SiteHeader({
   const selected = currentCity?.slug || "dakhla";
 
   const nav = [
-    { href: currentCity ? `/city/${currentCity.slug}` : "/", label: "Discover" },
-    { href: "/orders", label: "My orders" },
-    { href: "/login?next=merchant", label: "For business" },
+    { href: currentCity ? `/city/${currentCity.slug}` : "/", label: t("Discover") },
+    { href: "/taxi", label: t("Taxi") },
+    { href: "/orders", label: t("My orders") },
+    { href: "/login?next=merchant", label: t("For business") },
   ];
 
   return (
@@ -97,7 +102,7 @@ export function SiteHeader({
             <label className="relative hidden sm:block">
               <MapPin
                 size={15}
-                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-teal"
+                className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-teal"
               />
               <select
                 value={selected}
@@ -105,17 +110,17 @@ export function SiteHeader({
                   router.push(`/city/${event.target.value}`);
                   setOpen(false);
                 }}
-                className="h-10 max-w-[185px] appearance-none rounded-xl border border-ink/10 bg-white/70 pl-8 pr-8 text-xs font-extrabold text-ink outline-none transition hover:bg-white focus:border-teal"
-                aria-label="Choose city"
+                className="h-10 max-w-[185px] appearance-none rounded-xl border border-ink/10 bg-white/70 ps-8 pe-8 text-xs font-extrabold text-ink outline-none transition hover:bg-white focus:border-teal"
+                aria-label={t("Choose city")}
               >
-                <optgroup label="Southern Morocco">
+                <optgroup label={t("Southern Morocco")}>
                   {southern.map((city) => (
                     <option key={city.slug} value={city.slug}>
                       {city.name} — {city.nameAr}
                     </option>
                   ))}
                 </optgroup>
-                <optgroup label="All Morocco">
+                <optgroup label={t("All Morocco")}>
                   {others.map((city) => (
                     <option key={city.slug} value={city.slug}>
                       {city.name}
@@ -125,20 +130,25 @@ export function SiteHeader({
               </select>
               <ChevronDown
                 size={14}
-                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-ink/40"
+                className="pointer-events-none absolute end-3 top-1/2 -translate-y-1/2 text-ink/40"
               />
             </label>
 
-            <ThemeToggle />
+            <div className="hidden md:block">
+              <LanguageSwitcher />
+            </div>
+            <div className="hidden sm:block">
+              <ThemeToggle />
+            </div>
 
             <Link
               href="/cart"
               className="relative grid h-10 w-10 place-items-center rounded-xl border border-ink/10 bg-white/70 text-ink transition hover:bg-white"
-              aria-label="Cart"
+              aria-label={t("Cart")}
             >
               <ShoppingBag size={18} />
               {count > 0 ? (
-                <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-coral px-1 text-[10px] font-extrabold text-on-dark">
+                <span className="absolute -end-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-coral px-1 text-[10px] font-extrabold text-on-dark">
                   {count}
                 </span>
               ) : null}
@@ -155,18 +165,18 @@ export function SiteHeader({
               )}
               {account
                 ? account.status === "pending"
-                  ? "Pending review"
+                  ? t("Pending review")
                   : account.role === "customer"
-                    ? "Account"
-                    : "Dashboard"
-                : "Sign in"}
+                    ? t("Account")
+                    : t("Dashboard")
+                : t("Sign in")}
             </Link>
 
             <button
               type="button"
               onClick={() => setOpen((value) => !value)}
               className="grid h-10 w-10 place-items-center rounded-xl border border-ink/10 bg-white/70 lg:hidden"
-              aria-label="Menu"
+              aria-label={t("Menu")}
             >
               {open ? <X size={19} /> : <Menu size={19} />}
             </button>
@@ -179,7 +189,7 @@ export function SiteHeader({
               <label className="relative mb-1 sm:hidden">
                 <MapPin
                   size={15}
-                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-teal"
+                  className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-teal"
                 />
                 <select
                   value={selected}
@@ -187,17 +197,17 @@ export function SiteHeader({
                     router.push(`/city/${event.target.value}`);
                     setOpen(false);
                   }}
-                  className="input appearance-none pl-9"
-                  aria-label="Choose city"
+                  className="input appearance-none ps-9"
+                  aria-label={t("Choose city")}
                 >
-                  <optgroup label="Southern Morocco">
+                  <optgroup label={t("Southern Morocco")}>
                     {southern.map((city) => (
                       <option key={city.slug} value={city.slug}>
                         {city.name} — {city.nameAr}
                       </option>
                     ))}
                   </optgroup>
-                  <optgroup label="All Morocco">
+                  <optgroup label={t("All Morocco")}>
                     {others.map((city) => (
                       <option key={city.slug} value={city.slug}>
                         {city.name}
@@ -206,28 +216,33 @@ export function SiteHeader({
                   </optgroup>
                 </select>
               </label>
+              <div className="mb-1 flex items-center gap-2 px-1">
+                <LanguageSwitcher />
+                <ThemeToggle />
+              </div>
               {[
-                { href: "/", label: "Home", icon: MapPin },
-                { href: "/orders", label: "My orders", icon: ReceiptText },
+                { href: "/", label: t("Home"), icon: MapPin },
+                { href: "/taxi", label: t("Taxi"), icon: CarTaxiFront },
+                { href: "/orders", label: t("My orders"), icon: ReceiptText },
                 ...(account
                   ? [
                       {
                         href: accountHref(account),
                         label:
                           account.status === "pending"
-                            ? "Pending review"
+                            ? t("Pending review")
                             : account.role === "customer"
-                              ? "My account"
-                              : "Dashboard",
+                              ? t("My account")
+                              : t("Dashboard"),
                         icon: UserRound,
                       },
                     ]
                   : [
-                      { href: "/login", label: "Sign in", icon: UserRound },
-                      { href: "/signup", label: "Create account", icon: UserRound },
+                      { href: "/login", label: t("Sign in"), icon: UserRound },
+                      { href: "/signup", label: t("Create account"), icon: UserRound },
                     ]),
-                { href: "/login?next=merchant", label: "Sell on Wassl", icon: Store },
-                { href: "/login?next=admin", label: "Admin", icon: LayoutDashboard },
+                { href: "/login?next=merchant", label: t("Sell on Wassl"), icon: Store },
+                { href: "/login?next=admin", label: t("Admin"), icon: LayoutDashboard },
               ].map((item) => (
                 <Link
                   key={item.href}
@@ -244,20 +259,20 @@ export function SiteHeader({
         ) : null}
       </header>
 
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-ink/10 bg-cream/95 px-2 pb-[max(6px,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] pt-1.5 backdrop-blur-xl md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-ink/10 bg-cream/95 px-2 pb-[max(6px,env(safe-area-inset-bottom))] ps-[max(0.5rem,env(safe-area-inset-left))] pe-[max(0.5rem,env(safe-area-inset-right))] pt-1.5 backdrop-blur-xl md:hidden">
         <div className="mx-auto flex max-w-md items-center justify-around">
           {[
-            { href: "/", label: "Home", icon: MapPin },
-            { href: currentCity ? `/city/${currentCity.slug}` : "/", label: "Stores", icon: Store },
-            { href: "/cart", label: "Cart", icon: ShoppingBag, badge: count },
-            { href: "/orders", label: "Orders", icon: ReceiptText },
+            { href: "/", label: t("Home"), icon: MapPin },
+            { href: currentCity ? `/city/${currentCity.slug}` : "/", label: t("Stores"), icon: Store },
+            { href: "/taxi", label: t("Taxi"), icon: CarTaxiFront },
+            { href: "/orders", label: t("Orders"), icon: ReceiptText },
             {
               href: account ? accountHref(account) : "/login",
               label: account
                 ? account.status === "pending"
-                  ? "Pending"
-                  : "Account"
-                : "Sign in",
+                  ? t("Pending")
+                  : t("Account")
+                : t("Sign in"),
               icon: UserRound,
             },
           ].map((item) => (
@@ -271,11 +286,6 @@ export function SiteHeader({
             >
               <item.icon size={18} />
               {item.label}
-              {item.badge ? (
-                <span className="absolute right-2 top-0 grid h-4 min-w-4 place-items-center rounded-full bg-coral px-1 text-[8px] text-on-dark">
-                  {item.badge}
-                </span>
-              ) : null}
             </Link>
           ))}
         </div>

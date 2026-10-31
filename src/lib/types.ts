@@ -230,7 +230,8 @@ export type AuditEntity =
   | "driver"
   | "city"
   | "settings"
-  | "auth";
+  | "auth"
+  | "taxi";
 
 export interface AuditEntry {
   id: string;
@@ -273,6 +274,39 @@ export interface DeviceToken {
   updatedAt: string;
 }
 
+export type TaxiStatus =
+  | "requested"
+  | "accepted"
+  | "arriving"
+  | "in_progress"
+  | "completed"
+  | "cancelled";
+
+export interface TaxiRide {
+  id: string;
+  customerId: string;
+  customerName: string;
+  customerPhone: string;
+  citySlug: string;
+  pickupLabel: string;
+  dropoffLabel: string;
+  pickupLat: number;
+  pickupLng: number;
+  dropoffLat: number;
+  dropoffLng: number;
+  distanceKm: number;
+  fare: number;
+  status: TaxiStatus;
+  driverId?: string;
+  driverName?: string;
+  driverPhone?: string;
+  vehicle?: string;
+  plate?: string;
+  createdAt: string;
+  updatedAt: string;
+  completedAt?: string;
+}
+
 export interface Database {
   users: User[];
   cities: City[];
@@ -285,6 +319,8 @@ export interface Database {
   settings: PlatformSettings;
   /** Native push tokens. Optional so older persisted databases still load. */
   devices?: DeviceToken[];
+  /** Ride-hailing records. Optional so older persisted databases still load. */
+  taxiRides?: TaxiRide[];
 }
 
 /**

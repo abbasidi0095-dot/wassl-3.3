@@ -269,7 +269,7 @@ export function SignupForm({
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              className="input pr-11"
+              className="input pe-11"
               placeholder="At least 8 characters"
               autoComplete="new-password"
               minLength={8}
@@ -278,7 +278,7 @@ export function SignupForm({
             <button
               type="button"
               onClick={() => setShowPassword((value) => !value)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-ink/35 hover:text-ink"
+              className="absolute end-3 top-1/2 -translate-y-1/2 text-ink/35 hover:text-ink"
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}

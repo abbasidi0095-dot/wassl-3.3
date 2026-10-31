@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { CartProvider } from "@/components/cart-provider";
+import { LocaleProvider } from "@/components/locale-provider";
 import { NativeShell } from "@/components/native-shell";
+import { dirFor } from "@/lib/i18n";
+import { getLocale } from "@/lib/i18n-server";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -45,11 +48,12 @@ export const viewport: Viewport = {
   themeColor: "#0f6e6e",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const locale = await getLocale();
   return (
-    <html lang="en">
+    <html lang={locale} dir={dirFor(locale)} suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -64,10 +68,12 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <CartProvider>
-          <NativeShell />
-          {children}
-        </CartProvider>
+        <LocaleProvider initialLocale={locale}>
+          <CartProvider>
+            <NativeShell />
+            {children}
+          </CartProvider>
+        </LocaleProvider>
       </body>
     </html>
   );

@@ -230,7 +230,7 @@ export function MerchantDashboard({
             className={`flex items-center gap-2 rounded-2xl border px-3 py-2 ${
               store.isOpen
                 ? "border-teal/20 bg-teal/8 text-teal"
-                : "border-red-200 bg-red-50 text-red-600"
+                : "border-eed-200 bg-red-50 text-red-600"
             }`}
           >
             <span className={`status-dot ${store.isOpen ? "live-dot" : ""}`} />
@@ -462,7 +462,7 @@ export function MerchantDashboard({
                             {product.available ? "Available" : "Sold out"}
                           </span>
                         </td>
-                        <td className="text-right">
+                        <td className="text-end">
                           <button
                             type="button"
                             onClick={() => toggleProduct(product)}
@@ -518,7 +518,7 @@ export function MerchantDashboard({
               ].map(([label, value]) => (
                 <div key={label} className="flex items-start justify-between gap-4 border-b border-ink/5 pb-2">
                   <span className="font-bold text-ink/38">{label}</span>
-                  <span className="text-right font-extrabold text-ink/70">{value}</span>
+                  <span className="text-end font-extrabold text-ink/70">{value}</span>
                 </div>
               ))}
             </div>
@@ -575,7 +575,7 @@ export function MerchantDashboard({
                 >
                   <span
                     className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition ${
-                      store.isOpen ? "left-6" : "left-1"
+                      store.isOpen ? "start-6" : "start-1"
                     }`}
                   />
                 </button>
@@ -809,7 +809,7 @@ function MerchantOrderCard({
             {timeAgo(order.createdAt)} · {order.customerName}
           </div>
         </div>
-        <div className="text-right">
+        <div className="text-end">
           <div className="text-lg font-extrabold">{money(order.total)}</div>
           <div className="text-[9px] font-extrabold uppercase tracking-wider text-teal">COD</div>
         </div>
@@ -893,7 +893,7 @@ function MerchantOrderCard({
       ) : null}
 
       {rejecting ? (
-        <div className="mt-3 rounded-xl border border-red-200 bg-red-50/60 p-3">
+        <div className="mt-3 rounded-xl border border-eed-200 bg-red-50/60 p-3">
           <div className="text-[10px] font-extrabold uppercase tracking-wide text-red-700">
             Why are you rejecting this order?
           </div>

@@ -134,12 +134,12 @@ export function OrdersList() {
         <div className="relative flex-1">
           <Search
             size={15}
-            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink/30"
+            className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-ink/30"
           />
           <input
             value={code}
             onChange={(event) => setCode(event.target.value)}
-            className="input h-10 border-0 bg-transparent pl-9 shadow-none focus:shadow-none"
+            className="input h-10 border-0 bg-transparent ps-9 shadow-none focus:shadow-none"
             placeholder="Enter order code, e.g. WSL-84F2A1"
           />
         </div>
@@ -196,7 +196,7 @@ export function OrdersList() {
                       <span>{timeAgo(order.createdAt)}</span>
                     </div>
                   </div>
-                  <div className="text-right">
+                  <div className="text-end">
                     <div className="text-base font-extrabold">{money(order.total)}</div>
                     <div className="mt-1 inline-flex items-center gap-1 text-[10px] font-extrabold text-teal">
                       Track{" "}

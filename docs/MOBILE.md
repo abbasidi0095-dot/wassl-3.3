@@ -1,13 +1,13 @@
 # Wassl mobile apps (iOS + Android)
 
-Wassl 3.3.0 ships as a **Capacitor native shell** around the production Next.js
+Wassl 3.4.0 ships as a **Capacitor native shell** around the production Next.js
 app. The web app stays the single source of truth: the native projects load
 `https://wassl-ma.fly.dev`, so auth cookies, live order events (SSE), MapLibre
 and the admin/merchant dashboards all behave exactly as on the web.
 
 - App ID / bundle ID: `ma.wassl.app`
 - Display name: **Wassl**
-- Version: `3.3.0` (`versionName` on Android, `MARKETING_VERSION` on iOS)
+- Version: `3.4.0` (`versionName` on Android, `MARKETING_VERSION` on iOS)
 - Native projects: `android/`, `ios/`
 - Bundled offline fallback: `mobile/www/offline.html`
 - Config: `capacitor.config.ts`

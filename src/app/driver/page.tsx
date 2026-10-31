@@ -21,6 +21,7 @@ export default async function DriverPage() {
         subtitle={`${board.driver.citySlug} · driver workspace`}
         links={[
           { href: "/driver", label: "My route" },
+          { href: "/driver/taxi", label: "Taxi rides" },
           { href: "/driver#cash", label: "Cash & earnings" },
         ]}
         accent="saffron"

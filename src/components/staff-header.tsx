@@ -34,7 +34,7 @@ export function StaffHeader({
       <div className="container-wassl flex h-[66px] items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Logo compact />
-          <div className="hidden border-l border-ink/10 pl-3 sm:block">
+          <div className="hidden border-s border-ink/10 ps-3 sm:block">
             <div className="text-[12px] font-extrabold leading-4">{title}</div>
             <div className="text-[9px] font-bold text-ink/35">{subtitle}</div>
           </div>
@@ -49,7 +49,7 @@ export function StaffHeader({
           >
             Customer site <ArrowUpRight size={12} />
           </Link>
-          <div className="hidden text-right sm:block">
+          <div className="hidden text-end sm:block">
             <div className="text-[11px] font-extrabold leading-4">{session.name}</div>
             <div className="text-[9px] text-ink/35">On shift</div>
           </div>

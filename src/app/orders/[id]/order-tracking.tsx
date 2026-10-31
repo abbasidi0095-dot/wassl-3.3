@@ -148,12 +148,12 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
           </div>
           <p className="mt-2 text-sm text-ink/45">
             {order.store?.name} · {timeAgo(order.createdAt)}
-            {refreshing ? <span className="ml-2 text-teal">updating…</span> : null}
+            {refreshing ? <span className="ms-2 text-teal">updating…</span> : null}
           </p>
         </div>
         <div className="flex gap-2">
           {!delivered && !cancelled ? (
-            <div className="rounded-2xl border border-teal/15 bg-teal/8 px-4 py-2.5 text-right">
+            <div className="rounded-2xl border border-teal/15 bg-teal/8 px-4 py-2.5 text-end">
               <div className="text-[9px] font-extrabold uppercase tracking-wider text-teal">
                 Estimated arrival
               </div>
@@ -265,7 +265,7 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
                       <div key={step.status} className="relative flex gap-3 pb-4 last:pb-0">
                         {index < STEPS.length - 1 ? (
                           <span
-                            className={`absolute left-[9px] top-5 h-full w-px ${
+                            className={`absolute start-[9px] top-5 h-full w-px ${
                               done ? "timeline-line" : "bg-ink/10"
                             }`}
                           />

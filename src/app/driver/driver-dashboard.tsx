@@ -409,7 +409,7 @@ export function DriverDashboard({
       </div>
 
       {driver.cashOnHand >= driver.cashLimit ? (
-        <div className="mt-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-[11px] font-bold text-red-700">
+        <div className="mt-3 rounded-2xl border border-eed-200 bg-red-50 px-4 py-3 text-[11px] font-bold text-red-700">
           You reached your cash limit. Hand over {money(driver.cashOnHand)} to dispatch before
           taking new COD orders.
         </div>
@@ -478,7 +478,7 @@ export function DriverDashboard({
                             {timeAgo(order.createdAt)} · {order.customerName}
                           </div>
                         </div>
-                        <div className="text-right">
+                        <div className="text-end">
                           <div className="text-base font-extrabold">{money(order.total)}</div>
                           <div className="text-[9px] font-extrabold uppercase tracking-wider text-teal">
                             collect cash

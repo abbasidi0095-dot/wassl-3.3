@@ -3,6 +3,9 @@ import { ArrowLeft } from "lucide-react";
 import { getCities } from "@/lib/db";
 import { Logo } from "@/components/logo";
 import { SignupForm } from "./signup-form";
+import { LanguageSwitcher } from "@/components/language-switcher";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { getTranslator } from "@/lib/i18n-server";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Create your account · Wassl" };
@@ -12,7 +15,11 @@ export default async function SignupPage({
 }: {
   searchParams: Promise<{ role?: string }>;
 }) {
-  const [{ role }, cities] = await Promise.all([searchParams, getCities()]);
+  const [{ role }, cities, { t }] = await Promise.all([
+    searchParams,
+    getCities(),
+    getTranslator(),
+  ]);
   const initialRole =
     role === "merchant" || role === "driver" || role === "customer"
       ? role
@@ -32,24 +39,22 @@ export default async function SignupPage({
           <Logo light />
         </div>
         <div className="relative max-w-lg">
-          <span className="pill pill-warm">Join Wassl</span>
+          <span className="pill pill-warm">{t("Join Wassl")}</span>
           <h1 className="display mt-6 text-6xl">
-            Order local.
+            {t("Order local.")}
             <br />
-            Deliver local.
+            {t("Deliver local.")}
             <br />
-            Grow local.
+            {t("Grow local.")}
           </h1>
           <p className="mt-5 max-w-md text-sm leading-6 text-on-dark/60">
-            Customers order in a minute. Store owners and drivers join a
-            vetted network — every partner account is reviewed by Wassl
-            operations before it goes live.
+            {t("Customers order in a minute. Store owners and drivers join a vetted network — every partner account is reviewed by Wassl operations before it goes live.")}
           </p>
           <div className="mt-8 grid grid-cols-3 gap-3">
             {[
-              ["209", "cities"],
-              ["COD", "cash on delivery"],
-              ["Local", "partner network"],
+              ["209", t("cities")],
+              ["COD", t("cash on delivery")],
+              ["Local", t("partner network")],
             ].map(([value, label]) => (
               <div key={label} className="rounded-2xl border border-white/10 bg-white/5 p-4">
                 <div className="text-2xl font-extrabold tracking-tight">{value}</div>
@@ -70,8 +75,13 @@ export default async function SignupPage({
           <div className="mb-8 flex items-center justify-between lg:hidden">
             <Logo />
             <Link href="/" className="inline-flex items-center gap-1 text-xs font-bold text-ink/55">
-              <ArrowLeft size={14} /> Storefront
+              <ArrowLeft size={14} className="rtl:-scale-x-100" /> {t("Storefront")}
             </Link>
+          </div>
+
+          <div className="mb-4 flex items-center justify-end gap-2">
+            <LanguageSwitcher />
+            <ThemeToggle />
           </div>
 
           <SignupForm
@@ -85,10 +95,10 @@ export default async function SignupPage({
 
           <div className="mt-6 flex items-center justify-between text-xs font-bold text-ink/45">
             <Link href="/" className="inline-flex items-center gap-1 hover:text-ink">
-              <ArrowLeft size={14} /> Back to storefront
+              <ArrowLeft size={14} className="rtl:-scale-x-100" /> {t("Back to storefront")}
             </Link>
             <Link href="/login" className="text-teal hover:text-teal-dark">
-              Already have an account?
+              {t("Already have an account?")}
             </Link>
           </div>
         </div>

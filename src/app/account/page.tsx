@@ -177,7 +177,7 @@ export default async function AccountPage() {
                             {order.code} · {timeAgo(order.createdAt)}
                           </span>
                         </span>
-                        <span className="text-right">
+                        <span className="text-end">
                           <span className="block text-sm font-extrabold">
                             {money(order.total)}
                           </span>

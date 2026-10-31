@@ -225,6 +225,8 @@ staff out.
   map pin picker, saved-address chips, promo codes
 - Live tracking: SSE updates, timeline, driver card, call/WhatsApp, ETA fallback
 - Receipt, cash status, order history, one-click reorder (with modifiers)
+- Wassl Taxi: map-based pickup/drop-off, distance and fare estimate, cash ride,
+  live status timeline, driver card and trip history
 
 ### Store owner
 - Live order board with sound toggle and automatic refresh
@@ -241,6 +243,8 @@ staff out.
 - Browser GPS sharing, plus a deterministic route simulator for demos
 - COD wallet with cash-on-hand vs cash limit, estimated delivery earnings
 - Delivery history
+- Taxi queue: accept nearby rides, on-my-way, start and complete trips, cash
+  added to the driver wallet
 
 ### Admin
 - Live operations map with store, driver and customer markers
@@ -251,6 +255,7 @@ staff out.
 - Platform settings: brand, tagline, support phone, commission, default fee,
   waitlist toggle
 - COD reconciliation summary and one-click demo reset
+- Taxi operations: active/completed rides, cash collected, route and status
 
 ### Platform
 - HMAC-signed, role-scoped session cookies
@@ -258,6 +263,8 @@ staff out.
 - SSE event bus with filters for order, store, city, driver and type
 - File-backed JSON persistence with atomic writes
 - PWA manifest, theme colour, installable icon, mobile bottom navigation
+- English, French, Spanish and Arabic UI with RTL layout and a persisted locale
+- Light and dark themes with native status-bar sync in the mobile shells
 - Arabic brand and city names, MAD pricing, `+212`, Africa/Casablanca assumptions
 
 ---
@@ -409,7 +416,7 @@ This is a demo, deliberately scoped. Before a real pilot:
 
 ## Mobile apps (iOS + Android)
 
-Wassl 3.3.0 ships as a Capacitor native shell around the production Next.js app
+Wassl 3.4.0 ships as a Capacitor native shell around the production Next.js app
 (app ID `ma.wassl.app`). The native projects live in `android/` and `ios/`; the
 shell loads `https://wassl-ma.fly.dev` so auth, live orders, maps and dashboards
 stay identical to the web app. Native additions: splash/icons, safe-area layout,

@@ -111,7 +111,7 @@ export default async function CityPage({
                 interactive={false}
                 className="h-full min-h-[330px]"
               />
-              <div className="absolute left-4 top-4 rounded-2xl border border-ink/10 bg-paper/95 px-4 py-3 shadow-xl backdrop-blur">
+              <div className="absolute start-4 top-4 rounded-2xl border border-ink/10 bg-paper/95 px-4 py-3 shadow-xl backdrop-blur">
                 <div className="text-[9px] font-extrabold uppercase tracking-[0.14em] text-teal">
                   Delivery map
                 </div>

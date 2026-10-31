@@ -16,18 +16,19 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { StoreBrowser } from "@/components/store-browser";
 import { MapView } from "@/components/map-view";
-import { getCities, getPriorityCities, getSettings, getStores } from "@/lib/db";
+import { getCities, getPriorityCities, getStores } from "@/lib/db";
+import { getTranslator } from "@/lib/i18n-server";
 import { money } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
+  const { t } = await getTranslator();
   const cities = await getCities();
   const priority = await getPriorityCities();
   const stores = await getStores();
   const dakhla = cities.find((city) => city.slug === "dakhla") || priority[0];
   const dakhlaStores = stores.filter((store) => store.citySlug === "dakhla");
-  const settings = await getSettings();
   const storeCount = new Map<string, number>();
   for (const store of stores) {
     storeCount.set(store.citySlug, (storeCount.get(store.citySlug) ?? 0) + 1);
@@ -41,33 +42,31 @@ export default async function HomePage() {
           <div className="animate-rise">
             <div className="inline-flex items-center gap-2 rounded-full border border-teal/15 bg-white/60 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.12em] text-teal">
               <span className="status-dot live-dot" />
-              Now live in Dakhla & Laayoune
+              {t("Now live in Dakhla & Laayoune")}
             </div>
             <h1 className="display mt-5 max-w-[620px] text-[52px] sm:text-[68px] lg:text-[78px]">
-              The South,
+              {t("The South,")}
               <br />
-              <span className="text-teal">delivered.</span>
+              <span className="text-teal">{t("delivered.")}</span>
             </h1>
             <p className="mt-5 max-w-lg text-[15px] leading-7 text-ink/55">
-              {settings.tagline} Local restaurants, groceries and pharmacy essentials
-              from Dakhla to Tarfaya. Pay cash on delivery and follow your driver
-              live, block by block.
+              {t("Local restaurants, groceries and pharmacy essentials from Dakhla to Tarfaya. Pay cash on delivery and follow your driver live, block by block.")}
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-3">
               <Link href={`/city/${dakhla.slug}`} className="btn btn-primary h-12 px-5">
-                Browse Dakhla stores
-                <ArrowRight size={17} />
+                {t("Browse {city} stores", { city: dakhla.name })}
+                <ArrowRight size={17} className="rtl:-scale-x-100" />
               </Link>
               <Link href="/cities" className="btn btn-ghost h-12 px-5">
                 <MapPin size={16} />
-                All Moroccan cities
+                {t("All Moroccan cities")}
               </Link>
             </div>
             <div className="mt-8 grid max-w-lg grid-cols-3 gap-3">
               {[
-                { value: `${priority.length}`, label: "priority cities" },
-                { value: `${stores.length}`, label: "local stores" },
-                { value: "COD", label: "cash on delivery" },
+                { value: `${priority.length}`, label: t("priority cities") },
+                { value: `${stores.length}`, label: t("local stores") },
+                { value: "COD", label: t("cash on delivery") },
               ].map((item) => (
                 <div key={item.label} className="rounded-2xl border border-ink/10 bg-white/50 p-4">
                   <div className="text-2xl font-extrabold tracking-[-0.06em]">{item.value}</div>
@@ -80,13 +79,13 @@ export default async function HomePage() {
           </div>
 
           <div className="animate-rise-delay relative">
-            <div className="absolute -left-3 -top-3 z-10 hidden rounded-2xl border border-ink/10 bg-paper/95 p-3 shadow-xl backdrop-blur sm:block">
+            <div className="absolute -start-3 -top-3 z-10 hidden rounded-2xl border border-ink/10 bg-paper/95 p-3 shadow-xl backdrop-blur sm:block">
               <div className="flex items-center gap-2">
                 <span className="grid h-9 w-9 place-items-center rounded-xl bg-teal text-on-dark">
                   <Bike size={17} />
                 </span>
                 <div>
-                  <div className="text-[11px] font-extrabold">Youssef is on the way</div>
+                  <div className="text-[11px] font-extrabold">{t("Driver on the way")}</div>
                   <div className="text-[9px] font-bold text-ink/40">8 min · Dakhla Grill</div>
                 </div>
               </div>
@@ -111,16 +110,16 @@ export default async function HomePage() {
                 className="rounded-[24px]"
               />
             </div>
-            <div className="absolute -bottom-4 right-3 z-10 max-w-[250px] rounded-2xl border border-ink/10 bg-paper/95 p-4 shadow-xl backdrop-blur">
+            <div className="absolute -bottom-4 end-3 z-10 max-w-[250px] rounded-2xl border border-ink/10 bg-paper/95 p-4 shadow-xl backdrop-blur">
               <div className="flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-wider text-teal">
                 <span className="status-dot live-dot" />
-                Live tracking
+                {t("Live tracking")}
               </div>
               <div className="mt-2 text-sm font-extrabold leading-5">
-                “Your order is 2 streets away.”
+                {t("Your order is 2 streets away.")}
               </div>
               <div className="mt-2 flex items-center gap-1 text-[10px] font-bold text-ink/40">
-                <Star size={11} className="fill-saffron text-saffron" /> 4.9 driver rating
+                <Star size={11} className="fill-saffron text-saffron" /> 4.9 {t("driver rating")}
               </div>
             </div>
           </div>
@@ -131,23 +130,23 @@ export default async function HomePage() {
             {[
               {
                 icon: Clock3,
-                title: "Fast, local delivery",
-                text: "25–45 minutes in the city centre. Scheduled slots for longer routes.",
+                title: t("Fast, local delivery"),
+                text: t("25–45 minutes in the city centre. Scheduled slots for longer routes."),
               },
               {
                 icon: ShieldCheck,
-                title: "Cash on delivery",
-                text: "Pay the driver in cash. No card, no surprise fees.",
+                title: t("Cash on delivery"),
+                text: t("Pay the driver in cash. No card, no surprise fees."),
               },
               {
                 icon: Truck,
-                title: "Live driver tracking",
-                text: "Watch your driver move on the map from pickup to your door.",
+                title: t("Live driver tracking"),
+                text: t("Watch your driver move on the map from pickup to your door."),
               },
               {
                 icon: Phone,
-                title: "Human support",
-                text: "WhatsApp or call us in Arabic, French or English.",
+                title: t("Human support"),
+                text: t("WhatsApp or call us in Arabic, French or English."),
               },
             ].map((item) => (
               <div key={item.title} className="card-flat p-4">
@@ -162,14 +161,13 @@ export default async function HomePage() {
         <section className="container-wassl mt-14 lg:mt-20" id="stores">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <div className="eyebrow">Open across the South</div>
+              <div className="eyebrow">{t("Open across the South")}</div>
               <h2 className="mt-2 text-4xl font-extrabold tracking-[-0.06em] lg:text-5xl">
-                Local favourites, <span className="text-teal">one tap away.</span>
+                {t("Local favourites,")} <span className="text-teal">{t("one tap away.")}</span>
               </h2>
             </div>
             <p className="max-w-sm text-sm leading-6 text-ink/45">
-              Restaurants, groceries, pharmacy and cafés. Every order is cash on
-              delivery and tracked live.
+              {t("Restaurants, groceries, pharmacy and cafés. Every order is cash on delivery and tracked live.")}
             </p>
           </div>
           <div className="mt-6">
@@ -188,21 +186,20 @@ export default async function HomePage() {
                 }}
               />
               <div className="relative">
-                <span className="pill pill-warm">Southern corridor</span>
+                <span className="pill pill-warm">{t("Southern corridor")}</span>
                 <h2 className="mt-4 text-3xl font-extrabold tracking-[-0.055em]">
-                  From the lagoon
+                  {t("From the lagoon")}
                   <br />
-                  to the Atlantic.
+                  {t("to the Atlantic.")}
                 </h2>
                 <p className="mt-3 text-sm leading-6 text-on-dark/55">
-                  Five priority cities, one local operating model. Each city gets
-                  its own stores, drivers, zones and delivery fees.
+                  {t("Five priority cities, one local operating model. Each city gets its own stores, drivers, zones and delivery fees.")}
                 </p>
                 <Link
                   href="/cities"
                   className="mt-6 inline-flex items-center gap-2 text-xs font-extrabold text-saffron"
                 >
-                  Explore all cities <ArrowRight size={14} />
+                  {t("Explore all cities")} <ArrowRight size={14} className="rtl:-scale-x-100" />
                 </Link>
               </div>
             </div>
@@ -226,9 +223,9 @@ export default async function HomePage() {
                       </span>
                     </div>
                     <div className="mt-5 flex items-center justify-between text-[10px] font-bold text-ink/40">
-                      <span>{count ? `${count} stores live` : "Coming soon"}</span>
+                      <span>{count ? t("{count} stores live", { count }) : t("Coming soon")}</span>
                       <span className="inline-flex items-center gap-1 text-teal">
-                        Open <ArrowRight size={11} className="transition group-hover:translate-x-0.5" />
+                        {t("Open")} <ArrowRight size={11} className="transition group-hover:translate-x-0.5 rtl:-scale-x-100" />
                       </span>
                     </div>
                   </Link>
@@ -241,20 +238,18 @@ export default async function HomePage() {
         <section className="container-wassl mt-16 lg:mt-24">
           <div className="card grid gap-8 overflow-hidden p-6 md:grid-cols-2 md:items-center md:p-10">
             <div>
-              <div className="eyebrow">For local businesses</div>
+              <div className="eyebrow">{t("For local businesses")}</div>
               <h2 className="mt-2 text-4xl font-extrabold tracking-[-0.06em]">
-                Your store. Your drivers. One dashboard.
+                {t("Your store. Your drivers. One dashboard.")}
               </h2>
               <p className="mt-4 max-w-lg text-sm leading-6 text-ink/55">
-                Join Wassl and get a live order board, menu controls, COD
-                reconciliation and a direct line to local drivers. No upfront
-                subscription for the pilot.
+                {t("Join Wassl and get a live order board, menu controls, COD reconciliation and a direct line to local drivers. No upfront subscription for the pilot.")}
               </p>
               <div className="mt-6 grid gap-2">
                 {[
-                  "Accept orders from a tablet or phone",
-                  "Set your own prep time, zones and fees",
-                  "Weekly settlement minus a transparent commission",
+                  t("Accept orders from a tablet or phone"),
+                  t("Set your own prep time, zones and fees"),
+                  t("Weekly settlement minus a transparent commission"),
                 ].map((item) => (
                   <div key={item} className="flex items-center gap-2 text-xs font-bold text-ink/60">
                     <CheckCircle2 size={15} className="text-teal" />
@@ -265,11 +260,11 @@ export default async function HomePage() {
               <div className="mt-7 flex flex-wrap gap-2">
                 <Link href="/login?next=merchant" className="btn btn-primary">
                   <StoreIcon size={16} />
-                  Open store dashboard
+                  {t("Open store dashboard")}
                 </Link>
                 <Link href="/login?next=driver" className="btn btn-ghost">
                   <Bike size={16} />
-                  Driver app
+                  {t("Driver app")}
                 </Link>
               </div>
             </div>
@@ -277,7 +272,7 @@ export default async function HomePage() {
               <div className="rounded-2xl bg-white p-4 shadow-lg">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-extrabold uppercase tracking-wider text-ink/35">
-                    New order · Dakhla Grill
+                    {t("New order · Dakhla Grill")}
                   </span>
                   <span className="pill pill-warm">COD</span>
                 </div>
@@ -289,18 +284,18 @@ export default async function HomePage() {
                   </div>
                 </div>
                 <div className="mt-4 flex items-center justify-between border-t border-ink/5 pt-3">
-                  <span className="text-[11px] font-bold text-ink/40">Collect from customer</span>
+                  <span className="text-[11px] font-bold text-ink/40">{t("Collect from customer")}</span>
                   <span className="text-lg font-extrabold">{money(114)}</span>
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-2">
-                  <span className="btn btn-primary btn-sm">Accept order</span>
-                  <span className="btn btn-ghost btn-sm">View details</span>
+                  <span className="btn btn-primary btn-sm">{t("Accept order")}</span>
+                  <span className="btn btn-ghost btn-sm">{t("View details")}</span>
                 </div>
               </div>
-              <div className="absolute -bottom-4 -right-3 rounded-2xl bg-teal p-3 text-on-dark shadow-xl">
+              <div className="absolute -bottom-4 -end-3 rounded-2xl bg-teal p-3 text-on-dark shadow-xl">
                 <div className="flex items-center gap-2 text-[10px] font-extrabold">
                   <Sparkles size={13} className="text-saffron" />
-                  Settled weekly
+                  {t("Settled weekly")}
                 </div>
               </div>
             </div>

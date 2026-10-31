@@ -21,6 +21,7 @@ import { MapView } from "@/components/map-view";
 import { ProductTile } from "@/components/product-icon";
 import { quotePromo, type PromoQuote } from "@/lib/promos";
 import { money } from "@/lib/utils";
+import { useI18n } from "@/components/locale-provider";
 
 type SavedAddress = {
   id: string;
@@ -46,6 +47,7 @@ export function CheckoutForm({
   lockEmail?: boolean;
 } = {}) {
   const router = useRouter();
+  const { t } = useI18n();
   const { items, ready, subtotal, deliveryFee, minOrder, storeName, clear } = useCart();
   const store = items[0];
   const [name, setName] = useState(initialName);
@@ -254,10 +256,10 @@ export function CheckoutForm({
     return (
       <div className="card mt-8 grid place-items-center px-6 py-14 text-center">
         <div className="text-4xl">🛒</div>
-        <h2 className="mt-3 text-2xl font-extrabold tracking-tight">Nothing to check out</h2>
-        <p className="mt-2 text-sm text-ink/45">Add a few items from a local store first.</p>
+        <h2 className="mt-3 text-2xl font-extrabold tracking-tight">{t("Nothing to check out")}</h2>
+        <p className="mt-2 text-sm text-ink/45">{t("Add a few items from a local store first.")}</p>
         <Link href="/city/dakhla" className="btn btn-primary mt-5">
-          Browse stores <ArrowRight size={14} />
+          {t("Browse stores")} <ArrowRight size={14} className="rtl:-scale-x-100" />
         </Link>
       </div>
     );
@@ -272,8 +274,8 @@ export function CheckoutForm({
               <MapPin size={15} />
             </span>
             <div>
-              <h2 className="text-sm font-extrabold">Where should we deliver?</h2>
-              <p className="text-[10px] font-bold text-ink/35">Tap the map to move the pin.</p>
+              <h2 className="text-sm font-extrabold">{t("Where should we deliver?")}</h2>
+              <p className="text-[10px] font-bold text-ink/35">{t("Tap the map to move the pin.")}</p>
             </div>
           </div>
           <div className="mt-4 overflow-hidden rounded-2xl">
@@ -288,7 +290,7 @@ export function CheckoutForm({
           <div className="mt-3 flex items-center gap-2 rounded-xl bg-cream px-3 py-2 text-[10px] font-bold text-ink/45">
             <MapPin size={13} className="text-teal" />
             Pin: {pin.lat.toFixed(5)}, {pin.lng.toFixed(5)}
-            <span className="ml-auto hidden sm:block">Tap anywhere on the map</span>
+            <span className="ms-auto hidden sm:block">{t("Tap anywhere on the map")}</span>
           </div>
         </section>
 
@@ -296,7 +298,7 @@ export function CheckoutForm({
           {savedAddresses.length ? (
             <div className="mb-4">
               <div className="text-[10px] font-extrabold uppercase tracking-wider text-ink/35">
-                Saved addresses
+                {t("Saved addresses")}
               </div>
               <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
                 {savedAddresses.map((entry) => (
@@ -307,7 +309,7 @@ export function CheckoutForm({
                     <button
                       type="button"
                       onClick={() => applySavedAddress(entry)}
-                      className="px-3 py-2 text-left transition hover:bg-teal/6"
+                      className="px-3 py-2 text-start transition hover:bg-teal/6"
                     >
                       <span className="block text-[10px] font-extrabold text-teal">
                         {entry.label}
@@ -320,7 +322,7 @@ export function CheckoutForm({
                       type="button"
                       onClick={() => removeSavedAddress(entry)}
                       aria-label={`Remove ${entry.label}`}
-                      className="grid w-8 place-items-center border-l border-ink/8 text-ink/30 hover:bg-red-50 hover:text-red-500"
+                      className="grid w-8 place-items-center border-s border-ink/8 text-ink/30 hover:bg-red-50 hover:text-red-500"
                     >
                       <X size={12} />
                     </button>
@@ -331,7 +333,7 @@ export function CheckoutForm({
           ) : null}
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="block">
-              <span className="label">Full name</span>
+              <span className="label">{t("Full name")}</span>
               <input
                 value={name}
                 onChange={(event) => setName(event.target.value)}
@@ -341,16 +343,16 @@ export function CheckoutForm({
               />
             </label>
             <label className="block">
-              <span className="label">Phone number</span>
+              <span className="label">{t("Phone number")}</span>
               <div className="relative">
                 <Phone
                   size={14}
-                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink/30"
+                  className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-ink/30"
                 />
                 <input
                   value={phone}
                   onChange={(event) => setPhone(event.target.value)}
-                  className="input pl-9"
+                  className="input ps-9"
                   placeholder="+212 6…"
                   inputMode="tel"
                   required
@@ -361,19 +363,19 @@ export function CheckoutForm({
               <span className="label">
                 Email{" "}
                 <span className="font-normal text-ink/35">
-                  {lockEmail ? "(your account email · order updates)" : "(optional · order updates)"}
+                  {lockEmail ? t("(your account email · order updates)") : t("(optional · order updates)")}
                 </span>
               </span>
               <div className="relative">
                 <Mail
                   size={14}
-                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink/30"
+                  className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-ink/30"
                 />
                 <input
                   type="email"
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
-                  className="input pl-9"
+                  className="input ps-9"
                   placeholder="you@example.com"
                   autoComplete="email"
                   readOnly={lockEmail}
@@ -381,7 +383,7 @@ export function CheckoutForm({
               </div>
             </label>
             <label className="block sm:col-span-2">
-              <span className="label">Address</span>
+              <span className="label">{t("Address")}</span>
               <input
                 value={address}
                 onChange={(event) => setAddress(event.target.value)}
@@ -391,7 +393,7 @@ export function CheckoutForm({
               />
             </label>
             <label className="block sm:col-span-2">
-              <span className="label">Landmark · repère</span>
+              <span className="label">{t("Landmark · repère")}</span>
               <input
                 value={landmark}
                 onChange={(event) => setLandmark(event.target.value)}
@@ -401,7 +403,7 @@ export function CheckoutForm({
               />
             </label>
             <label className="block sm:col-span-2">
-              <span className="label">Notes for the driver (optional)</span>
+              <span className="label">{t("Notes for the driver (optional)")}</span>
               <textarea
                 value={notes}
                 onChange={(event) => setNotes(event.target.value)}
@@ -415,25 +417,25 @@ export function CheckoutForm({
         <section className="card p-5">
           <div className="flex items-center gap-2">
             <Clock3 size={16} className="text-teal" />
-            <h2 className="text-sm font-extrabold">When?</h2>
+            <h2 className="text-sm font-extrabold">{t("When?")}</h2>
           </div>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
             <button
               type="button"
               onClick={() => setScheduled("")}
-              className={`rounded-2xl border p-3 text-left transition ${
+              className={`rounded-2xl border p-3 text-start transition ${
                 !scheduled ? "border-teal bg-teal/8" : "border-ink/10 bg-white/50"
               }`}
             >
-              <div className="text-xs font-extrabold">As soon as possible</div>
-              <div className="mt-0.5 text-[10px] text-ink/40">Usually 25–45 minutes</div>
+              <div className="text-xs font-extrabold">{t("As soon as possible")}</div>
+              <div className="mt-0.5 text-[10px] text-ink/40">{t("Usually 25–45 minutes")}</div>
             </button>
             <label
               className={`rounded-2xl border p-3 transition ${
                 scheduled ? "border-teal bg-teal/8" : "border-ink/10 bg-white/50"
               }`}
             >
-              <div className="text-xs font-extrabold">Schedule for later</div>
+              <div className="text-xs font-extrabold">{t("Schedule for later")}</div>
               <input
                 type="datetime-local"
                 value={scheduled}
@@ -447,13 +449,13 @@ export function CheckoutForm({
 
       <aside className="card p-5 lg:sticky lg:top-24">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-extrabold tracking-tight">Your order</h2>
+          <h2 className="text-lg font-extrabold tracking-tight">{t("Your order")}</h2>
           <Link href="/cart" className="inline-flex items-center gap-1 text-[10px] font-extrabold text-teal">
             <ArrowLeft size={12} /> Edit
           </Link>
         </div>
         <div className="mt-2 text-[11px] font-bold text-ink/40">{storeName}</div>
-        <div className="mt-4 max-h-56 space-y-2 overflow-y-auto pr-1">
+        <div className="mt-4 max-h-56 space-y-2 overflow-y-auto pe-1">
           {items.map((item) => (
             <div key={item.lineId} className="flex items-center gap-2 text-[11px]">
               <ProductTile name={item.name} className="h-7 w-7 rounded-lg" iconSize={14} />
@@ -490,7 +492,7 @@ export function CheckoutForm({
               <div className="relative flex-1">
                 <Tag
                   size={13}
-                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink/30"
+                  className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-ink/30"
                 />
                 <input
                   value={promoInput}
@@ -501,9 +503,9 @@ export function CheckoutForm({
                       applyPromo();
                     }
                   }}
-                  className="input h-10 pl-9 uppercase"
-                  placeholder="Promo code"
-                  aria-label="Promo code"
+                  className="input h-10 ps-9 uppercase"
+                  placeholder={t("Promo code")}
+                  aria-label={t("Promo code")}
                 />
               </div>
               <button type="button" onClick={applyPromo} className="btn btn-ghost btn-sm">
@@ -519,16 +521,16 @@ export function CheckoutForm({
         </div>
         <div className="mt-4 space-y-2 border-t border-ink/8 pt-4 text-[12px]">
           <div className="flex justify-between text-ink/50">
-            <span>Subtotal</span>
+            <span>{t("Subtotal")}</span>
             <span className="font-extrabold text-ink">{money(subtotal)}</span>
           </div>
           <div className="flex justify-between text-ink/50">
-            <span>Delivery</span>
+            <span>{t("Delivery")}</span>
             <span className="font-extrabold text-ink">
               {activePromo?.freeDelivery ? (
                 <>
-                  <s className="mr-1 text-ink/30">{money(deliveryFee)}</s>
-                  <span className="text-teal">Free</span>
+                  <s className="me-1 text-ink/30">{money(deliveryFee)}</s>
+                  <span className="text-teal">{t("Free")}</span>
                 </>
               ) : (
                 money(deliveryFee)
@@ -537,12 +539,12 @@ export function CheckoutForm({
           </div>
           {discount > 0 ? (
             <div className="flex justify-between text-teal">
-              <span>Promo {activePromo?.code}</span>
+              <span>{t("Promo {code}", { code: activePromo?.code || "" })}</span>
               <span className="font-extrabold">−{money(discount)}</span>
             </div>
           ) : null}
           <div className="flex justify-between pt-1 text-base font-extrabold">
-            <span>Total</span>
+            <span>{t("Total")}</span>
             <span>{money(total)}</span>
           </div>
         </div>
@@ -551,7 +553,7 @@ export function CheckoutForm({
           <Banknote size={18} className="shrink-0 text-teal" />
           <div>
             <div className="text-[10px] font-extrabold uppercase tracking-wider text-teal">
-              Cash on delivery
+              {t("Cash on delivery")}
             </div>
             <div className="mt-0.5 text-[10px] leading-4 text-ink/45">
               Pay {money(total)} to the driver.
@@ -566,7 +568,7 @@ export function CheckoutForm({
 
         {belowMinimum ? (
           <p className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-[11px] font-bold text-red-700">
-            This store has a {money(minOrder)} minimum order.
+            {t("This store has a {minimum} minimum order.", { minimum: money(minOrder) })}
           </p>
         ) : null}
         {error ? (
@@ -580,7 +582,7 @@ export function CheckoutForm({
           disabled={loading || belowMinimum}
           className="btn btn-primary mt-4 w-full disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {loading ? "Placing order…" : `Place COD order · ${money(total)}`}
+          {loading ? t("Placing order…") : t("Place COD order · {price}", { price: money(total) })}
           {!loading ? <CheckCircle2 size={15} /> : null}
         </button>
         <p className="mt-3 text-center text-[9px] font-bold text-ink/30">

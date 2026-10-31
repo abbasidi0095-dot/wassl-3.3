@@ -5,6 +5,7 @@ import { Check, Minus, Plus, X } from "lucide-react";
 import type { Product, SelectedModifier, Store } from "@/lib/types";
 import { money } from "@/lib/utils";
 import { tapFeedback } from "@/lib/haptics";
+import { useI18n } from "./locale-provider";
 import { useCart } from "./cart-provider";
 import { productVisual } from "./product-icon";
 
@@ -26,6 +27,7 @@ export function ProductSheet({
   onClose: () => void;
 }) {
   const { addItem } = useCart();
+  const { t } = useI18n();
   const [qty, setQty] = useState(1);
   const visual = productVisual(product.name, product.category);
   const ProductGlyph = visual.Icon;
@@ -150,8 +152,8 @@ export function ProductSheet({
           <button
             type="button"
             onClick={onClose}
-            className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-white/90 text-ink/60 shadow-sm hover:text-ink"
-            aria-label="Close"
+            className="absolute end-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-white/90 text-ink/60 shadow-sm hover:text-ink"
+            aria-label={t("Close")}
           >
             <X size={17} />
           </button>
@@ -186,8 +188,8 @@ export function ProductSheet({
                   <legend className="flex w-full items-baseline justify-between gap-2">
                     <span className="text-[13px] font-extrabold">{group.name}</span>
                     <span className="text-[9px] font-bold uppercase tracking-wide text-ink/35">
-                      {group.required ? "Required" : "Optional"}
-                      {group.max > 1 ? ` · up to ${group.max}` : ""}
+                      {group.required ? t("Required") : t("Optional")}
+                      {group.max > 1 ? ` · ${t("up to {max}", { max: group.max })}` : ""}
                     </span>
                   </legend>
                   <div className="mt-2 space-y-1.5">
@@ -201,7 +203,7 @@ export function ProductSheet({
                           type="button"
                           disabled={disabled}
                           onClick={() => toggle(group.id, option.id, group.max)}
-                          className={`flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition ${
+                          className={`flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-start transition ${
                             checked
                               ? "border-teal bg-teal/6"
                               : dimmed
@@ -219,11 +221,11 @@ export function ProductSheet({
                           <span className="flex-1 text-[12px] font-bold">
                             {option.name}
                             {option.soldOut ? (
-                              <span className="ml-2 text-[9px] uppercase text-red-500">sold out</span>
+                              <span className="ms-2 text-[9px] uppercase text-red-500">{t("Sold out")}</span>
                             ) : null}
                           </span>
                           <span className="text-[11px] font-extrabold text-ink/45">
-                            {option.priceDelta === 0 ? "Free" : `+${money(option.priceDelta)}`}
+                            {option.priceDelta === 0 ? t("Free") : `+${money(option.priceDelta)}`}
                           </span>
                         </button>
                       );
@@ -242,7 +244,7 @@ export function ProductSheet({
                 type="button"
                 onClick={() => setQty((value) => Math.max(1, value - 1))}
                 className="grid h-9 w-9 place-items-center rounded-lg hover:bg-cream"
-                aria-label="Decrease quantity"
+                aria-label={t("Decrease quantity")}
               >
                 <Minus size={15} />
               </button>
@@ -251,7 +253,7 @@ export function ProductSheet({
                 type="button"
                 onClick={() => setQty((value) => Math.min(20, value + 1))}
                 className="grid h-9 w-9 place-items-center rounded-lg hover:bg-cream"
-                aria-label="Increase quantity"
+                aria-label={t("Increase quantity")}
               >
                 <Plus size={15} />
               </button>
@@ -262,7 +264,7 @@ export function ProductSheet({
               disabled={incomplete}
               className="btn btn-primary flex-1 disabled:cursor-not-allowed disabled:opacity-45"
             >
-              Add to cart · {money(unitPrice * qty)}
+              {t("Add to cart · {price}", { price: money(unitPrice * qty) })}
             </button>
           </div>
           {incomplete ? (

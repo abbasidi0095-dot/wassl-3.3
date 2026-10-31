@@ -5,10 +5,12 @@ import { ArrowRight, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { useCart } from "@/components/cart-provider";
 import { ProductTile } from "@/components/product-icon";
 import { money } from "@/lib/utils";
+import { useI18n } from "@/components/locale-provider";
 
 export function CartView() {
   const { items, ready, subtotal, deliveryFee, minOrder, setQty, removeItem, clear, storeName, storeSlug } =
     useCart();
+  const { t } = useI18n();
 
   if (!ready) {
     return <div className="card mt-8 h-48 animate-pulse" />;
@@ -20,16 +22,16 @@ export function CartView() {
         <span className="grid h-16 w-16 place-items-center rounded-2xl bg-teal/10 text-teal">
           <ShoppingBag size={26} />
         </span>
-        <h2 className="mt-4 text-2xl font-extrabold tracking-tight">Your cart is empty</h2>
+        <h2 className="mt-4 text-2xl font-extrabold tracking-tight">{t("Your cart is empty")}</h2>
         <p className="mt-2 max-w-sm text-sm leading-6 text-ink/50">
-          Browse local stores in Dakhla or Laayoune and add something you love.
+          {t("Browse local stores in Dakhla or Laayoune and add something you love.")}
         </p>
         <div className="mt-5 flex flex-wrap justify-center gap-2">
           <Link href="/city/dakhla" className="btn btn-primary">
-            Browse Dakhla <ArrowRight size={14} />
+            {t("Browse {city}", { city: "Dakhla" })} <ArrowRight size={14} className="rtl:-scale-x-100" />
           </Link>
           <Link href="/cities" className="btn btn-ghost">
-            All cities
+            {t("All cities")}
           </Link>
         </div>
       </div>
@@ -47,14 +49,14 @@ export function CartView() {
         <div className="flex items-center justify-between border-b border-ink/8 px-5 py-4">
           <div>
             <div className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-ink/35">
-              Ordering from
+              {t("Ordering from")}
             </div>
             <Link href={`/store/${storeSlug}`} className="text-sm font-extrabold text-teal">
               {storeName}
             </Link>
           </div>
           <button type="button" onClick={clear} className="btn btn-ghost btn-sm">
-            <Trash2 size={13} /> Clear
+            <Trash2 size={13} /> {t("Clear")}
           </button>
         </div>
         <div className="divide-y divide-ink/6">
@@ -81,7 +83,7 @@ export function CartView() {
                   type="button"
                   onClick={() => setQty(item.lineId, item.qty - 1)}
                   className="grid h-7 w-7 place-items-center rounded-lg hover:bg-cream"
-                  aria-label="Decrease quantity"
+                  aria-label={t("Decrease quantity")}
                 >
                   <Minus size={13} />
                 </button>
@@ -90,19 +92,19 @@ export function CartView() {
                   type="button"
                   onClick={() => setQty(item.lineId, item.qty + 1)}
                   className="grid h-7 w-7 place-items-center rounded-lg hover:bg-cream"
-                  aria-label="Increase quantity"
+                  aria-label={t("Increase quantity")}
                 >
                   <Plus size={13} />
                 </button>
               </div>
-              <div className="w-20 text-right text-[13px] font-extrabold">
+              <div className="w-20 text-end text-[13px] font-extrabold">
                 {money(item.price * item.qty)}
               </div>
               <button
                 type="button"
                 onClick={() => removeItem(item.lineId)}
                 className="grid h-8 w-8 place-items-center rounded-lg text-ink/25 hover:bg-red-50 hover:text-red-500"
-                aria-label="Remove item"
+                aria-label={t("Remove item")}
               >
                 <Trash2 size={14} />
               </button>
@@ -114,40 +116,40 @@ export function CartView() {
             href={`/store/${storeSlug}`}
             className="inline-flex items-center gap-1 text-[11px] font-extrabold text-teal"
           >
-            <Plus size={13} /> Add more items
+            <Plus size={13} /> {t("Add more items")}
           </Link>
         </div>
       </div>
 
       <aside className="card p-5 lg:sticky lg:top-24">
-        <h2 className="text-lg font-extrabold tracking-tight">Order summary</h2>
+        <h2 className="text-lg font-extrabold tracking-tight">{t("Order summary")}</h2>
         <div className="mt-4 space-y-2 text-[12px]">
           <div className="flex justify-between text-ink/50">
-            <span>Subtotal</span>
+            <span>{t("Subtotal")}</span>
             <span className="font-extrabold text-ink">{money(subtotal)}</span>
           </div>
           <div className="flex justify-between text-ink/50">
-            <span>Delivery fee</span>
+            <span>{t("Delivery fee")}</span>
             <span className="font-extrabold text-ink">{money(fee)}</span>
           </div>
           <div className="flex justify-between border-t border-ink/8 pt-3 text-base font-extrabold">
-            <span>Total</span>
+            <span>{t("Total")}</span>
             <span>{money(total)}</span>
           </div>
         </div>
 
         <div className="mt-4 rounded-2xl bg-saffron/15 p-3">
           <div className="text-[10px] font-extrabold uppercase tracking-wider text-ink/55">
-            Cash on delivery
+            {t("Cash on delivery")}
           </div>
           <p className="mt-1 text-[11px] leading-5 text-ink/50">
-            Keep {money(total)} ready. The driver confirms the amount on delivery.
+            {t("Keep {amount} ready. The driver confirms the amount on delivery.", { amount: money(total) })}
           </p>
         </div>
 
         {belowMinimum ? (
           <p className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-[11px] font-bold text-red-700">
-            Add {money(minimum - subtotal)} more to meet the {money(minimum)} minimum.
+            {t("Add {amount} more to meet the {minimum} minimum.", { amount: money(minimum - subtotal), minimum: money(minimum) })}
           </p>
         ) : null}
 
@@ -156,10 +158,10 @@ export function CartView() {
           className={`btn mt-4 w-full ${belowMinimum ? "pointer-events-none opacity-40" : "btn-primary"}`}
           aria-disabled={belowMinimum}
         >
-          Continue to delivery <ArrowRight size={15} />
+          {t("Continue to delivery")} <ArrowRight size={15} className="rtl:-scale-x-100" />
         </Link>
         <p className="mt-3 text-center text-[9px] font-bold text-ink/30">
-          No account needed · Pay cash on arrival
+          {t("No account needed · Pay cash on arrival")}
         </p>
       </aside>
     </div>

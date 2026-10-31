@@ -129,6 +129,26 @@ button {
   font-family: var(--font-arabic);
 }
 
+html[lang="ar"] body {
+  font-family: var(--font-arabic), var(--font-sans);
+}
+
+html[lang="ar"] h1,
+html[lang="ar"] h2,
+html[lang="ar"] h3,
+html[lang="ar"] .display {
+  letter-spacing: 0;
+}
+
+html[lang="ar"] .display,
+html[lang="ar"] .display + * {
+  line-height: 1.22;
+}
+
+[dir="rtl"] .rtl-flip {
+  transform: scaleX(-1);
+}
+
 .container-wassl {
   width: min(1180px, calc(100% - 32px));
   margin-inline: auto;

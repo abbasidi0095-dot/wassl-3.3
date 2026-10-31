@@ -546,7 +546,7 @@ export function AdminConsole({
           >
             <Users size={14} /> Accounts
             {pendingUsers.length ? (
-              <span className="ml-1 grid h-5 min-w-5 place-items-center rounded-full bg-coral px-1 text-[9px] font-extrabold text-on-dark">
+              <span className="ms-1 grid h-5 min-w-5 place-items-center rounded-full bg-coral px-1 text-[9px] font-extrabold text-on-dark">
                 {pendingUsers.length}
               </span>
             ) : null}
@@ -859,7 +859,7 @@ export function AdminConsole({
                           {openState.detail}
                         </div>
                       </td>
-                      <td className="text-right">
+                      <td className="text-end">
                         <div className="flex justify-end gap-1">
                           <button
                             type="button"
@@ -984,13 +984,13 @@ export function AdminConsole({
               <div className="relative">
                 <Search
                   size={14}
-                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink/30"
+                  className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-ink/30"
                 />
                 <input
                   value={cityQuery}
                   onChange={(event) => setCityQuery(event.target.value)}
                   placeholder="Search cities…"
-                  className="input h-9 w-52 pl-8 text-xs"
+                  className="input h-9 w-52 ps-8 text-xs"
                 />
               </div>
               {[
@@ -1056,7 +1056,7 @@ export function AdminConsole({
                           {city.launchStatus}
                         </span>
                       </td>
-                      <td className="text-right">
+                      <td className="text-end">
                         <button
                           type="button"
                           onClick={() => toggleCity(city)}
@@ -1195,7 +1195,7 @@ export function AdminConsole({
               className={`mt-4 rounded-2xl border p-4 ${
                 dataSource.integrity.ok
                   ? "border-teal/20 bg-teal/5"
-                  : "border-red-200 bg-red-50"
+                  : "border-eed-200 bg-red-50"
               }`}
             >
               <div className="flex items-center gap-2 text-[11px] font-extrabold">
@@ -1388,7 +1388,7 @@ export function AdminConsole({
                 >
                   <span
                     className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition ${
-                      settings.cityWaitlistEnabled ? "left-6" : "left-1"
+                      settings.cityWaitlistEnabled ? "start-6" : "start-1"
                     }`}
                   />
                 </button>
@@ -1944,7 +1944,7 @@ function AdminOrderCard({
             {order.citySlug} · {timeAgo(order.createdAt)} · {order.customerName}
           </div>
         </div>
-        <div className="text-right">
+        <div className="text-end">
           <div className="text-base font-extrabold">{money(order.total)}</div>
           <div className="text-[9px] font-extrabold uppercase tracking-wider text-teal">COD</div>
         </div>
@@ -2019,7 +2019,7 @@ function AdminOrderCard({
             onChange={(event) => {
               if (event.target.value) onStatus(event.target.value as OrderStatus);
             }}
-            className="ml-auto h-8 rounded-lg border border-ink/10 bg-white px-2 text-[10px] font-bold text-ink/55"
+            className="ms-auto h-8 rounded-lg border border-ink/10 bg-white px-2 text-[10px] font-bold text-ink/55"
             aria-label="Next legal status"
           >
             <option value="">Next step…</option>
@@ -2031,7 +2031,7 @@ function AdminOrderCard({
             ))}
           </select>
         ) : (
-          <span className="ml-auto text-[9px] font-extrabold uppercase tracking-wider text-ink/30">
+          <span className="ms-auto text-[9px] font-extrabold uppercase tracking-wider text-ink/30">
             closed
           </span>
         )}

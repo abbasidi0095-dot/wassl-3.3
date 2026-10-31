@@ -7,6 +7,7 @@ import {
   runWithEventBatch,
 } from "./events";
 import { hashPassword, orderCode, randomId, verifyPassword } from "./security";
+import { estimateTaxiFare, haversineKm, TAXI_TRANSITIONS } from "./taxi";
 import {
   BOOTSTRAP_ADMIN_EMAIL,
   BOOTSTRAP_ADMIN_PASSWORD,
@@ -38,6 +39,8 @@ import type {
   Product,
   Role,
   Store,
+  TaxiRide,
+  TaxiStatus,
   User,
 } from "./types";
 import { STATUS_META } from "./types";
@@ -1739,6 +1742,171 @@ export async function registerDevice(input: RegisterDeviceInput): Promise<Device
     db.devices.push(device);
     if (db.devices.length > 5000) db.devices.splice(0, db.devices.length - 5000);
     return device;
+  });
+}
+
+export type CreateTaxiRideInput = {
+  citySlug: string;
+  pickupLabel: string;
+  dropoffLabel: string;
+  pickupLat: number;
+  pickupLng: number;
+  dropoffLat: number;
+  dropoffLng: number;
+};
+
+function assertCoordinate(lat: number, lng: number): void {
+  if (!Number.isFinite(lat) || lat < -90 || lat > 90) {
+    throw new Error("Pickup or drop-off location is invalid");
+  }
+  if (!Number.isFinite(lng) || lng < -180 || lng > 180) {
+    throw new Error("Pickup or drop-off location is invalid");
+  }
+}
+
+export async function createTaxiRide(
+  input: CreateTaxiRideInput,
+  actor: OrderActor,
+): Promise<TaxiRide> {
+  assertCoordinate(input.pickupLat, input.pickupLng);
+  assertCoordinate(input.dropoffLat, input.dropoffLng);
+  const distanceKm = haversineKm(
+    { lat: input.pickupLat, lng: input.pickupLng },
+    { lat: input.dropoffLat, lng: input.dropoffLng },
+  );
+  if (distanceKm < 0.15) throw new Error("Pickup and drop-off are too close");
+  if (distanceKm > 150) throw new Error("This trip is too long for Wassl Taxi");
+
+  return mutate((db) => {
+    const city = db.cities.find((candidate) => candidate.slug === input.citySlug);
+    if (!city) throw new Error("City not found");
+    if (!actor.id) throw new Error("Please sign in to request a ride");
+    const user = db.users.find((candidate) => candidate.id === actor.id);
+
+    const now = new Date().toISOString();
+    const ride: TaxiRide = {
+      id: `ride_${randomId("x", 6).slice(2)}`,
+      customerId: actor.id,
+      customerName: actor.name || user?.name || "Customer",
+      customerPhone: user?.phone || db.settings.supportPhone,
+      citySlug: city.slug,
+      pickupLabel: input.pickupLabel.trim() || "Pickup point",
+      dropoffLabel: input.dropoffLabel.trim() || "Destination",
+      pickupLat: input.pickupLat,
+      pickupLng: input.pickupLng,
+      dropoffLat: input.dropoffLat,
+      dropoffLng: input.dropoffLng,
+      distanceKm: Math.round(distanceKm * 100) / 100,
+      fare: estimateTaxiFare(distanceKm),
+      status: "requested",
+      createdAt: now,
+      updatedAt: now,
+    };
+    db.taxiRides ??= [];
+    db.taxiRides.push(ride);
+
+    recordAudit(db, {
+      actorRole: actor.role,
+      actorId: actor.id,
+      actorName: actor.name,
+      action: "taxi.request",
+      entity: "taxi",
+      entityId: ride.id,
+      summary: `${ride.pickupLabel} → ${ride.dropoffLabel} · ${ride.fare} MAD`,
+      after: ride.status,
+      metadata: { citySlug: city.slug, distanceKm: ride.distanceKm },
+    });
+    return ride;
+  });
+}
+
+export async function getTaxiRide(rideId: string): Promise<TaxiRide | undefined> {
+  return (await getDb()).taxiRides?.find((ride) => ride.id === rideId);
+}
+
+export async function getTaxiRides(filter?: {
+  customerId?: string;
+  driverId?: string;
+  citySlug?: string;
+  status?: TaxiStatus;
+  limit?: number;
+}): Promise<TaxiRide[]> {
+  const rides = (await getDb()).taxiRides ?? [];
+  const filtered = rides.filter(
+    (ride) =>
+      (!filter?.customerId || ride.customerId === filter.customerId) &&
+      (!filter?.driverId || ride.driverId === filter.driverId) &&
+      (!filter?.citySlug || ride.citySlug === filter.citySlug) &&
+      (!filter?.status || ride.status === filter.status),
+  );
+  filtered.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  return filter?.limit ? filtered.slice(0, filter.limit) : filtered;
+}
+
+export async function updateTaxiRideStatus(
+  rideId: string,
+  next: TaxiStatus,
+  actor: OrderActor,
+): Promise<TaxiRide> {
+  return mutate((db) => {
+    db.taxiRides ??= [];
+    const ride = db.taxiRides.find((candidate) => candidate.id === rideId);
+    if (!ride) throw new Error("Ride not found");
+    if (!TAXI_TRANSITIONS[ride.status].includes(next)) {
+      throw new Error(`A ${ride.status} ride cannot move to ${next}`);
+    }
+
+    if (actor.role === "driver") {
+      const driver = db.drivers.find((candidate) => candidate.id === actor.driverId);
+      if (!driver || !driver.active) throw new Error("Driver profile is not active");
+      if (ride.status === "requested" && next === "accepted") {
+        ride.driverId = driver.id;
+        ride.driverName = driver.name;
+        ride.driverPhone = driver.phone;
+        ride.vehicle = driver.vehicle;
+        ride.plate = driver.plate;
+        driver.status = "busy";
+      } else if (ride.driverId !== actor.driverId) {
+        throw new Error("This ride is assigned to another driver");
+      }
+    } else if (actor.role === "customer") {
+      if (ride.customerId !== actor.id) throw new Error("This is not your ride");
+      if (next !== "cancelled") throw new Error("Customers can only cancel a ride");
+    } else if (actor.role !== "admin") {
+      throw new Error("You do not have access to this action");
+    }
+
+    const before = ride.status;
+    ride.status = next;
+    ride.updatedAt = new Date().toISOString();
+    if (next === "completed") {
+      ride.completedAt = ride.updatedAt;
+      if (ride.driverId) {
+        const driver = db.drivers.find((candidate) => candidate.id === ride.driverId);
+        if (driver) {
+          driver.cashOnHand += ride.fare;
+          driver.status = "available";
+        }
+      }
+    }
+    if (next === "cancelled" && ride.driverId) {
+      const driver = db.drivers.find((candidate) => candidate.id === ride.driverId);
+      if (driver && driver.status === "busy") driver.status = "available";
+    }
+
+    recordAudit(db, {
+      actorRole: actor.role,
+      actorId: actor.id,
+      actorName: actor.name,
+      action: "taxi.status",
+      entity: "taxi",
+      entityId: ride.id,
+      summary: `${ride.pickupLabel} → ${ride.dropoffLabel}: ${before} → ${next}`,
+      before,
+      after: next,
+      metadata: { citySlug: ride.citySlug, fare: ride.fare },
+    });
+    return ride;
   });
 }
 

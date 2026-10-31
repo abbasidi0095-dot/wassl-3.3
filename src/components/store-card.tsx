@@ -46,7 +46,7 @@ export function StoreCard({ store }: { store: Store }) {
             )}
           </div>
           {store.dataOrigin === "marocapis" ? (
-            <span className="absolute bottom-3 left-3.5 z-10 inline-flex items-center gap-1 rounded-full bg-ink/45 px-2 py-0.5 text-[8px] font-extrabold uppercase tracking-wider text-on-dark/90 backdrop-blur">
+            <span className="absolute bottom-3 start-3.5 z-10 inline-flex items-center gap-1 rounded-full bg-ink/45 px-2 py-0.5 text-[8px] font-extrabold uppercase tracking-wider text-on-dark/90 backdrop-blur">
               <BadgeCheck size={9} /> Verified listing
             </span>
           ) : null}
