@@ -8,9 +8,9 @@ import type { Role } from "./types";
  * deployment always has a working operator login; change it before production.
  */
 export const BOOTSTRAP_ADMIN_EMAIL =
-  process.env.WASSL_ADMIN_EMAIL || "ops@wassl.ma";
+  process.env.WASSL_ADMIN_EMAIL || "admin@wassl.ma";
 export const BOOTSTRAP_ADMIN_PASSWORD =
-  process.env.WASSL_ADMIN_PASSWORD || "Wsl-Ops-7Kp9!2026";
+  process.env.WASSL_ADMIN_PASSWORD || "admin";
 
 /** Seeded demo staff. New self-service accounts never get these defaults. */
 export const DEMO_STORE_EMAIL = "store@wassl.ma";

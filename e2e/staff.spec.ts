@@ -12,8 +12,8 @@ const orderPayload = {
   items: [{ productId: "product_001", qty: 1 }],
 };
 
-const ADMIN_EMAIL = "ops@wassl.ma";
-const ADMIN_PASSWORD = "Wsl-Ops-7Kp9!2026";
+const ADMIN_EMAIL = "admin@wassl.ma";
+const ADMIN_PASSWORD = "admin";
 const STORE_EMAIL = "store@wassl.ma";
 const STORE_PASSWORD = "Wsl-Store-4Dkh!2026";
 const DRIVER_EMAIL = "driver@wassl.ma";

@@ -121,7 +121,7 @@ describe("OTP accounts", () => {
     await db.resetDatabase();
 
     const user = await db.upsertOtpUser({
-      email: "ops@wassl.ma",
+      email: "admin@wassl.ma",
       role: "merchant",
     });
 

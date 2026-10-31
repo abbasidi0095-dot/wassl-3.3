@@ -63,7 +63,7 @@ export default async function PendingPage() {
           </dl>
 
           <a
-            href="mailto:ops@wassl.ma?subject=Wassl%20account%20approval"
+            href="mailto:admin@wassl.ma?subject=Wassl%20account%20approval"
             className="btn btn-primary mt-6 w-full"
           >
             <Mail size={16} /> Contact operations

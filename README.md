@@ -55,14 +55,14 @@ Copy `.env.example` to `.env.local` for a documented template.
 | `WASSL_PG_CACHE_MS` | `0` | Read-cache TTL in milliseconds; `0` always reads the latest committed row |
 | `WASSL_DATA_DIR` | `./data` | Directory for the JSON database |
 | `PORT` | `3000` | Server port |
-| `WASSL_ADMIN_EMAIL` | `ops@wassl.ma` | Provisioned operations account, created on first login |
+| `WASSL_ADMIN_EMAIL` | `admin@wassl.ma` | Provisioned operations account, created on first login |
 | `WASSL_ADMIN_PASSWORD` | demo fallback | Rotates the operator password on the next sign-in |
 | `WASSL_DEMO_STORE_PASSWORD` | demo fallback | Password for the seeded store accounts |
 | `WASSL_DEMO_DRIVER_PASSWORD` | demo fallback | Password for the seeded driver accounts |
 | `WASSL_DEMO_CUSTOMER_PASSWORD` | demo fallback | Password for the seeded customer account |
 | `RESEND_API_KEY` | unset | Optional order-notification email (OTP fallback also uses it) |
 | `RESEND_FROM` | `Wassl <orders@wassl.ma>` | Verified Resend sender address |
-| `WASSL_ADMIN_EMAILS` | `ops@wassl.ma` | Extra addresses allowed to claim the admin role through the legacy OTP path |
+| `WASSL_ADMIN_EMAILS` | `admin@wassl.ma` | Extra addresses allowed to claim the admin role through the legacy OTP path |
 | `NEXT_PUBLIC_SUPABASE_URL` | provided project | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | provided key | Public Supabase key (safe in the browser) |
 | `SUPABASE_SERVICE_ROLE_KEY` | unset | Server-only key that lets the app mirror profiles into Supabase |
@@ -135,7 +135,7 @@ deployment defaults in `src/lib/auth-config.ts`.
 
 | Workspace | Email | Notes |
 |---|---|---|
-| Operations | `ops@wassl.ma` | Provisioned only — never self-service |
+| Operations | `admin@wassl.ma` | Provisioned only — never self-service |
 | Store owner | `store@wassl.ma` | Dakhla Grill, active |
 | Store owner | `sahara@wassl.ma` | Sahara Market, active |
 | Store owner | `laayoune@wassl.ma` | Laâyoune Burger, active |
