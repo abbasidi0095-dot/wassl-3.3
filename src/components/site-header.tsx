@@ -19,6 +19,7 @@ import type { City } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Logo } from "./logo";
 import { LanguageSwitcher } from "./language-switcher";
+import { NotificationBell } from "./notification-bell";
 import { ThemeToggle } from "./theme-toggle";
 import { useI18n } from "./locale-provider";
 import { useCart } from "./cart-provider";
@@ -140,6 +141,8 @@ export function SiteHeader({
             <div className="hidden sm:block">
               <ThemeToggle />
             </div>
+
+            <NotificationBell />
 
             <Link
               href="/cart"

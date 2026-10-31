@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getOrder, getOrderView, updateOrderStatus, type OrderView } from "@/lib/db";
 import { notifyOrderStatusChange } from "@/lib/email";
+import { notifyOrderPush } from "@/lib/push";
 import { isResponse, requireApiRole, actorFromSession } from "@/lib/api-auth";
 import { OrderRuleError } from "@/lib/order-machine";
 import type { OrderStatus } from "@/lib/types";
@@ -48,6 +49,7 @@ export async function POST(
       updated as unknown as OrderView,
       updated.customerEmail,
     );
+    void notifyOrderPush(updated);
     return NextResponse.json({ ok: true, order: updated });
   } catch (error) {
     if (error instanceof OrderRuleError) {

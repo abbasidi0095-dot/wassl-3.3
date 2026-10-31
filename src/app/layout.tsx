@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { CartProvider } from "@/components/cart-provider";
 import { LocaleProvider } from "@/components/locale-provider";
+import { LiveActivityProvider } from "@/components/live-activity-provider";
+import { OngoingTracker } from "@/components/ongoing-tracker";
 import { NativeShell } from "@/components/native-shell";
 import { dirFor } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
@@ -69,10 +71,13 @@ export default async function RootLayout({
       </head>
       <body>
         <LocaleProvider initialLocale={locale}>
-          <CartProvider>
-            <NativeShell />
-            {children}
-          </CartProvider>
+          <LiveActivityProvider>
+            <CartProvider>
+              <NativeShell />
+              {children}
+              <OngoingTracker />
+            </CartProvider>
+          </LiveActivityProvider>
         </LocaleProvider>
       </body>
     </html>

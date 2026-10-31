@@ -7,6 +7,7 @@ import {
   type OrderView,
 } from "@/lib/db";
 import { getSessionFromRequest } from "@/lib/auth";
+import { notifyOrderPush } from "@/lib/push";
 import { storePhoto } from "@/lib/store-images";
 
 export const runtime = "nodejs";
@@ -177,6 +178,7 @@ export async function POST(request: Request) {
       promoCode: body.promoCode?.trim() || undefined,
       items,
     });
+    void notifyOrderPush(order);
     return NextResponse.json(
       { ok: true, order: await getOrderView(order.id) },
       { status: 201 },

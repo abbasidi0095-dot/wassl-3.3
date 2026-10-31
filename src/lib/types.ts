@@ -307,6 +307,17 @@ export interface TaxiRide {
   completedAt?: string;
 }
 
+export interface PushSubscriptionRecord {
+  id: string;
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+  email?: string;
+  userId?: string;
+  locale?: string;
+  createdAt: string;
+}
+
 export interface Database {
   users: User[];
   cities: City[];
@@ -321,6 +332,8 @@ export interface Database {
   devices?: DeviceToken[];
   /** Ride-hailing records. Optional so older persisted databases still load. */
   taxiRides?: TaxiRide[];
+  /** Browser Web Push subscriptions. */
+  pushSubscriptions?: PushSubscriptionRecord[];
 }
 
 /**

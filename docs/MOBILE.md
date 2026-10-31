@@ -1,13 +1,13 @@
 # Wassl mobile apps (iOS + Android)
 
-Wassl 3.4.0 ships as a **Capacitor native shell** around the production Next.js
+Wassl 3.5.0 ships as a **Capacitor native shell** around the production Next.js
 app. The web app stays the single source of truth: the native projects load
 `https://wassl-ma.fly.dev`, so auth cookies, live order events (SSE), MapLibre
 and the admin/merchant dashboards all behave exactly as on the web.
 
 - App ID / bundle ID: `ma.wassl.app`
 - Display name: **Wassl**
-- Version: `3.4.0` (`versionName` on Android, `MARKETING_VERSION` on iOS)
+- Version: `3.5.0` (`versionName` on Android, `MARKETING_VERSION` on iOS)
 - Native projects: `android/`, `ios/`
 - Bundled offline fallback: `mobile/www/offline.html`
 - Config: `capacitor.config.ts`
@@ -114,6 +114,17 @@ Signing key). Deep links supported today:
 returns through history before minimising the app.
 
 ## Push notifications
+
+### Web Push (browser + installed PWA)
+- `public/sw.js` handles push + notification clicks.
+- `src/lib/push.ts` sends via VAPID; configure `VAPID_PUBLIC_KEY`,
+  `VAPID_PRIVATE_KEY` and `VAPID_SUBJECT` on the host.
+- Subscriptions are stored in `Database.pushSubscriptions` and matched by
+  customer email (orders) or user id (taxi rides).
+- iPhone/iPad: Web Push requires adding the PWA to the Home Screen on iOS 16.4+
+  and granting notifications; Safari tabs do not receive background push.
+
+### Native push
 
 The shell asks signed-in users once per install and registers the device token
 via `POST /api/devices`; tokens are stored in `Database.devices` (see

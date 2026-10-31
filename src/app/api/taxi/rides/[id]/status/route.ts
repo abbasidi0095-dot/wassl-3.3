@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { actorFromSession, isResponse, requireApiRole } from "@/lib/api-auth";
 import { updateTaxiRideStatus } from "@/lib/db";
+import { notifyTaxiPush } from "@/lib/push";
 import type { TaxiStatus } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -33,6 +34,7 @@ export async function POST(
       body.status as TaxiStatus,
       actorFromSession(session),
     );
+    void notifyTaxiPush(ride);
     return NextResponse.json({ ok: true, ride });
   } catch (error) {
     return NextResponse.json(

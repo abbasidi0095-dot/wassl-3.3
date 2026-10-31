@@ -37,6 +37,7 @@ import type {
   OrderStatus,
   PlatformSettings,
   Product,
+  PushSubscriptionRecord,
   Role,
   Store,
   TaxiRide,
@@ -1743,6 +1744,65 @@ export async function registerDevice(input: RegisterDeviceInput): Promise<Device
     if (db.devices.length > 5000) db.devices.splice(0, db.devices.length - 5000);
     return device;
   });
+}
+
+export async function savePushSubscription(input: {
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+  email?: string;
+  userId?: string;
+  locale?: string;
+}): Promise<PushSubscriptionRecord> {
+  return mutate((db) => {
+    db.pushSubscriptions ??= [];
+    const existing = db.pushSubscriptions.find(
+      (subscription) => subscription.endpoint === input.endpoint,
+    );
+    if (existing) {
+      existing.p256dh = input.p256dh;
+      existing.auth = input.auth;
+      if (input.email) existing.email = input.email;
+      if (input.userId) existing.userId = input.userId;
+      if (input.locale) existing.locale = input.locale;
+      return existing;
+    }
+    const subscription: PushSubscriptionRecord = {
+      id: randomId("push", 6),
+      endpoint: input.endpoint,
+      p256dh: input.p256dh,
+      auth: input.auth,
+      email: input.email,
+      userId: input.userId,
+      locale: input.locale,
+      createdAt: new Date().toISOString(),
+    };
+    db.pushSubscriptions.push(subscription);
+    if (db.pushSubscriptions.length > 2000) {
+      db.pushSubscriptions.splice(0, db.pushSubscriptions.length - 2000);
+    }
+    return subscription;
+  });
+}
+
+export async function removePushSubscription(endpoint: string): Promise<void> {
+  await mutate((db) => {
+    db.pushSubscriptions = (db.pushSubscriptions ?? []).filter(
+      (subscription) => subscription.endpoint !== endpoint,
+    );
+  });
+}
+
+export async function getPushSubscriptions(filter: {
+  email?: string;
+  userId?: string;
+}): Promise<PushSubscriptionRecord[]> {
+  const subscriptions = (await getDb()).pushSubscriptions ?? [];
+  return subscriptions.filter(
+    (subscription) =>
+      (filter.email && subscription.email === filter.email) ||
+      (filter.userId && subscription.userId === filter.userId),
+  );
 }
 
 export type CreateTaxiRideInput = {

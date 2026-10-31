@@ -227,6 +227,10 @@ staff out.
 - Receipt, cash status, order history, one-click reorder (with modifiers)
 - Wassl Taxi: map-based pickup/drop-off, distance and fare estimate, cash ride,
   live status timeline, driver card and trip history
+- Persistent live tracker dock for active orders and taxi rides (progress bar,
+  expandable list, minimise to a floating pill, auto-hides when complete)
+- Notification centre with unread badge, in-app history, browser Web Push and
+  one-tap test; confetti when an order or ride completes
 
 ### Store owner
 - Live order board with sound toggle and automatic refresh
@@ -263,6 +267,8 @@ staff out.
 - SSE event bus with filters for order, store, city, driver and type
 - File-backed JSON persistence with atomic writes
 - PWA manifest, theme colour, installable icon, mobile bottom navigation
+- Web Push (VAPID + service worker) for order and taxi status, plus in-app
+  notifications; native push tokens registered by the Capacitor shell
 - English, French, Spanish and Arabic UI with RTL layout and a persisted locale
 - Light and dark themes with native status-bar sync in the mobile shells
 - Arabic brand and city names, MAD pricing, `+212`, Africa/Casablanca assumptions
@@ -416,7 +422,7 @@ This is a demo, deliberately scoped. Before a real pilot:
 
 ## Mobile apps (iOS + Android)
 
-Wassl 3.4.0 ships as a Capacitor native shell around the production Next.js app
+Wassl 3.5.0 ships as a Capacitor native shell around the production Next.js app
 (app ID `ma.wassl.app`). The native projects live in `android/` and `ios/`; the
 shell loads `https://wassl-ma.fly.dev` so auth, live orders, maps and dashboards
 stay identical to the web app. Native additions: splash/icons, safe-area layout,

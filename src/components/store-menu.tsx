@@ -9,6 +9,7 @@ import { useCart } from "./cart-provider";
 import { ProductSheet } from "./product-sheet";
 import { ProductTile, productVisual } from "./product-icon";
 import { useI18n } from "./locale-provider";
+import { useLiveActivity } from "./live-activity-provider";
 
 export function StoreMenu({
   store,
@@ -26,6 +27,8 @@ export function StoreMenu({
   const [sheet, setSheet] = useState<Product | null>(null);
   const { addItem, count, items, storeId } = useCart();
   const { t } = useI18n();
+  const { activeOrders, activeRides } = useLiveActivity();
+  const hasOngoing = activeOrders.length + activeRides.length > 0;
 
   const visible = useMemo(() => {
     const term = query.trim().toLowerCase();
@@ -257,7 +260,13 @@ export function StoreMenu({
       ) : null}
 
       {cartFromStore && items.length ? (
-        <div className="fixed inset-x-3 bottom-[calc(78px+env(safe-area-inset-bottom))] z-30 md:hidden">
+        <div
+          className={`fixed inset-x-3 z-30 md:hidden ${
+            hasOngoing
+              ? "bottom-[calc(196px+env(safe-area-inset-bottom))]"
+              : "bottom-[calc(78px+env(safe-area-inset-bottom))]"
+          }`}
+        >
           <a
             href="/cart"
             className="flex items-center justify-between gap-3 rounded-2xl bg-ink px-4 py-3 text-on-dark shadow-2xl"
