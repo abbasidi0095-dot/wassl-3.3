@@ -295,7 +295,18 @@ export function LiveActivityProvider({ children }: { children: ReactNode }) {
       return false;
     }
     await navigator.serviceWorker.register("/sw.js");
-    const registration = await navigator.serviceWorker.ready;
+    const registration = await Promise.race([
+      navigator.serviceWorker.ready,
+      new Promise<null>((resolve) => window.setTimeout(() => resolve(null), 8000)),
+    ]);
+    if (!registration) {
+      setPushError(
+        t(
+          "The service worker did not start. Close and reopen the Home Screen app.",
+        ),
+      );
+      return false;
+    }
     if (!registration.pushManager) {
       setPushError(t("Notifications are not supported in this browser."));
       return false;
@@ -308,12 +319,25 @@ export function LiveActivityProvider({ children }: { children: ReactNode }) {
       return false;
     }
     const existing = await registration.pushManager.getSubscription();
-    const subscription =
-      existing ??
-      (await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(keyData.publicKey) as unknown as BufferSource,
-      }));
+    let subscription = existing;
+    if (!subscription) {
+      try {
+        subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(
+            keyData.publicKey,
+          ) as unknown as BufferSource,
+        });
+      } catch (error) {
+        setPushError(
+          t(
+            "iOS could not create the push subscription. Check Notification settings and try again.",
+          ),
+        );
+        console.error("[push] subscribe failed", error);
+        return false;
+      }
+    }
     const saved = await fetch("/api/push/subscribe", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -338,7 +362,10 @@ export function LiveActivityProvider({ children }: { children: ReactNode }) {
 
   const resetPushSubscription = useCallback(async (): Promise<boolean> => {
     if (!("serviceWorker" in navigator)) return false;
-    const registration = await navigator.serviceWorker.ready.catch(() => null);
+    const registration = await Promise.race([
+      navigator.serviceWorker.ready.catch(() => null),
+      new Promise<null>((resolve) => window.setTimeout(() => resolve(null), 8000)),
+    ]);
     if (!registration?.pushManager) return false;
     const existing = await registration.pushManager.getSubscription();
     if (existing) {
@@ -368,6 +395,11 @@ export function LiveActivityProvider({ children }: { children: ReactNode }) {
     // Always replace an old subscription when the user explicitly enables
     // alerts. This clears subscriptions made with a previous VAPID key.
     await resetPushSubscription().catch((error) => {
+      setPushError(
+        t(
+          "iOS could not create the push subscription. Check Notification settings and try again.",
+        ),
+      );
       console.error("[push] subscribe failed", error);
       return false;
     });
@@ -389,6 +421,11 @@ export function LiveActivityProvider({ children }: { children: ReactNode }) {
         Notification.permission === "granted";
       if (canNotify) {
         await subscribePush().catch((error) => {
+          setPushError(
+            t(
+              "iOS could not create the push subscription. Check Notification settings and try again.",
+            ),
+          );
           console.error("[push] test subscription failed", error);
           return false;
         });

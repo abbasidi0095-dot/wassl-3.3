@@ -29,6 +29,11 @@ and dark themes.
 
 ## Release history
 
+### 11.7.3 — 1 November 2026 — iOS push timeout diagnostics
+- Wait for an active service worker with an 8-second timeout.
+- Surface subscribe failures and service-worker startup failures instead of a
+  generic no-subscription message.
+
 ### 11.7.2 — 1 November 2026 — iOS push diagnostics
 - Removed the false-negative `window.PushManager` check and wait for the active
   service worker before subscribing.
