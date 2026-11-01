@@ -29,6 +29,12 @@ and dark themes.
 
 ## Release history
 
+### 11.0.3 — 1 November 2026 — iOS home-screen splash and update prompt
+- Splash replays when the home-screen app returns after a real pause.
+- Added startup images for newer iPhone sizes.
+- Added an in-app **update ready** prompt backed by the service worker.
+- PWA cache version and iOS launch assets refreshed.
+
 ### 11.0.2 — 1 November 2026 — splash on every launch
 - The Wassl splash now runs on **every full app launch or reload**, not once per
   browser session.
