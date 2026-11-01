@@ -82,14 +82,23 @@ async function signupMerchant(
   }
   const phoneBody = (await (await emailConfirm).json()) as {
     needsPhone?: boolean;
-    devPhoneCode?: string;
+    channels?: string[];
   };
   expect(phoneBody.needsPhone).toBe(true);
-  expect(phoneBody.devPhoneCode).toMatch(/^\d{6}$/);
+  expect(phoneBody.channels).toEqual(expect.arrayContaining(["sms", "whatsapp"]));
   await expect(page).toHaveURL(/\/verify-phone/, { timeout: 15_000 });
 
+  const phoneSend = page.waitForResponse(
+    (candidate) =>
+      candidate.url().includes("/api/auth/verify/phone/send") &&
+      candidate.request().method() === "POST",
+  );
+  await page.getByRole("button", { name: "Send code" }).click();
+  const codeBody = (await (await phoneSend).json()) as { devCode?: string };
+  expect(codeBody.devCode).toMatch(/^\d{6}$/);
+
   for (let index = 0; index < 6; index += 1) {
-    await page.getByLabel(`Digit ${index + 1}`).fill(phoneBody.devPhoneCode![index]);
+    await page.getByLabel(`Digit ${index + 1}`).fill(codeBody.devCode![index]);
   }
   await expect(page).toHaveURL(/\/pending/, { timeout: 15_000 });
 }
