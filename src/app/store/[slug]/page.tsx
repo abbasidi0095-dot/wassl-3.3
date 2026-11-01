@@ -10,7 +10,6 @@ import {
   Star,
 } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
-import { CityPreferenceSync } from "@/components/city-preference-sync";
 import { SiteFooter } from "@/components/site-footer";
 import { StoreMenu } from "@/components/store-menu";
 import { CartMini } from "@/components/cart-mini";
@@ -80,8 +79,7 @@ export default async function StorePage({
     );
     return (
       <>
-        <CityPreferenceSync slug={city.slug} />
-        <SiteHeader cities={cities} currentCity={city} />
+          <SiteHeader cities={cities} currentCity={city} />
         <main className="container-wassl py-6">
           <div className="mb-3 flex justify-end">
             <StartChatButton

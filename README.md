@@ -29,6 +29,10 @@ and dark themes.
 
 ## Release history
 
+### 11.6.4 — 1 November 2026 — keep the chosen city on store links
+- Opening a store from another city no longer changes the default city; only
+  the city switcher and city pages do.
+
 ### 11.6.3 — 1 November 2026 — account city becomes the default
 - The city chosen at signup is stored in `wassl.city` and used by the home feed,
   grocery, pharmacy, search, taxi and the app headers.
