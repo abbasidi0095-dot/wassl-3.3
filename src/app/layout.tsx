@@ -7,6 +7,7 @@ import { NativeShell } from "@/components/native-shell";
 import { BrandProvider } from "@/components/brand-provider";
 import { SplashIntro } from "@/components/splash-intro";
 import { PwaUpdater } from "@/components/pwa-updater";
+import { FloatingCart } from "@/components/floating-cart";
 import { dirFor } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n-server";
 import { getSettings } from "@/lib/db";
@@ -65,6 +66,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: "cover",
   colorScheme: "light dark",
+  maximumScale: 1,
+  userScalable: false,
   themeColor: "#153F37",
 };
 
@@ -89,7 +92,7 @@ export default async function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var s=localStorage.getItem("wassl.theme");var d=s?s==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;if(d)document.documentElement.classList.add("dark");var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;if(reduce){document.documentElement.classList.add("wassl-splash-skip");}else{document.documentElement.classList.add("wassl-splashing");}}catch(e){}})();`,
+            __html: `(function(){try{var s=localStorage.getItem("wassl.theme");var d=s?s==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;if(d)document.documentElement.classList.add("dark");var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;if(reduce){document.documentElement.classList.add("wassl-splash-skip");}else{document.documentElement.classList.add("wassl-splashing");}document.addEventListener("gesturestart",function(e){e.preventDefault();},{passive:false});document.addEventListener("gesturechange",function(e){e.preventDefault();},{passive:false});}catch(e){}})();`,
           }}
         />
         <link
@@ -126,6 +129,7 @@ export default async function RootLayout({
               <NativeShell />
               {children}
               <OngoingTracker />
+              <FloatingCart />
               <PwaUpdater />
             </CartProvider>
           </LiveActivityProvider>

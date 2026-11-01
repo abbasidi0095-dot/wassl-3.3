@@ -16,7 +16,7 @@ the architecture, hard constraints and the full change history.
 
 ## Snapshot
 
-- Release: **11.0.3** (1 November 2026; iOS PWA splash and update prompt)
+- Release: **11.0.4** (1 November 2026; floating cart and fixed chrome)
 - Live: <https://wassl.shop>
 - Stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4,
   MapLibre GL, Capacitor 8 (iOS/Android), JSON or Postgres document store.
@@ -90,6 +90,12 @@ persists; every mutation should add an audit entry via `recordAudit`.
    passwords live in the host environment.
 
 ## Change history (newest first)
+
+### 11.0.4 — floating cart and fixed chrome
+- `FloatingCart` shows across the customer app after a cart item exists.
+- Header is sticky at every breakpoint; six-tab dock remains fixed.
+- Viewport zoom locked and iOS gesture zoom prevented; maps keep their own gestures.
+- PWA update prompt retained.
 
 ### 11.0.3 — iOS PWA splash and update prompt
 - Splash replays on foreground resume after 3 seconds away.
