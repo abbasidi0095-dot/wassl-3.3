@@ -46,6 +46,7 @@ type LiveActivityValue = {
   notifications: WasslNotification[];
   unread: number;
   pushState: PushState;
+  pushError: string | null;
   markAllRead: () => void;
   clearNotifications: () => void;
   enablePush: () => Promise<void>;
@@ -82,6 +83,7 @@ export function LiveActivityProvider({ children }: { children: ReactNode }) {
   const [rides, setRides] = useState<TaxiRide[]>([]);
   const [notifications, setNotifications] = useState<WasslNotification[]>([]);
   const [pushState, setPushState] = useState<PushState>("default");
+  const [pushError, setPushError] = useState<string | null>(null);
   const snapshot = useRef<Record<string, string>>({});
   const seeded = useRef(false);
 
@@ -253,13 +255,55 @@ export function LiveActivityProvider({ children }: { children: ReactNode }) {
   }, [role]);
 
   const subscribePush = useCallback(async (): Promise<boolean> => {
-    if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+    const iosDevice = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const ios = iosDevice ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    const standalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      (navigator as Navigator & { standalone?: boolean }).standalone === true;
+    if (ios && !standalone) {
+      setPushError(
+        t(
+          "Open Wassl from the Home Screen icon. Safari tabs cannot receive iPhone notifications.",
+        ),
+      );
       return false;
     }
-    const registration = await navigator.serviceWorker.register("/sw.js");
+    if (iosDevice) {
+      const version = navigator.userAgent.match(/OS (\d+)_(\d+)/);
+      if (
+        version &&
+        (Number(version[1]) < 16 ||
+          (Number(version[1]) === 16 && Number(version[2]) < 4))
+      ) {
+        setPushError(t("iOS 16.4 or later is required for Home Screen notifications."));
+        return false;
+      }
+    }
+    if (!("Notification" in window)) {
+      setPushError(t("Notifications are not supported in this browser."));
+      return false;
+    }
+    if (Notification.permission !== "granted") {
+      setPushError(
+        t("Allow notifications in iPhone Settings → Notifications → Wassl."),
+      );
+      return false;
+    }
+    if (!("serviceWorker" in navigator)) {
+      setPushError(t("Notifications are not supported in this browser."));
+      return false;
+    }
+    await navigator.serviceWorker.register("/sw.js");
+    const registration = await navigator.serviceWorker.ready;
+    if (!registration.pushManager) {
+      setPushError(t("Notifications are not supported in this browser."));
+      return false;
+    }
     const keyResponse = await fetch("/api/push/public-key", { cache: "no-store" });
     const keyData = (await keyResponse.json()) as { publicKey?: string | null };
     if (!keyData.publicKey) {
+      setPushError(t("The server push key is missing."));
       console.error("[push] VAPID public key is not configured on the server");
       return false;
     }
@@ -279,17 +323,24 @@ export function LiveActivityProvider({ children }: { children: ReactNode }) {
       }),
     });
     if (!saved.ok) {
+      setPushError(
+        saved.status === 401
+          ? t("Sign in to enable notifications.")
+          : t("Could not save the push subscription. Try again."),
+      );
       console.error("[push] subscription could not be saved", saved.status);
       return false;
     }
+    setPushError(null);
     setPushState("subscribed");
     return true;
-  }, []);
+  }, [t]);
 
   const resetPushSubscription = useCallback(async (): Promise<boolean> => {
-    if (!("serviceWorker" in navigator) || !("PushManager" in window)) return false;
-    const registration = await navigator.serviceWorker.getRegistration();
-    const existing = await registration?.pushManager.getSubscription();
+    if (!("serviceWorker" in navigator)) return false;
+    const registration = await navigator.serviceWorker.ready.catch(() => null);
+    if (!registration?.pushManager) return false;
+    const existing = await registration.pushManager.getSubscription();
     if (existing) {
       await fetch("/api/push/subscribe", {
         method: "DELETE",
@@ -309,13 +360,18 @@ export function LiveActivityProvider({ children }: { children: ReactNode }) {
     const permission = await Notification.requestPermission();
     if (permission !== "granted") {
       setPushState(permission === "denied" ? "denied" : "default");
+      setPushError(
+        t("Allow notifications in iPhone Settings → Notifications → Wassl."),
+      );
       return;
     }
-    await subscribePush().catch((error) => {
+    // Always replace an old subscription when the user explicitly enables
+    // alerts. This clears subscriptions made with a previous VAPID key.
+    await resetPushSubscription().catch((error) => {
       console.error("[push] subscribe failed", error);
       return false;
     });
-  }, [subscribePush]);
+  }, [resetPushSubscription, t]);
 
   // If permission was already granted, silently attach this device.
   useEffect(() => {
@@ -344,6 +400,9 @@ export function LiveActivityProvider({ children }: { children: ReactNode }) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ delaySeconds }),
         });
+        if (response.status === 401) {
+          setPushError(t("Sign in to enable notifications."));
+        }
         const data = (await response.json().catch(() => ({}))) as {
           sent?: number;
         };
@@ -406,6 +465,7 @@ export function LiveActivityProvider({ children }: { children: ReactNode }) {
       notifications,
       unread: notifications.filter((item) => !item.read).length,
       pushState,
+      pushError,
       markAllRead,
       clearNotifications,
       enablePush,
@@ -416,6 +476,7 @@ export function LiveActivityProvider({ children }: { children: ReactNode }) {
     rides,
     notifications,
     pushState,
+    pushError,
     markAllRead,
     clearNotifications,
     enablePush,
