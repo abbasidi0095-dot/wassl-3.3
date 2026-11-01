@@ -168,3 +168,15 @@ export async function whatsappQr(): Promise<
   if (!qrCode) return { ok: false, error: "OpenWA did not return a QR code." };
   return { ok: true, status, qrCode };
 }
+
+export async function startWhatsAppSession(): Promise<
+  { ok: true; state: string } | { ok: false; error: string }
+> {
+  const result = await request("/start", { method: "POST" });
+  if (!result.ok) return { ok: false, error: result.error };
+  const state =
+    (typeof result.data?.status === "string" && result.data.status) ||
+    (typeof result.data?.state === "string" && result.data.state) ||
+    "unknown";
+  return { ok: true, state };
+}

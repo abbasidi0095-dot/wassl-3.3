@@ -4,6 +4,7 @@ import { requireRole } from "@/lib/auth";
 import { StaffHeader } from "@/components/staff-header";
 import {
   isWhatsAppConfigured,
+  startWhatsAppSession,
   whatsappQr,
   whatsappSessionStatus,
 } from "@/lib/whatsapp";
@@ -14,9 +15,31 @@ export const metadata = { title: "WhatsApp session · Wassl" };
 export default async function AdminWhatsAppPage() {
   const session = await requireRole("admin");
   const configured = isWhatsAppConfigured();
-  const status = configured ? await whatsappSessionStatus() : null;
-  const qr =
-    status?.ok && status.state === "qr_ready" ? await whatsappQr() : null;
+  let status = configured ? await whatsappSessionStatus() : null;
+
+  // Opening this page is the operator's explicit intent to link or re-link the
+  // dedicated number, so start a stopped session and fetch a fresh QR.
+  if (
+    status?.ok &&
+    ["created", "disconnected", "failed", "action_required"].includes(
+      status.state,
+    )
+  ) {
+    await startWhatsAppSession();
+    status = await whatsappSessionStatus();
+  }
+
+  let qr = null;
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    if (!status?.ok || status.state === "ready") break;
+    const candidate = await whatsappQr();
+    if (candidate.ok) {
+      qr = candidate;
+      break;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    status = await whatsappSessionStatus();
+  }
 
   return (
     <div className="staff-shell">
@@ -93,9 +116,8 @@ export default async function AdminWhatsAppPage() {
             </div>
           ) : (
             <div className="mt-5 rounded-[8px] border border-line bg-surface-2 p-4 text-[12px] leading-5 text-muted">
-              Session state: <strong>{status.state}</strong>
-              {qr && !qr.ok ? ` · ${qr.error}` : ""}. Start the session in OpenWA
-              and reload this page.
+              Session state: <strong>{status.state}</strong>. Reload this page in a
+              few seconds while the session starts.
             </div>
           )}
 
