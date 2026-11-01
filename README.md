@@ -29,6 +29,10 @@ and dark themes.
 
 ## Release history
 
+### 11.3.1 — 1 November 2026 — palette fallback polish
+- Aligned the dark-mode signal fallbacks with the new tangerine so themed
+  surfaces stay consistent before admin colours load.
+
 ### 11.3.0 — 1 November 2026 — cobalt and tangerine palette
 - New signature palette: **Wassl Blue `#2447E0`**, **Night Ink `#101A33`**,
   **Limestone `#F7F2E8`** and **Signal Tangerine `#FF8A3D`**.

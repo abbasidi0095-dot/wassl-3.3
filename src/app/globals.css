@@ -255,8 +255,8 @@ html.dark {
   --brand-deep: var(--brand-deep-custom-dark, #c2ccff);
   --brand-soft: var(--brand-soft-custom-dark, #131f3d);
   --brand-ink: var(--brand-ink-custom-dark, #07122e);
-  --signal: var(--signal-custom-dark, #e9ae55);
-  --signal-ink: var(--signal-ink-custom-dark, #f2c47c);
+  --signal: var(--signal-custom-dark, #ffb47d);
+  --signal-ink: var(--signal-ink-custom-dark, #ffc9a6);
   --signal-soft: var(--signal-soft-custom-dark, #2a2114);
   --danger: #f08a72;
   --danger-soft: #2d1712;
@@ -515,8 +515,8 @@ html[dir="rtl"] .tnum {
      the Tailwind bridge keeps `text-on-dark` cream here in dark mode, where the
      global token flips to near-black. */
   --color-on-dark: #fbf7ee;
-  --signal: var(--signal-on-dark, #e9ae55);
-  --signal-ink: var(--signal-on-dark, #f2c47c);
+  --signal: var(--signal-on-dark, #ffb47d);
+  --signal-ink: var(--signal-on-dark, #ffc9a6);
 }
 
 .field-ink .text-saffron {
@@ -534,8 +534,8 @@ html.dark .field-ink {
   color: #fbf7ee;
   border-color: var(--line);
   --on-ink: #fbf7ee;
-  --signal: var(--signal-on-dark, #e9ae55);
-  --signal-ink: var(--signal-on-dark, #f2c47c);
+  --signal: var(--signal-on-dark, #ffb47d);
+  --signal-ink: var(--signal-on-dark, #ffc9a6);
 }
 
 .panel-quiet {
