@@ -1297,6 +1297,30 @@ html.wassl-splash-skip .wassl-splash {
 .promo-ticker {
   overflow: hidden;
 }
+.promo-ticker::before,
+.promo-ticker::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  width: 26px;
+  pointer-events: none;
+}
+.promo-ticker::before {
+  inset-inline-start: 0;
+  background: linear-gradient(to right, var(--ink), transparent);
+}
+.promo-ticker::after {
+  inset-inline-end: 0;
+  background: linear-gradient(to left, var(--ink), transparent);
+}
+[dir="rtl"] .promo-ticker::before {
+  background: linear-gradient(to left, var(--ink), transparent);
+}
+[dir="rtl"] .promo-ticker::after {
+  background: linear-gradient(to right, var(--ink), transparent);
+}
 .promo-ticker__track {
   display: flex;
   width: max-content;

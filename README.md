@@ -29,6 +29,10 @@ and dark themes.
 
 ## Release history
 
+### 11.2.1 — 1 November 2026 — ticker edge fade
+- Softened the promo ticker edges so moving text fades instead of clipping hard.
+- Verified the ticker, launcher and pharmacy page in light, dark and Arabic RTL.
+
 ### 11.2.0 — 1 November 2026 — pharmacy, promo ticker and a focused launcher
 - Launcher services are now **Food to go**, **Grocery**, **Pharmacy** and
   **Taxi**. Express, Services and Business were removed from the customer
