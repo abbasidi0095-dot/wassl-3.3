@@ -37,7 +37,9 @@ and dark themes.
 - Added `PHONE_VERIFICATION_REQUIRED`, `OTP_SMS_ENABLED` and
   `OTP_WHATSAPP_ENABLED`; all default **off**.
 - With phone verification off, signup completes after email verification.
-- Added OpenWA registration check, idempotent sends and session probes.
+- Added OpenWA registration check, idempotent sends, session probes and an
+  admin QR page at `/admin/whatsapp`.
+- Added `OPENWA_*` settings and a staged master/channel flag set.
 - Full runbook: `docs/AUTH-OTP.md`.
 
 ### 11.5.0 — 1 November 2026 — email and SMS verification

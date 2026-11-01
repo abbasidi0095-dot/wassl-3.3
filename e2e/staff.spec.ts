@@ -103,6 +103,55 @@ async function signupMerchant(
   await expect(page).toHaveURL(/\/pending/, { timeout: 15_000 });
 }
 
+test("phone verification accepts the SMS channel too", async ({ request }) => {
+  const email = `sms-${Date.now()}@wassl.test`;
+  const signup = await request.post("/api/auth/signup", {
+    data: {
+      name: "SMS Tester",
+      email,
+      password: "Strong-Pass-1",
+      role: "customer",
+      phone: "0712345678",
+      citySlug: "dakhla",
+    },
+  });
+  const signupBody = (await signup.json()) as { devCode?: string };
+  expect(signupBody.devCode).toMatch(/^\d{6}$/);
+
+  const confirmed = await request.post("/api/auth/verify/confirm", {
+    data: { email, code: signupBody.devCode },
+  });
+  const confirmBody = (await confirmed.json()) as {
+    needsPhone?: boolean;
+    redirect?: string;
+  };
+  expect(confirmBody.needsPhone).toBe(true);
+  const ticket = new URL(
+    confirmBody.redirect || "",
+    "http://127.0.0.1",
+  ).searchParams.get("ticket");
+  expect(ticket).toBeTruthy();
+
+  const sent = await request.post("/api/auth/verify/phone/send", {
+    data: { email, ticket, channel: "sms" },
+  });
+  const sentBody = (await sent.json()) as {
+    devCode?: string;
+    channel?: string;
+  };
+  expect(sentBody.channel).toBe("sms");
+  expect(sentBody.devCode).toMatch(/^\d{6}$/);
+
+  const phone = await request.post("/api/auth/verify/phone/confirm", {
+    data: { email, code: sentBody.devCode, ticket },
+  });
+  expect(phone.ok()).toBeTruthy();
+  const session = await request.get("/api/session");
+  expect(((await session.json()) as { session?: { role: string } }).session?.role).toBe(
+    "customer",
+  );
+});
+
 test("refuses an illegal jump and records each legal transition", async ({ request }) => {
   await login(request, STORE_EMAIL, STORE_PASSWORD);
 

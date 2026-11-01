@@ -119,8 +119,10 @@ Wassl calls:
 - `GET /sessions/{id}/contacts/check/{number}` before sending;
 - `POST /sessions/{id}/messages/send-text` with an `Idempotency-Key`.
 
-The gateway must stay on loopback or a private network. Link the dedicated
-number by scanning the session QR, then confirm the session survives a restart.
+The gateway stays on loopback. Link the dedicated number from
+`https://wassl.shop/admin/whatsapp` while signed in as an admin: the page starts
+the session if needed and shows a fresh QR. OTP remains off until
+`OTP_WHATSAPP_ENABLED=1` is set. Confirm the session survives a restart.
 
 ## Local and e2e
 
