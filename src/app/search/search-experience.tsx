@@ -9,6 +9,7 @@ import {
   Grid2X2,
   Loader2,
   Package,
+  Plus,
   Search,
   Sparkles,
   Store as StoreIcon,
@@ -17,6 +18,8 @@ import {
 import type { City } from "@/lib/types";
 import type { ProductComparison, SearchGroup, SearchHit, SearchKind, SearchResult } from "@/lib/search";
 import { useI18n } from "@/components/locale-provider";
+import { useCart } from "@/components/cart-provider";
+import type { PersonalSearchItem, PersonalSearchResult } from "@/lib/personal-search";
 import { cn } from "@/lib/utils";
 
 const RECENT_KEY = "wassl_recent_searches";
@@ -58,6 +61,13 @@ export function SearchExperience({
   initialCity: string;
 }) {
   const { t } = useI18n();
+  const { addItem } = useCart();
+  const [personal, setPersonal] = useState<PersonalSearchResult>({
+    personalized: false,
+    recent: [],
+    frequent: [],
+  });
+  const [added, setAdded] = useState<string | null>(null);
   const [query, setQuery] = useState(initialQuery);
   const [citySlug, setCitySlug] = useState(initialCity);
   const [result, setResult] = useState<SearchResult | null>(null);
@@ -69,7 +79,46 @@ export function SearchExperience({
 
   useEffect(() => {
     setRecent(readRecent());
+    let active = true;
+    fetch("/api/search/personal", { cache: "no-store" })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data: PersonalSearchResult | null) => {
+        if (active && data) setPersonal(data);
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
   }, []);
+
+  function reorder(item: PersonalSearchItem) {
+    addItem(
+      {
+        productId: item.productId,
+        storeId: item.storeId,
+        storeSlug: item.storeSlug,
+        storeName: item.storeName,
+        storeCategory: item.storeCategory,
+        citySlug: item.citySlug,
+        storeLat: item.storeLat,
+        storeLng: item.storeLng,
+        deliveryFee: item.deliveryFee,
+        minOrder: item.minOrder,
+        name: item.name,
+        emoji: item.emoji,
+        image: item.image,
+        basePrice: item.basePrice,
+        price: item.price,
+        unit: item.unit,
+        stockMax: item.stockMax,
+        sku: item.barcode,
+        options: [],
+      },
+      1,
+    );
+    setAdded(item.productId);
+    window.setTimeout(() => setAdded(null), 1600);
+  }
 
   const remember = useCallback((value: string) => {
     const term = value.trim();
@@ -234,6 +283,29 @@ export function SearchExperience({
         </form>
       </div>
 
+      {showLanding && personal.personalized ? (
+        <div className="mt-6 space-y-5">
+          {personal.recent.length ? (
+            <PersonalRow
+              title={t("Buy again")}
+              items={personal.recent}
+              added={added}
+              onAdd={reorder}
+              t={t}
+            />
+          ) : null}
+          {personal.frequent.length ? (
+            <PersonalRow
+              title={t("Frequently bought")}
+              items={personal.frequent}
+              added={added}
+              onAdd={reorder}
+              t={t}
+            />
+          ) : null}
+        </div>
+      ) : null}
+
       {showLanding && recent.length ? (
         <section className="mt-6">
           <div className="flex items-center justify-between gap-3">
@@ -352,6 +424,63 @@ export function SearchExperience({
         </div>
       ) : null}
     </div>
+  );
+}
+
+function PersonalRow({
+  title,
+  items,
+  added,
+  onAdd,
+  t,
+}: {
+  title: string;
+  items: PersonalSearchItem[];
+  added: string | null;
+  onAdd: (item: PersonalSearchItem) => void;
+  t: (value: string) => string;
+}) {
+  return (
+    <section>
+      <h2 className="text-[13px] font-semibold">{title}</h2>
+      <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        {items.map((item) => (
+          <article
+            key={`${item.reason}-${item.storeId}-${item.productId}`}
+            className="flex items-center gap-3 rounded-[16px] border border-line bg-surface p-2.5"
+          >
+            <span className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-[10px] border border-line bg-surface-2">
+              {item.image ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={item.image} alt="" className="h-full w-full object-cover" />
+              ) : (
+                <Package size={17} className="text-muted" />
+              )}
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-[12px] font-semibold">
+                {item.name}
+              </span>
+              <span className="mt-0.5 block truncate text-[10px] text-muted">
+                {item.storeName} · {item.price} MAD
+              </span>
+            </span>
+            <button
+              type="button"
+              onClick={() => onAdd(item)}
+              className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-ink text-paper transition-colors hover:bg-brand"
+              aria-label={`${t("Add")} ${item.name}`}
+            >
+              {added === item.productId ? (
+                <span className="text-[9px] font-bold">✓</span>
+              ) : (
+                <Plus size={14} />
+              )}
+            </button>
+          </article>
+        ))}
+      </div>
+    </section>
   );
 }
 

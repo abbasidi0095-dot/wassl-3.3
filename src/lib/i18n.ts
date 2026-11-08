@@ -894,6 +894,8 @@ const fr: Record<string, string> = {
   "Local favourites, delivered across the South.": "Les favoris du Sud, livrés chez vous.",
   "Cash on delivery · prices in MAD": "Paiement à la livraison · prix en MAD",
   "Order now": "Commander",
+  "Buy again": "Acheter à nouveau",
+  "Frequently bought": "Achetés souvent",
 
   "Compare nearby stores": "Comparer les magasins à proximité",
   "The same item across nearby stores. Prices and stock are live.": "Le même article dans les magasins proches. Prix et stock en direct.",
@@ -1771,6 +1773,8 @@ const es: Record<string, string> = {
   "Local favourites, delivered across the South.": "Los favoritos del Sur, a tu puerta.",
   "Cash on delivery · prices in MAD": "Pago contra reembolso · precios en MAD",
   "Order now": "Pedir ahora",
+  "Buy again": "Comprar de nuevo",
+  "Frequently bought": "Comprados con frecuencia",
 
   "Compare nearby stores": "Comparar tiendas cercanas",
   "The same item across nearby stores. Prices and stock are live.": "El mismo artículo en tiendas cercanas. Precios y stock en directo.",
@@ -2645,6 +2649,8 @@ const ar: Record<string, string> = {
   "Local favourites, delivered across the South.": "مفضلات الجنوب تصل إلى بابك.",
   "Cash on delivery · prices in MAD": "الدفع عند الاستلام · الأسعار بالدرهم",
   "Order now": "اطلب الآن",
+  "Buy again": "اشترِ مرة أخرى",
+  "Frequently bought": "الأكثر شراءً",
 
   "Compare nearby stores": "مقارنة المتاجر القريبة",
   "The same item across nearby stores. Prices and stock are live.": "نفس المنتج في المتاجر القريبة. الأسعار والمخزون مباشرة.",
