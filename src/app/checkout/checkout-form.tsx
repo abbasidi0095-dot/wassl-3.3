@@ -182,9 +182,10 @@ export function CheckoutForm({
     const handle = window.setTimeout(async () => {
       setGeocoding(true);
       try {
-        const response = await fetch(`/api/geocode?q=${encodeURIComponent(term)}`, {
-          cache: "force-cache",
-        });
+        const response = await fetch(
+          `/api/geocode?q=${encodeURIComponent(term)}&city=${encodeURIComponent(store?.citySlug ?? "")}`,
+          { cache: "force-cache" },
+        );
         const data = (await response.json()) as { suggestions?: AddressSuggestion[] };
         if (active) setSuggestions(data.suggestions ?? []);
       } catch {

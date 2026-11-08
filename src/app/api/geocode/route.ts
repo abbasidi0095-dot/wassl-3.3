@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getCity } from "@/lib/db";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -11,16 +12,27 @@ type NominatimResult = {
 };
 
 export async function GET(request: Request) {
-  const query = (new URL(request.url).searchParams.get("q") || "").trim().slice(0, 120);
+  const params = new URL(request.url).searchParams;
+  const query = (params.get("q") || "").trim().slice(0, 120);
+  const citySlug = (params.get("city") || "").slice(0, 60);
   if (query.length < 3) return NextResponse.json({ suggestions: [] });
+  const city = citySlug ? await getCity(citySlug) : undefined;
+  if (!city) return NextResponse.json({ suggestions: [] });
 
   const url = new URL("https://nominatim.openstreetmap.org/search");
   url.search = new URLSearchParams({
     format: "jsonv2",
-    q: query,
+    q: `${query}, ${city.name}`,
     countrycodes: "ma",
     limit: "6",
     addressdetails: "1",
+    bounded: "1",
+    viewbox: [
+      city.lng - 0.45,
+      city.lat + 0.35,
+      city.lng + 0.45,
+      city.lat - 0.35,
+    ].join(","),
     "accept-language": "ar,fr,en",
   }).toString();
 
