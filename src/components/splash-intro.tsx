@@ -11,7 +11,6 @@ export function SplashIntro() {
   const [visible, setVisible] = useState(true);
   const [leaving, setLeaving] = useState(false);
   const timers = useRef<number[]>([]);
-  const hiddenAt = useRef<number | null>(null);
 
   const clearTimers = useCallback(() => {
     timers.current.forEach((timer) => window.clearTimeout(timer));
@@ -19,6 +18,7 @@ export function SplashIntro() {
   }, []);
 
   const start = useCallback(() => {
+    (window as unknown as { __wasslSplashFresh?: boolean }).__wasslSplashFresh = false;
     clearTimers();
     setLeaving(false);
     setVisible(true);
@@ -34,26 +34,19 @@ export function SplashIntro() {
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) {
+    // The launch flag is set by the inline script in the document head. It is true
+    // only for the first page load of a session, so the splash plays once per
+    // session instead of on every app open or reload.
+    const freshLaunch =
+      (window as unknown as { __wasslSplashFresh?: boolean }).__wasslSplashFresh === true;
+    if (reduce || !freshLaunch) {
       setVisible(false);
+      document.documentElement.classList.add("wassl-splash-skip");
       document.documentElement.classList.remove("wassl-splashing");
       return;
     }
     start();
-
-    function onVisibility() {
-      if (document.visibilityState === "hidden") {
-        hiddenAt.current = Date.now();
-        return;
-      }
-      const awayFor = hiddenAt.current ? Date.now() - hiddenAt.current : 0;
-      hiddenAt.current = null;
-      // Reopening the home-screen app after a real pause behaves like a launch.
-      if (awayFor > 3000) start();
-    }
-    document.addEventListener("visibilitychange", onVisibility);
     return () => {
-      document.removeEventListener("visibilitychange", onVisibility);
       clearTimers();
       document.documentElement.classList.remove("wassl-splashing");
     };

@@ -89,7 +89,7 @@ export default async function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var s=localStorage.getItem("wassl.theme");var d=s?s==="dark":${defaultDark};if(d)document.documentElement.classList.add("dark");var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;if(reduce){document.documentElement.classList.add("wassl-splash-skip");}else{document.documentElement.classList.add("wassl-splashing");}document.addEventListener("gesturestart",function(e){e.preventDefault();},{passive:false});document.addEventListener("gesturechange",function(e){e.preventDefault();},{passive:false});}catch(e){}})();`,
+            __html: `(function(){try{var s=localStorage.getItem("wassl.theme");var d=s?s==="dark":${defaultDark};if(d)document.documentElement.classList.add("dark");var seen=false;try{seen=sessionStorage.getItem("wassl.splash.seen")==="1";if(!seen)sessionStorage.setItem("wassl.splash.seen","1");}catch(e){}window.__wasslSplashFresh=!seen;var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;if(reduce||seen){document.documentElement.classList.add("wassl-splash-skip");}else{document.documentElement.classList.add("wassl-splashing");}document.addEventListener("gesturestart",function(e){e.preventDefault();},{passive:false});document.addEventListener("gesturechange",function(e){e.preventDefault();},{passive:false});}catch(e){}})();`,
           }}
         />
         <link
