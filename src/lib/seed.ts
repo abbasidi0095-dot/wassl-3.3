@@ -1,4 +1,5 @@
 import citiesJson from "@/data/cities.json";
+import mockCatalogJson from "@/data/mock-catalog.json";
 import { buildImportedRestaurants } from "./restaurant-catalog";
 import {
   BOOTSTRAP_ADMIN_EMAIL,
@@ -255,6 +256,7 @@ const stores: Store[] = [
             : ["Café", "Breakfast"],
   })),
   ...buildImportedRestaurants().stores,
+  ...(mockCatalogJson.stores as Store[]),
 ];
 
 export type ProductSeed = Omit<Product, "id" | "available"> & { available?: boolean };
@@ -442,19 +444,24 @@ const productSeed: ProductSeed[] = [
   p("store_tarfaya_tea", "Sweet", "Sellou", "House-made, 150g", 20, "🍪"),
 ];
 
+const existingProductImages = mockCatalogJson.existingProductImages as Record<string, string>;
+
 const products: Product[] = [
   ...productSeed.map((item, index) => ({
     ...item,
     ...groceryStock(item, index),
+    image: existingProductImages[item.name] ?? item.image,
     id: `product_${String(index + 1).padStart(3, "0")}`,
     available: item.available ?? true,
   })),
   ...groceryExtra.map((item, index) => ({
     ...item,
+    image: existingProductImages[item.name] ?? item.image,
     id: `product_${String(productSeed.length + index + 1).padStart(3, "0")}`,
     available: item.available ?? true,
   })),
   ...buildImportedRestaurants().products,
+  ...(mockCatalogJson.products as Product[]),
 ];
 
 const drivers: Driver[] = [
