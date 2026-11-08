@@ -5747,6 +5747,47 @@ export async function removeFamilyMember(
   });
 }
 
+export async function addFamilyAddress(input: {
+  userId: string;
+  label: string;
+  name: string;
+  phone: string;
+  address: string;
+  landmark: string;
+  lat: number;
+  lng: number;
+}): Promise<FamilyView> {
+  return mutate((db) => {
+    const family = familyForUser(db, input.userId);
+    if (!family) throw new Error("You do not belong to a family");
+    family.addresses ??= [];
+    if (family.addresses.length >= 20) throw new Error("A family can keep up to 20 addresses");
+    family.addresses.push({
+      id: randomId("faddr", 6),
+      label: input.label.trim().slice(0, 40) || "Home",
+      name: input.name.trim(),
+      phone: input.phone.trim(),
+      address: input.address.trim(),
+      landmark: input.landmark.trim(),
+      lat: input.lat,
+      lng: input.lng,
+      createdAt: new Date().toISOString(),
+    });
+    family.updatedAt = new Date().toISOString();
+    return familyView(family);
+  });
+}
+
+export async function removeFamilyAddress(userId: string, id: string): Promise<FamilyView> {
+  return mutate((db) => {
+    const family = familyForUser(db, userId);
+    if (!family) throw new Error("You do not belong to a family");
+    family.addresses = (family.addresses ?? []).filter((entry) => entry.id !== id);
+    family.updatedAt = new Date().toISOString();
+    return familyView(family);
+  });
+}
+
 export async function leaveFamily(userId: string): Promise<void> {
   await mutate((db) => {
     const family = familyForUser(db, userId);

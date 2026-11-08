@@ -944,6 +944,18 @@ export interface FamilyMember {
   joinedAt: string;
 }
 
+export interface FamilyAddress {
+  id: string;
+  label: string;
+  name: string;
+  phone: string;
+  address: string;
+  landmark: string;
+  lat: number;
+  lng: number;
+  createdAt: string;
+}
+
 export interface Family {
   id: string;
   name: string;
@@ -953,6 +965,7 @@ export interface Family {
   createdAt: string;
   updatedAt: string;
   members: FamilyMember[];
+  addresses?: FamilyAddress[];
 }
 
 

@@ -33,6 +33,7 @@ export function FamilyManager({
   const [copied, setCopied] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [address, setAddress] = useState({ label: "Home", name: "", phone: "", address: "", landmark: "" });
 
   useEffect(() => {
     if (family) setInviteUrl("");
@@ -96,6 +97,17 @@ export function FamilyManager({
 
   async function remove(memberId: string) {
     const data = await call(`/api/family/members/${memberId}`, undefined, "DELETE");
+    if (data?.family) setFamily(data.family);
+  }
+
+  async function addAddress(event: React.FormEvent) {
+    event.preventDefault();
+    const data = await call("/api/family/addresses", address);
+    if (data?.family) setFamily(data.family);
+  }
+
+  async function removeAddress(id: string) {
+    const data = await call(`/api/family/addresses?id=${encodeURIComponent(id)}`, undefined, "DELETE");
     if (data?.family) setFamily(data.family);
   }
 
@@ -221,6 +233,32 @@ export function FamilyManager({
           </div>
         </section>
       ) : null}
+
+      <section className="card mt-4 p-4">
+        <h2 className="text-[13px] font-semibold">{t("Shared addresses")}</h2>
+        <div className="mt-2 grid gap-2 sm:grid-cols-2">
+          {(family.addresses ?? []).map((entry) => (
+            <div key={entry.id} className="flex items-start justify-between gap-2 rounded-[10px] border border-line bg-surface p-3">
+              <div className="min-w-0">
+                <div className="text-[12px] font-semibold">{entry.label} · {entry.name}</div>
+                <div className="truncate text-[10px] text-muted">{entry.address} · {entry.landmark}</div>
+              </div>
+              <button type="button" onClick={() => removeAddress(entry.id)} className="shrink-0 text-[10px] text-muted hover:text-danger" aria-label={t("Remove address")}>×</button>
+            </div>
+          ))}
+          {!(family.addresses ?? []).length ? (
+            <div className="text-[11px] text-muted sm:col-span-2">{t("No shared addresses yet.")}</div>
+          ) : null}
+        </div>
+        <form onSubmit={addAddress} className="mt-3 grid gap-2 sm:grid-cols-2">
+          <input value={address.label} onChange={(event) => setAddress({ ...address, label: event.target.value })} className="input" placeholder={t("Label")} />
+          <input value={address.name} onChange={(event) => setAddress({ ...address, name: event.target.value })} className="input" placeholder={t("Name")} required />
+          <input value={address.phone} onChange={(event) => setAddress({ ...address, phone: event.target.value })} className="input" placeholder={t("Phone")} required />
+          <input value={address.address} onChange={(event) => setAddress({ ...address, address: event.target.value })} className="input" placeholder={t("Address")} required />
+          <input value={address.landmark} onChange={(event) => setAddress({ ...address, landmark: event.target.value })} className="input" placeholder={t("Landmark")} required />
+          <button type="submit" className="btn btn-ghost" disabled={busy}>{t("Add shared address")}</button>
+        </form>
+      </section>
 
       <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_340px] lg:items-start">
         <section className="card p-4">
