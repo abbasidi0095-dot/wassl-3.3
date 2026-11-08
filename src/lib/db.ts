@@ -5890,6 +5890,7 @@ export type FamilySummary = {
   orderCount: number;
   totalSpend: number;
   favouriteCount: number;
+  favourites: Array<{ id: string; name: string; image?: string; storeName: string; count: number }>;
   recent: Array<{ id: string; code: string; storeName: string; total: number; createdAt: string }>;
 };
 
@@ -5911,12 +5912,34 @@ export async function getFamilySummary(userId: string): Promise<FamilySummary | 
         emails.has(order.customerEmail.toLowerCase()),
     )
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-  const favouriteCount = new Set(members.flatMap((user) => user.favorites ?? [])).size;
+  const favouriteCounts = new Map<string, number>();
+  for (const user of members) {
+    for (const productId of user.favorites ?? []) {
+      favouriteCounts.set(productId, (favouriteCounts.get(productId) ?? 0) + 1);
+    }
+  }
+  const favourites = [...favouriteCounts.entries()]
+    .map(([productId, count]) => {
+      const product = db.products.find((entry) => entry.id === productId);
+      if (!product) return null;
+      return {
+        id: product.id,
+        name: product.name,
+        image: product.image,
+        storeName: db.stores.find((store) => store.id === product.storeId)?.name ?? "",
+        count,
+      };
+    })
+    .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 8);
+  const favouriteCount = favouriteCounts.size;
   return {
     memberCount: family.members.length,
     orderCount: orders.length,
     totalSpend: orders.reduce((sum, order) => sum + order.total, 0),
     favouriteCount,
+    favourites,
     recent: orders.slice(0, 5).map((order) => ({
       id: order.id,
       code: order.code,

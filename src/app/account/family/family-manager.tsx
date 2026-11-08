@@ -181,6 +181,28 @@ export function FamilyManager({
         </section>
       ) : null}
 
+      {summary?.favourites.length ? (
+        <section className="card mt-4 p-4">
+          <h2 className="text-[13px] font-semibold">{t("Shared favourites")}</h2>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            {summary.favourites.map((item) => (
+              <div key={item.id} className="flex items-center gap-2 rounded-[10px] border border-line bg-surface p-2">
+                <span className="h-9 w-9 shrink-0 overflow-hidden rounded-[8px] bg-surface-2">
+                  {item.image ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={item.image} alt="" className="h-full w-full object-cover" />
+                  ) : null}
+                </span>
+                <span className="min-w-0">
+                  <span className="block truncate text-[11px] font-semibold">{item.name}</span>
+                  <span className="block truncate text-[10px] text-muted">{item.storeName}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
       <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_340px] lg:items-start">
         <section className="card p-4">
           <h2 className="text-[13px] font-semibold">{t("Members")}</h2>
