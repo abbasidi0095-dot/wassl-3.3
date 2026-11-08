@@ -282,7 +282,7 @@ export function matchScore(query: string, fields: Array<string | undefined>): nu
       best = Math.max(best, 140);
       continue;
     }
-    if (haystack.startsWith(needle)) {
+    if (haystack.startsWith(`${needle} `)) {
       best = Math.max(best, 120);
       continue;
     }
