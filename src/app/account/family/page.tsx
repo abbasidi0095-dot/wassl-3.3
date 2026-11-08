@@ -1,5 +1,5 @@
 import { requireRole } from "@/lib/auth";
-import { getFamilyForUser } from "@/lib/db";
+import { getFamilyForUser, getFamilySummary } from "@/lib/db";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getCities } from "@/lib/db";
@@ -17,6 +17,7 @@ export default async function FamilyPage({
   const session = await requireRole("customer");
   const { token } = await searchParams;
   const family = await getFamilyForUser(session.userId);
+  const summary = family ? await getFamilySummary(session.userId) : null;
   const cities = await getCities();
   const city = await getPreferredCity(cities);
 
@@ -26,6 +27,7 @@ export default async function FamilyPage({
       <main className="container-wassl pb-16 pt-6 lg:pt-8">
         <FamilyManager
           family={family ?? null}
+          summary={summary}
           currentUserId={session.userId}
           initialToken={token ?? ""}
         />

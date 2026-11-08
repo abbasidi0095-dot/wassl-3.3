@@ -5883,3 +5883,46 @@ export async function setSavedBasketReminder(
     return savedBasketView(basket);
   });
 }
+
+
+export type FamilySummary = {
+  memberCount: number;
+  orderCount: number;
+  totalSpend: number;
+  favouriteCount: number;
+  recent: Array<{ id: string; code: string; storeName: string; total: number; createdAt: string }>;
+};
+
+/** Aggregate family metrics without exposing one member's full order history. */
+export async function getFamilySummary(userId: string): Promise<FamilySummary | null> {
+  const db = await getDb();
+  const family = familyForUser(db, userId);
+  if (!family) return null;
+  const memberIds = new Set(family.members.map((member) => member.userId));
+  const members = db.users.filter((user) => memberIds.has(user.id));
+  const emails = new Set(
+    members.map((user) => user.email.toLowerCase()).filter(Boolean),
+  );
+  const orders = db.orders
+    .filter(
+      (order) =>
+        order.status !== "cancelled" &&
+        order.customerEmail &&
+        emails.has(order.customerEmail.toLowerCase()),
+    )
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const favouriteCount = new Set(members.flatMap((user) => user.favorites ?? [])).size;
+  return {
+    memberCount: family.members.length,
+    orderCount: orders.length,
+    totalSpend: orders.reduce((sum, order) => sum + order.total, 0),
+    favouriteCount,
+    recent: orders.slice(0, 5).map((order) => ({
+      id: order.id,
+      code: order.code,
+      storeName: db.stores.find((store) => store.id === order.storeId)?.name ?? "Store",
+      total: order.total,
+      createdAt: order.createdAt,
+    })),
+  };
+}

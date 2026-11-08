@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Check, Copy, Link2, Loader2, LogOut, Shield, Trash2, UserPlus, Users } from "lucide-react";
 import { useI18n } from "@/components/locale-provider";
-import type { FamilyView } from "@/lib/db";
+import type { FamilySummary, FamilyView } from "@/lib/db";
 import type { FamilyRole } from "@/lib/types";
 
 const ROLE_LABELS: Record<FamilyRole, string> = {
@@ -14,10 +14,12 @@ const ROLE_LABELS: Record<FamilyRole, string> = {
 
 export function FamilyManager({
   family: initialFamily,
+  summary,
   currentUserId,
   initialToken,
 }: {
   family: FamilyView | null;
+  summary: FamilySummary | null;
   currentUserId: string;
   initialToken: string;
 }) {
@@ -162,6 +164,22 @@ export function FamilyManager({
           {family.members.length} {t("members")} · {isOwner ? t("You are the owner") : t("Member")}
         </p>
       </header>
+
+      {summary ? (
+        <section className="mt-4 grid gap-3 sm:grid-cols-4">
+          {[
+            { label: t("Members"), value: summary.memberCount },
+            { label: t("Orders"), value: summary.orderCount },
+            { label: t("Total spend"), value: `${summary.totalSpend} MAD` },
+            { label: t("Favourites"), value: summary.favouriteCount },
+          ].map((item) => (
+            <div key={item.label} className="rounded-[14px] border border-line bg-surface p-3">
+              <div className="text-[10px] text-muted">{item.label}</div>
+              <div className="mt-1 font-display text-[20px] font-semibold tnum">{item.value}</div>
+            </div>
+          ))}
+        </section>
+      ) : null}
 
       <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_340px] lg:items-start">
         <section className="card p-4">
