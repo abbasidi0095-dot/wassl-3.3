@@ -23,6 +23,10 @@ const db = JSON.parse(readFileSync(file, "utf8"));
 const stamp = new Date().toISOString().replace(/[:.]/g, "-");
 copyFileSync(file, path.join(dataDir, `db.backup-${stamp}.json`));
 
+// Replace the previous mock catalogue so menus and photos stay in sync.
+db.stores = (db.stores ?? []).filter((store) => !store.id?.startsWith("store_mock_"));
+db.products = (db.products ?? []).filter((product) => !product.id?.startsWith("product_mock_"));
+
 const storeSlugs = new Set((db.stores ?? []).map((store) => store.slug));
 const productIds = new Set((db.products ?? []).map((product) => product.id));
 const storeProductNames = new Set(

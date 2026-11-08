@@ -35,7 +35,11 @@ try {
   if (!row.rowCount) throw new Error(`No wassl_state row for ${stateId}`);
   const db = row.rows[0].data;
 
-  const storeSlugs = new Set((db.stores ?? []).map((store) => store.slug));
+  // Replace the previous mock catalogue so menus and photos stay in sync.
+db.stores = (db.stores ?? []).filter((store) => !store.id?.startsWith("store_mock_"));
+db.products = (db.products ?? []).filter((product) => !product.id?.startsWith("product_mock_"));
+
+const storeSlugs = new Set((db.stores ?? []).map((store) => store.slug));
   const productIds = new Set((db.products ?? []).map((product) => product.id));
   const storeProductNames = new Set(
     (db.products ?? []).map((product) => `${product.storeId}::${product.name}`),
