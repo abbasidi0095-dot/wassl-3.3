@@ -53,7 +53,8 @@ export default async function PharmacyPage({
     <>
       <SiteHeader cities={cities} currentCity={requested} />
       <main className="container-wassl pb-[112px] pt-6 md:pb-12">
-        <section className="border-b border-line pb-7">
+        <section className="pb-7">
+          <div className="figma-band p-6">
           <div className="flex items-center gap-2 text-[12px] text-muted">
             <span className="status-dot live-dot text-success" />
             {pharmacies.length === 1
@@ -69,6 +70,7 @@ export default async function PharmacyPage({
             )}
           </p>
 
+          </div>
           <div className="mt-5 grid gap-2 sm:grid-cols-3">
             {[
               {

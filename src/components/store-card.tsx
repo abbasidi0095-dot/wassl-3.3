@@ -15,33 +15,35 @@ export function StoreCard({ store }: { store: Store }) {
   const tags = [...new Set([...(store.dietaryTags ?? []), ...(store.tags ?? [])])];
 
   return (
-    <article className="aero-tile group relative overflow-hidden rounded-[10px] border transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-line-strong hover:shadow-[var(--shadow)] focus-within:border-brand focus-within:shadow-[var(--shadow)] motion-reduce:transform-none">
+    <article className="figma-store group relative focus-within:ring-2 focus-within:ring-brand">
       <Link
         href={`/store/${store.slug}`}
         className="absolute inset-0 z-0"
         aria-label={`Browse ${store.name}`}
       />
       <div className="pointer-events-none relative z-10">
-        <div className="store-cover relative aspect-[16/10]">
+        <div className="figma-store-image">
           <Image
             src={storePhoto(store)}
             alt={`${store.name} storefront`}
             fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
-            className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+            sizes="(max-width: 640px) 80vw, (max-width: 1024px) 50vw, 400px"
+            className="object-cover"
           />
-          <span
-            className="absolute start-3 top-3 rounded-[2px] bg-surface/95 px-1.5 py-0.5 text-[11px] font-medium text-ink"
-            aria-hidden="true"
-          >
-            {categoryLabel(store.category)}
-          </span>
+          <span className="figma-cat-chip">{categoryLabel(store.category)}</span>
+          {hasRating ? (
+            <span className="figma-rating">
+              <Star size={11} className="fill-signal text-signal" />
+              <span className="tnum">{store.rating.toFixed(1)}</span>
+            </span>
+          ) : null}
+          <span className="figma-price tnum">{money(store.deliveryFee)}</span>
         </div>
 
         <div className="p-4">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <h3 className="truncate font-display text-[18px] font-semibold leading-tight tracking-[-0.02em]">
+              <h3 className="truncate font-display text-[20px] font-bold leading-tight tracking-[-0.02em]">
                 {store.name}
               </h3>
               <p className="mt-0.5 truncate text-[11px] text-muted">
@@ -52,25 +54,16 @@ export function StoreCard({ store }: { store: Store }) {
                 )}
               </p>
             </div>
-            {hasRating ? (
-              <span className="inline-flex shrink-0 items-center gap-1 text-[11px] font-medium text-muted tnum">
-                <Star size={11} className="fill-signal text-signal" />
-                {store.rating.toFixed(1)}
-              </span>
-            ) : null}
           </div>
 
-          <p className="mt-2.5 line-clamp-1 text-[13px] text-muted">
-            {store.tagline}
-          </p>
+          <p className="mt-2 line-clamp-1 text-[13px] text-muted">{store.tagline}</p>
 
           <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted tnum">
             <span className="inline-flex items-center gap-1">
               <Clock3 size={11} />
               {store.prepTime}–{store.prepTime + 10} min
             </span>
-            <span>{money(store.deliveryFee)}</span>
-            <span>{tmin(store.minOrder)}</span>
+            <span>{money(store.minOrder)} min</span>
             {tags.slice(0, 1).map((tag) => (
               <span key={tag} className="truncate">
                 {tag}
@@ -99,7 +92,7 @@ export function StoreCard({ store }: { store: Store }) {
                 href={mapsUrl}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="pointer-events-auto inline-flex items-center gap-0.5 font-medium text-brand"
+                className="pointer-events-auto -m-1 inline-flex min-h-6 min-w-6 items-center justify-center gap-0.5 p-1 font-medium text-brand"
                 aria-label={`View ${store.name} on Google Maps`}
               >
                 <MapPin size={11} />
@@ -115,8 +108,4 @@ export function StoreCard({ store }: { store: Store }) {
       </div>
     </article>
   );
-}
-
-function tmin(value: number) {
-  return `Min ${money(value)}`;
 }

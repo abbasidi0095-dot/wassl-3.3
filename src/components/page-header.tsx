@@ -18,7 +18,7 @@ export function PageHeader({
   children?: ReactNode;
 }) {
   return (
-    <header className="border-b border-line pb-6 pt-8 lg:pb-8 lg:pt-10">
+    <header className="figma-band mb-5 p-6 lg:p-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0">
           {label ? (

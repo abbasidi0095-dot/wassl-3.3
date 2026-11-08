@@ -151,7 +151,7 @@ export function StoreMenu({
       {!query && upsell.length ? (
         <section className="mt-4">
           <div className="flex items-center gap-1.5">
-            <Sparkles size={12} className="text-signal" />
+            <Sparkles size={12} className="text-signal-ink" />
             <h3 className="text-[11px] font-medium text-muted">
               {t("Goes well with your order")}
             </h3>
@@ -162,12 +162,12 @@ export function StoreMenu({
                 key={product.id}
                 type="button"
                 onClick={() => quickAdd(product)}
-                className="flex min-w-0 items-center gap-2.5 rounded-[6px] border border-line bg-surface p-2 text-start transition-colors hover:border-line-strong sm:w-[190px] sm:shrink-0"
+                className="flex min-w-0 items-center gap-2.5 rounded-[16px] border border-line bg-surface p-2 text-start transition-colors hover:border-line-strong sm:w-[190px] sm:shrink-0"
               >
                 <ProductTile
                   name={product.name}
                   category={product.category}
-                  className="h-9 w-9 rounded-[4px]"
+                  className="h-9 w-9 rounded-[12px]"
                   iconSize={16}
                 />
                 <span className="min-w-0 flex-1">
@@ -200,14 +200,14 @@ export function StoreMenu({
               {list.map((product) => (
                 <article
                   key={product.id}
-                  className={`group flex gap-3 rounded-[8px] border border-line bg-surface p-3 transition-colors hover:border-line-strong ${
+                  className={`group flex gap-3 rounded-[20px] border border-line bg-surface p-3 transition-colors hover:border-line-strong ${
                     product.available ? "" : "opacity-55"
                   }`}
                 >
                   <button
                     type="button"
                     onClick={() => product.available && setSheet(product)}
-                    className="h-[76px] w-[76px] shrink-0 overflow-hidden rounded-[6px] bg-surface-2"
+                    className="h-[86px] w-[86px] shrink-0 overflow-hidden rounded-[16px] bg-surface-2"
                     aria-label={t("Open {product}", { product: product.name })}
                   >
                     <ProductTile
@@ -229,7 +229,7 @@ export function StoreMenu({
                         </p>
                       </div>
                       {product.popular ? (
-                        <span className="shrink-0 text-[11px] text-signal">
+                        <span className="shrink-0 text-[11px] text-signal-ink">
                           {t("Popular")}
                         </span>
                       ) : null}
@@ -247,7 +247,7 @@ export function StoreMenu({
                         type="button"
                         disabled={!product.available || !store.isOpen}
                         onClick={() => quickAdd(product)}
-                        className="grid h-8 w-8 place-items-center rounded-[4px] border border-line-strong text-ink transition-colors hover:border-ink hover:bg-ink hover:text-paper disabled:cursor-not-allowed disabled:border-line disabled:text-muted/40 disabled:hover:bg-transparent"
+                        className="grid h-10 w-10 place-items-center rounded-full border border-line-strong text-ink transition-colors hover:border-ink hover:bg-ink hover:text-paper disabled:cursor-not-allowed disabled:border-line disabled:text-muted/40 disabled:hover:bg-transparent"
                         aria-label={t("Add {product} to cart", {
                           product: product.name,
                         })}
@@ -282,7 +282,7 @@ export function StoreMenu({
         >
           <a
             href="/cart"
-            className="flex items-center justify-between gap-3 rounded-[8px] bg-ink px-4 py-3 text-on-dark shadow-lg"
+            className="flex items-center justify-between gap-3 rounded-[20px] bg-ink px-4 py-3 text-on-dark shadow-lg"
           >
             <span className="text-[13px] font-medium tnum">
               {t(count === 1 ? "{count} item" : "{count} items", { count })} ·{" "}

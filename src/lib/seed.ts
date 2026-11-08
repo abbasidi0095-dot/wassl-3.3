@@ -38,7 +38,7 @@ const settings: PlatformSettings = {
   primaryColor: "#2447e0",
   accentColor: "#ff8a3d",
   themePreset: "coastal",
-  defaultTheme: "system",
+  defaultTheme: "light",
   cityWaitlistEnabled: true,
 };
 

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   CarTaxiFront,
   ChevronDown,
@@ -46,7 +47,7 @@ function accountHref(account: AccountInfo) {
 }
 
 const iconButton =
-  "grid h-9 w-9 place-items-center rounded-[6px] text-ink/70 transition-colors hover:bg-surface-2 hover:text-ink";
+  "grid h-9 w-9 place-items-center rounded-full bg-surface/70 text-ink/75 transition-colors hover:bg-surface-2 hover:text-ink";
 
 export function SiteHeader({
   cities,
@@ -60,6 +61,7 @@ export function SiteHeader({
   const { count } = useCart();
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [account, setAccount] = useState<AccountInfo | null | undefined>(undefined);
 
   useEffect(() => {
@@ -80,6 +82,10 @@ export function SiteHeader({
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const southern = cities.filter((city) => city.priority);
   const others = cities.filter((city) => !city.priority);
@@ -143,7 +149,7 @@ export function SiteHeader({
               <select
                 value={selected}
                 onChange={(event) => selectCity(event.target.value)}
-                className="h-9 max-w-[190px] appearance-none rounded-[6px] border border-line bg-transparent ps-8 pe-7 text-[13px] font-medium text-ink outline-none transition-colors hover:border-line-strong focus:border-brand"
+                className="h-9 max-w-[190px] appearance-none rounded-full border border-line bg-surface/70 ps-8 pe-7 text-[13px] font-medium text-ink outline-none transition-colors hover:border-line-strong focus:border-brand"
                 aria-label={t("Choose city")}
               >
                 {cityOptions}
@@ -189,7 +195,7 @@ export function SiteHeader({
 
             <Link
               href={account ? accountHref(account) : "/login"}
-              className="hidden h-9 items-center gap-2 rounded-[6px] bg-ink px-3 text-[13px] font-semibold text-on-dark transition-colors hover:bg-brand sm:flex"
+              className="hidden h-9 items-center gap-2 rounded-full bg-brand px-3.5 text-[13px] font-semibold text-brand-ink transition-colors hover:bg-brand-deep sm:flex"
             >
               {account?.role === "customer" ? (
                 <UserRound size={14} />
@@ -286,7 +292,7 @@ export function SiteHeader({
                   key={`${item.href}-${item.label}`}
                   href={item.href}
                   onClick={() => setOpen(false)}
-                  className="flex items-center gap-3 rounded-[6px] px-3 py-2.5 text-sm font-medium hover:bg-surface-2"
+                  className="flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium hover:bg-surface-2"
                 >
                   <item.icon size={16} className="text-muted" />
                   {item.label}
@@ -297,8 +303,10 @@ export function SiteHeader({
         ) : null}
       </header>
 
-      <nav
-        className="tabbar fixed inset-x-2.5 bottom-[calc(8px+env(safe-area-inset-bottom))] z-40 grid overflow-hidden rounded-[18px] border border-line/80 md:hidden"
+      {mounted
+        ? createPortal(
+            <nav
+              className="tabbar fixed inset-x-2.5 bottom-[calc(8px+env(safe-area-inset-bottom))] z-40 grid overflow-hidden rounded-[18px] border border-line/80 md:hidden"
         style={{ gridTemplateColumns: `repeat(${mobileNav.length}, minmax(0, 1fr))` }}
         aria-label="Sections"
       >
@@ -316,7 +324,10 @@ export function SiteHeader({
             <span className="truncate">{item.label}</span>
           </Link>
         ))}
-      </nav>
+            </nav>,
+            document.body,
+          )
+        : null}
     </>
   );
 }

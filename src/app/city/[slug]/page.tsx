@@ -53,8 +53,8 @@ export default async function CityPage({
       <SiteHeader cities={cities} currentCity={city} />
       <main>
         <section className="container-wassl">
-          <div className="grid gap-8 border-b border-line pb-8 pt-8 lg:grid-cols-[1fr_0.9fr] lg:items-end lg:gap-12 lg:pt-12">
-            <div>
+          <div className="grid gap-8 pb-8 pt-6 lg:grid-cols-[1fr_0.9fr] lg:items-end lg:gap-10 lg:pt-8">
+            <div className="figma-band p-6 lg:p-7">
               <div className="flex flex-wrap items-center gap-2 text-[13px] text-muted">
                 <span className="inline-flex items-center gap-1.5">
                   <span className={`status-dot ${city.launchStatus === "live" ? "live-dot" : ""} ${city.launchStatus === "live" ? "text-success" : ""}`} />

@@ -18,7 +18,7 @@ export function SiteFooter() {
         <div className="grid gap-10 py-14 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
             <Logo light />
-            <p className="mt-5 max-w-xs text-[15px] leading-6 opacity-60">
+            <p className="mt-5 max-w-xs text-[15px] leading-6 opacity-75">
               {t(
                 "Local stores, local drivers, one simple way to get what you need across Southern Morocco.",
               )}
@@ -26,7 +26,7 @@ export function SiteFooter() {
             <p className="arabic mt-3 text-[15px] font-medium text-saffron">
               {BRAND.taglineAr}
             </p>
-            <div className="mt-7 flex flex-wrap gap-x-6 gap-y-2 text-[13px] opacity-50">
+            <div className="mt-7 flex flex-wrap gap-x-6 gap-y-2 text-[13px] opacity-65">
               <span>{t("Cash on delivery")}</span>
               <span>{t("Verified partners")}</span>
               <span>{t("Prices in MAD")}</span>
@@ -34,7 +34,7 @@ export function SiteFooter() {
           </div>
 
           <div>
-            <p className="text-[13px] font-semibold opacity-40">
+            <p className="text-[13px] font-semibold opacity-70">
               {t("Southern Morocco")}
             </p>
             <div className="mt-4 grid gap-2.5 text-sm">
@@ -44,7 +44,7 @@ export function SiteFooter() {
                   href={`/city/${city.toLowerCase().replace("â", "a")}`}
                   className="inline-flex w-fit items-center gap-1.5 opacity-70 transition-opacity hover:opacity-100"
                 >
-                  <MapPin size={12} className="opacity-50" />
+                  <MapPin size={12} className="opacity-65" />
                   {city}
                 </Link>
               ))}
@@ -52,7 +52,7 @@ export function SiteFooter() {
           </div>
 
           <div>
-            <p className="text-[13px] font-semibold opacity-40">
+            <p className="text-[13px] font-semibold opacity-70">
               {t("Platform")}
             </p>
             <div className="mt-4 grid gap-2.5 text-sm opacity-70">
@@ -72,17 +72,17 @@ export function SiteFooter() {
           </div>
 
           <div>
-            <p className="text-[13px] font-semibold opacity-40">
+            <p className="text-[13px] font-semibold opacity-70">
               {t("Support")}
             </p>
             <a
               href={`tel:${supportPhone.replace(/\s/g, "")}`}
               className="mt-4 inline-flex items-center gap-2 text-sm font-medium"
             >
-              <Phone size={14} className="opacity-50" />
+              <Phone size={14} className="opacity-65" />
               {supportPhone}
             </a>
-            <p className="mt-3 text-[13px] leading-5 opacity-45">
+            <p className="mt-3 text-[13px] leading-5 opacity-70">
               {t("Daily 09:00–23:00")}
               <br />
               {t("Arabic · Français · English")}
@@ -97,7 +97,7 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 border-t border-white/10 py-6 text-[13px] opacity-40 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-2 border-t border-white/10 py-6 text-[13px] opacity-70 sm:flex-row sm:items-center sm:justify-between">
           <span>
             {t("© {year} {brand}. Built for Morocco.", {
               year: new Date().getFullYear(),

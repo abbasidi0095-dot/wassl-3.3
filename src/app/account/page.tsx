@@ -118,7 +118,7 @@ export default async function AccountPage() {
       <SiteHeader cities={cities} currentCity={cityForHeader} />
 
       <main className="container-wassl pt-8 lg:pt-12">
-        <header className="flex flex-wrap items-end justify-between gap-4">
+        <header className="figma-band flex flex-wrap items-end justify-between gap-4 p-6 lg:p-8">
           <div className="max-w-2xl">
             <div className="eyebrow">{t("Your account")}</div>
             <h1 className="display mt-2 text-[clamp(2.4rem,1.7rem+2.6vw,4rem)]">

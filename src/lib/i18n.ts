@@ -889,6 +889,12 @@ const fr: Record<string, string> = {
   "Sign in to enable notifications.": "Connectez-vous pour activer les notifications.",
   "The server push key is missing.": "La clé de notification du serveur est manquante.",
   "Could not save the push subscription. Try again.": "Impossible d'enregistrer l'abonnement aux notifications. Réessayez.",
+  "Best seller": "Meilleures ventes",
+  "View all": "Tout voir",
+  "Local favourites, delivered across the South.": "Les favoris du Sud, livrés chez vous.",
+  "Cash on delivery · prices in MAD": "Paiement à la livraison · prix en MAD",
+  "Order now": "Commander",
+
 };
 
 const es: Record<string, string> = {
@@ -1754,6 +1760,12 @@ const es: Record<string, string> = {
   "Sign in to enable notifications.": "Inicia sesión para activar las notificaciones.",
   "The server push key is missing.": "Falta la clave de notificaciones del servidor.",
   "Could not save the push subscription. Try again.": "No se pudo guardar la suscripción push. Inténtalo de nuevo.",
+  "Best seller": "Más vendidos",
+  "View all": "Ver todo",
+  "Local favourites, delivered across the South.": "Los favoritos del Sur, a tu puerta.",
+  "Cash on delivery · prices in MAD": "Pago contra reembolso · precios en MAD",
+  "Order now": "Pedir ahora",
+
 };
 
 const ar: Record<string, string> = {
@@ -2616,6 +2628,12 @@ const ar: Record<string, string> = {
   "Sign in to enable notifications.": "سجّل الدخول لتفعيل الإشعارات.",
   "The server push key is missing.": "مفتاح إشعارات الخادم مفقود.",
   "Could not save the push subscription. Try again.": "تعذر حفظ اشتراك الإشعارات. حاول مرة أخرى.",
+  "Best seller": "الأكثر مبيعاً",
+  "View all": "عرض الكل",
+  "Local favourites, delivered across the South.": "مفضلات الجنوب تصل إلى بابك.",
+  "Cash on delivery · prices in MAD": "الدفع عند الاستلام · الأسعار بالدرهم",
+  "Order now": "اطلب الآن",
+
 };
 
 const DICTIONARIES: Record<Exclude<Locale, "en">, Record<string, string>> = {

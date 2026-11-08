@@ -158,7 +158,7 @@ export default async function StorePage({
                   <>
                     <span className="text-line-strong">/</span>
                     <span className="inline-flex items-center gap-1 tnum">
-                      <Star size={10} className="fill-signal text-signal" />
+                      <Star size={10} className="fill-signal text-signal-ink" />
                       {store.rating.toFixed(1)} · {store.reviews} reviews
                     </span>
                   </>

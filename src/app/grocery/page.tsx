@@ -75,8 +75,8 @@ export default async function GroceryPage({
       <SiteHeader cities={cities} currentCity={currentCity} />
       <main>
         <section className="container-wassl">
-          <div className="grid gap-7 border-b border-line py-6 sm:py-8 lg:grid-cols-[1fr_0.78fr] lg:items-end lg:gap-12 lg:py-12">
-            <div>
+          <div className="grid gap-7 py-6 sm:py-8 lg:grid-cols-[1fr_0.78fr] lg:items-end lg:gap-10 lg:py-8">
+            <div className="figma-band p-6 lg:p-7">
               <div className="flex items-center gap-2 text-[13px] text-muted">
                 <span className="status-dot live-dot text-success" />
                 {t("{count} supermarkets open now", { count: openNow })}

@@ -66,9 +66,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  colorScheme: "light dark",
-  maximumScale: 1,
-  userScalable: false,
+  colorScheme: "light",
   themeColor: "#2447E0",
 };
 
@@ -79,9 +77,7 @@ export default async function RootLayout({
   const defaultDark =
     settings.defaultTheme === "dark"
       ? "true"
-      : settings.defaultTheme === "light"
-        ? "false"
-        : 'window.matchMedia("(prefers-color-scheme: dark)").matches';
+      : "false";
   return (
     <html
       lang={locale}
@@ -93,7 +89,7 @@ export default async function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var s=localStorage.getItem("wassl.theme");var d=s?s==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;if(d)document.documentElement.classList.add("dark");var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;if(reduce){document.documentElement.classList.add("wassl-splash-skip");}else{document.documentElement.classList.add("wassl-splashing");}document.addEventListener("gesturestart",function(e){e.preventDefault();},{passive:false});document.addEventListener("gesturechange",function(e){e.preventDefault();},{passive:false});}catch(e){}})();`,
+            __html: `(function(){try{var s=localStorage.getItem("wassl.theme");var d=s?s==="dark":${defaultDark};if(d)document.documentElement.classList.add("dark");var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;if(reduce){document.documentElement.classList.add("wassl-splash-skip");}else{document.documentElement.classList.add("wassl-splashing");}document.addEventListener("gesturestart",function(e){e.preventDefault();},{passive:false});document.addEventListener("gesturechange",function(e){e.preventDefault();},{passive:false});}catch(e){}})();`,
           }}
         />
         <link

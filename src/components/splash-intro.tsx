@@ -74,7 +74,7 @@ export function SplashIntro() {
 
   return (
     <div
-      className={`wassl-splash fixed inset-0 z-[200] grid place-items-center bg-[#0B1226] px-6 text-[#FFF7EA] ${
+      className={`wassl-splash fixed inset-0 z-[200] grid place-items-center bg-[var(--brand)] px-6 text-[var(--brand-ink)] ${
         leaving ? "wassl-splash-leaving" : ""
       }`}
       role="status"
@@ -90,7 +90,7 @@ export function SplashIntro() {
           <path
             d="M9 18.5 21.5 47 32 28.5 42.5 47 55 18.5"
             pathLength={1}
-            stroke="#FFF7EA"
+            stroke="currentColor"
             strokeWidth="6.5"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -98,12 +98,12 @@ export function SplashIntro() {
             strokeDashoffset="1"
             className="wassl-splash-route"
           />
-          <circle cx="9" cy="18.5" r="2.2" fill="#FFF7EA" className="wassl-splash-origin" />
+          <circle cx="9" cy="18.5" r="2.2" fill="currentColor" className="wassl-splash-origin" />
           <circle
             cx="55"
             cy="18.5"
             r="4.6"
-            stroke="#FF8A3D"
+            stroke="var(--sun)"
             strokeWidth="2.6"
             className="wassl-splash-node"
           />
@@ -111,7 +111,7 @@ export function SplashIntro() {
             cx="55"
             cy="18.5"
             r="1.5"
-            fill="#FF8A3D"
+            fill="var(--sun)"
             className="wassl-splash-node"
           />
         </svg>

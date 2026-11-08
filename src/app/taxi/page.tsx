@@ -26,7 +26,7 @@ export default async function TaxiPage() {
     <>
       <SiteHeader cities={cities} currentCity={currentCity} />
       <main className="container-wassl pb-16">
-        <div className="border-b border-line pb-6 pt-8 lg:pb-8 lg:pt-10">
+        <div className="figma-band mt-5 p-6 lg:p-8">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 text-[13px] text-muted">

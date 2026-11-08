@@ -131,7 +131,7 @@ export function ProductSheet({
         role="dialog"
         aria-modal="true"
         aria-label={product.name}
-        className="sheet-in flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-t-[16px] bg-surface shadow-2xl sm:rounded-[12px]"
+        className="sheet-in flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-t-[28px] bg-surface shadow-2xl sm:rounded-[24px]"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="relative shrink-0">
@@ -160,7 +160,7 @@ export function ProductSheet({
           <button
             type="button"
             onClick={onClose}
-            className="absolute end-3 top-3 grid h-9 w-9 place-items-center rounded-[4px] bg-surface/90 text-muted hover:text-ink"
+            className="absolute end-3 top-3 grid h-11 w-11 place-items-center rounded-full bg-surface/90 text-muted hover:text-ink"
             aria-label={t("Close")}
           >
             <X size={17} />
@@ -211,7 +211,7 @@ export function ProductSheet({
                           type="button"
                           disabled={disabled}
                           onClick={() => toggle(group.id, option.id, group.max)}
-                          className={`flex w-full items-center gap-3 rounded-[6px] border px-3 py-2.5 text-start transition-colors ${
+                          className={`flex w-full items-center gap-3 rounded-[16px] border px-3 py-2.5 text-start transition-colors ${
                             checked
                               ? "border-teal bg-brand-soft"
                               : dimmed
@@ -221,7 +221,7 @@ export function ProductSheet({
                         >
                           <span
                             className={`grid h-4 w-4 shrink-0 place-items-center border ${
-                              group.max === 1 ? "rounded-full" : "rounded-[4px]"
+                              group.max === 1 ? "rounded-full" : "rounded-[12px]"
                             } ${checked ? "border-teal bg-brand text-on-dark" : "border-line"}`}
                           >
                             {checked ? <Check size={10} strokeWidth={3} /> : null}
@@ -247,11 +247,11 @@ export function ProductSheet({
 
         <div className="shrink-0 border-t border-line bg-surface p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1 rounded-[4px] border border-line p-1">
+            <div className="flex items-center gap-1 rounded-[12px] border border-line p-1">
               <button
                 type="button"
                 onClick={() => setQty((value) => Math.max(1, value - 1))}
-                className="grid h-9 w-9 place-items-center rounded-[4px] hover:bg-surface-2"
+                className="grid h-11 w-11 place-items-center rounded-full hover:bg-surface-2"
                 aria-label={t("Decrease quantity")}
               >
                 <Minus size={15} />
@@ -260,7 +260,7 @@ export function ProductSheet({
               <button
                 type="button"
                 onClick={() => setQty((value) => Math.min(20, value + 1))}
-                className="grid h-9 w-9 place-items-center rounded-[4px] hover:bg-surface-2"
+                className="grid h-11 w-11 place-items-center rounded-full hover:bg-surface-2"
                 aria-label={t("Increase quantity")}
               >
                 <Plus size={15} />
