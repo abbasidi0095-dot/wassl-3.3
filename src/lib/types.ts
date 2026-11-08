@@ -884,6 +884,55 @@ export interface GroupOrder {
   participants: GroupOrderParticipant[];
 }
 
+
+export type RecurringOrderFrequency = "daily" | "weekly" | "monthly" | "custom";
+export type RecurringOrderStatus = "active" | "paused" | "cancelled";
+
+export interface RecurringOrderItem {
+  productId: string;
+  name: string;
+  price: number;
+  qty: number;
+  image?: string;
+  unit?: string;
+  optionIds?: string[];
+  variantId?: string;
+}
+
+export interface RecurringOrderAddress {
+  name: string;
+  phone: string;
+  email?: string;
+  address: string;
+  landmark: string;
+  notes?: string;
+  lat: number;
+  lng: number;
+}
+
+export interface RecurringOrder {
+  id: string;
+  userId: string;
+  storeId: string;
+  storeSlug: string;
+  storeName: string;
+  citySlug: string;
+  title: string;
+  frequency: RecurringOrderFrequency;
+  intervalDays?: number;
+  status: RecurringOrderStatus;
+  /** Customer explicitly opted into automatic COD order creation. */
+  consent: boolean;
+  nextRunAt: string;
+  lastRunAt?: string;
+  lastOrderId?: string;
+  lastError?: string;
+  address: RecurringOrderAddress;
+  items: RecurringOrderItem[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Database {
   users: User[];
   cities: City[];
@@ -914,6 +963,7 @@ export interface Database {
   businessAccounts?: BusinessAccount[];
   businessOrders?: BusinessOrder[];
   groupOrders?: GroupOrder[];
+  recurringOrders?: RecurringOrder[];
 }
 
 /**

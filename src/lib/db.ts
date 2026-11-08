@@ -66,6 +66,10 @@ import type {
   BusinessOrderStatus,
   GroupOrder,
   GroupOrderParticipant,
+  RecurringOrder,
+  RecurringOrderAddress,
+  RecurringOrderFrequency,
+  RecurringOrderItem,
   ChatMessage,
   ChatThread,
   ChatThreadStatus,
@@ -5342,4 +5346,247 @@ export async function cancelGroupOrder(code: string, userId: string): Promise<Gr
     order.updatedAt = new Date().toISOString();
     return groupOrderView(order);
   });
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* Recurring orders                                                           */
+/* -------------------------------------------------------------------------- */
+
+export function nextRecurringRun(
+  frequency: RecurringOrderFrequency,
+  intervalDays: number | undefined,
+  from = new Date(),
+): Date {
+  const next = new Date(from.getTime());
+  if (frequency === "daily") next.setDate(next.getDate() + 1);
+  else if (frequency === "weekly") next.setDate(next.getDate() + 7);
+  else if (frequency === "monthly") next.setMonth(next.getMonth() + 1);
+  else next.setDate(next.getDate() + Math.max(1, Math.min(90, intervalDays ?? 1)));
+  return next;
+}
+
+function recurringLine(
+  product: NonNullable<Database["products"][number]>,
+  qty: number,
+): RecurringOrderItem {
+  let optionDelta = 0;
+  const optionIds = (product.modifiers ?? [])
+    .filter((group) => group.required)
+    .map((group) => {
+      const option = group.options.find((entry) => !entry.soldOut);
+      if (option) optionDelta += option.priceDelta;
+      return option?.id;
+    })
+    .filter((id): id is string => Boolean(id));
+  const variant = product.variants?.[0];
+  return {
+    productId: product.id,
+    name: product.name,
+    price: (variant?.price ?? product.price) + optionDelta,
+    qty,
+    image: product.image,
+    unit: variant?.unit ?? product.unit,
+    optionIds,
+    variantId: variant?.id,
+  };
+}
+
+export async function createRecurringOrder(input: {
+  userId: string;
+  storeId: string;
+  title: string;
+  frequency: RecurringOrderFrequency;
+  intervalDays?: number;
+  startAt?: string;
+  address: RecurringOrderAddress;
+  items: Array<{ productId: string; qty: number }>;
+  consent: boolean;
+}): Promise<RecurringOrder> {
+  const start = input.startAt ? new Date(input.startAt) : new Date(Date.now() + 24 * 60 * 60 * 1000);
+  if (!Number.isFinite(start.getTime()) || start.getTime() < Date.now()) {
+    throw new Error("Choose a start time in the future");
+  }
+  if (!input.items.length) throw new Error("Add at least one product");
+  return mutate((db) => {
+    const store = db.stores.find((entry) => entry.id === input.storeId);
+    if (!store) throw new Error("Store not found");
+    const items: RecurringOrderItem[] = [];
+    for (const requested of input.items) {
+      const product = db.products.find(
+        (entry) => entry.id === requested.productId && entry.storeId === store.id,
+      );
+      if (!product) throw new Error("A product is not available in this store");
+      if (!product.available) throw new Error(`${product.name} is sold out`);
+      const stock = product.variants?.length
+        ? product.variants.reduce((sum, variant) => sum + variant.stock, 0)
+        : (product.stock ?? 1);
+      if (stock <= 0) throw new Error(`${product.name} is sold out`);
+      const qty = Math.max(1, Math.min(20, Math.floor(requested.qty), stock));
+      items.push(recurringLine(product, qty));
+    }
+    const now = new Date().toISOString();
+    const order: RecurringOrder = {
+      id: randomId("recurring", 8),
+      userId: input.userId,
+      storeId: store.id,
+      storeSlug: store.slug,
+      storeName: store.name,
+      citySlug: store.citySlug,
+      title: input.title.trim().slice(0, 80) || "Recurring order",
+      frequency: input.frequency,
+      intervalDays: input.frequency === "custom" ? Math.max(1, Math.min(90, input.intervalDays ?? 1)) : undefined,
+      status: "active",
+      consent: input.consent,
+      nextRunAt: start.toISOString(),
+      address: input.address,
+      items,
+      createdAt: now,
+      updatedAt: now,
+    };
+    db.recurringOrders ??= [];
+    db.recurringOrders.push(order);
+    recordAudit(db, {
+      actorRole: "customer",
+      actorId: input.userId,
+      action: "recurring.create",
+      entity: "order",
+      entityId: order.id,
+      summary: `Created recurring order ${order.title} at ${store.name}`,
+    });
+    return order;
+  });
+}
+
+export async function listRecurringOrders(userId: string): Promise<RecurringOrder[]> {
+  return ((await getDb()).recurringOrders ?? [])
+    .filter((order) => order.userId === userId)
+    .sort((a, b) => a.nextRunAt.localeCompare(b.nextRunAt));
+}
+
+export async function setRecurringOrderStatus(
+  id: string,
+  userId: string,
+  status: "active" | "paused" | "cancelled",
+): Promise<RecurringOrder> {
+  return mutate((db) => {
+    const order = db.recurringOrders?.find((entry) => entry.id === id);
+    if (!order || order.userId !== userId) throw new Error("Recurring order not found");
+    if (order.status === "cancelled") throw new Error("This schedule is cancelled");
+    order.status = status;
+    if (status === "active" && new Date(order.nextRunAt).getTime() < Date.now()) {
+      order.nextRunAt = nextRecurringRun(order.frequency, order.intervalDays).toISOString();
+    }
+    order.updatedAt = new Date().toISOString();
+    recordAudit(db, {
+      actorRole: "customer",
+      actorId: userId,
+      action: `recurring.${status}`,
+      entity: "order",
+      entityId: order.id,
+      summary: `${status} recurring order ${order.title}`,
+    });
+    return order;
+  });
+}
+
+export async function skipRecurringOrder(id: string, userId: string): Promise<RecurringOrder> {
+  return mutate((db) => {
+    const order = db.recurringOrders?.find((entry) => entry.id === id);
+    if (!order || order.userId !== userId) throw new Error("Recurring order not found");
+    if (order.status !== "active") throw new Error("Only active schedules can be skipped");
+    order.nextRunAt = nextRecurringRun(
+      order.frequency,
+      order.intervalDays,
+      new Date(order.nextRunAt),
+    ).toISOString();
+    order.updatedAt = new Date().toISOString();
+    return order;
+  });
+}
+
+export type RecurringRunSummary = {
+  checked: number;
+  created: number;
+  skipped: number;
+  failed: number;
+  details: Array<{ id: string; title: string; status: "created" | "skipped" | "failed"; orderId?: string; error?: string }>;
+};
+
+/**
+ * Creates due recurring orders with a stable idempotency key. COD only; a
+ * schedule without explicit consent is skipped rather than silently charged.
+ */
+export async function runDueRecurringOrders(now = new Date()): Promise<RecurringRunSummary> {
+  const db = await getDb();
+  const due = (db.recurringOrders ?? []).filter(
+    (order) =>
+      order.status === "active" &&
+      new Date(order.nextRunAt).getTime() <= now.getTime(),
+  );
+  const summary: RecurringRunSummary = { checked: due.length, created: 0, skipped: 0, failed: 0, details: [] };
+  for (const schedule of due) {
+    if (!schedule.consent) {
+      summary.skipped += 1;
+      summary.details.push({ id: schedule.id, title: schedule.title, status: "skipped", error: "Customer consent required" });
+      await mutate((database) => {
+        const current = database.recurringOrders?.find((entry) => entry.id === schedule.id);
+        if (current) {
+          current.nextRunAt = nextRecurringRun(current.frequency, current.intervalDays, now).toISOString();
+          current.lastError = "Consent required before automatic order creation";
+          current.updatedAt = new Date().toISOString();
+        }
+      });
+      continue;
+    }
+    try {
+      const order = await createOrder(
+        {
+          citySlug: schedule.citySlug,
+          storeId: schedule.storeId,
+          customerName: schedule.address.name,
+          customerPhone: schedule.address.phone,
+          customerEmail: schedule.address.email,
+          address: schedule.address.address,
+          landmark: schedule.address.landmark,
+          notes: schedule.address.notes,
+          lat: schedule.address.lat,
+          lng: schedule.address.lng,
+          items: schedule.items.map((item) => ({
+            productId: item.productId,
+            qty: item.qty,
+            optionIds: item.optionIds,
+            variantId: item.variantId,
+          })),
+          idempotencyKey: `recurring:${schedule.id}:${schedule.nextRunAt}`,
+        },
+        { role: "customer" },
+      );
+      summary.created += 1;
+      summary.details.push({ id: schedule.id, title: schedule.title, status: "created", orderId: order.id });
+      await mutate((database) => {
+        const current = database.recurringOrders?.find((entry) => entry.id === schedule.id);
+        if (current) {
+          current.lastRunAt = now.toISOString();
+          current.lastOrderId = order.id;
+          current.lastError = undefined;
+          current.nextRunAt = nextRecurringRun(current.frequency, current.intervalDays, now).toISOString();
+          current.updatedAt = now.toISOString();
+        }
+      });
+    } catch (error) {
+      summary.failed += 1;
+      const message = error instanceof Error ? error.message : "Could not create order";
+      summary.details.push({ id: schedule.id, title: schedule.title, status: "failed", error: message });
+      await mutate((database) => {
+        const current = database.recurringOrders?.find((entry) => entry.id === schedule.id);
+        if (current) {
+          current.lastError = message;
+          current.nextRunAt = nextRecurringRun(current.frequency, current.intervalDays, now).toISOString();
+          current.updatedAt = now.toISOString();
+        }
+      });
+    }
+  }
+  return summary;
 }

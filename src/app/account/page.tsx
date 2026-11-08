@@ -16,6 +16,7 @@ import {
   Star,
   UserRound,
   Users,
+  Repeat,
 } from "lucide-react";
 import { requireRole } from "@/lib/auth";
 import { isEmailVerified } from "@/lib/email-verification";
@@ -105,6 +106,12 @@ export default async function AccountPage() {
       label: t("Group orders"),
       note: t("Order together, pay once"),
       icon: Users,
+    },
+    {
+      href: "/account/recurring",
+      label: t("Recurring orders"),
+      note: t("Your weekly shop, on a schedule"),
+      icon: Repeat,
     },
     {
       href: "/orders",
