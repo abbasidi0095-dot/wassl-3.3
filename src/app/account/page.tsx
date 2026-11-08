@@ -17,6 +17,7 @@ import {
   UserRound,
   Users,
   Repeat,
+  Tag,
 } from "lucide-react";
 import { requireRole } from "@/lib/auth";
 import { isEmailVerified } from "@/lib/email-verification";
@@ -112,6 +113,18 @@ export default async function AccountPage() {
       label: t("Recurring orders"),
       note: t("Your weekly shop, on a schedule"),
       icon: Repeat,
+    },
+    {
+      href: "/account/family",
+      label: t("Wassl Family"),
+      note: t("One household, one shared shop"),
+      icon: Users,
+    },
+    {
+      href: "/deals",
+      label: t("Deals"),
+      note: t("Live offers and promo codes"),
+      icon: Tag,
     },
     {
       href: "/orders",

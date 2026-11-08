@@ -66,6 +66,9 @@ import type {
   BusinessOrderStatus,
   GroupOrder,
   GroupOrderParticipant,
+  Family,
+  FamilyMember,
+  FamilyRole,
   RecurringOrder,
   RecurringOrderAddress,
   RecurringOrderFrequency,
@@ -5589,4 +5592,167 @@ export async function runDueRecurringOrders(now = new Date()): Promise<Recurring
     }
   }
   return summary;
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* Wassl Family                                                               */
+/* -------------------------------------------------------------------------- */
+
+export type FamilyView = Omit<Family, "inviteTokenHash">;
+
+function familyView(family: Family): FamilyView {
+  const { inviteTokenHash: _hash, ...view } = family;
+  return view;
+}
+
+function familyTokenHash(token: string): string {
+  return createHash("sha256").update(token).digest("hex");
+}
+
+function familyForUser(db: Database, userId: string): Family | undefined {
+  return db.families?.find((family) =>
+    family.members.some((member) => member.userId === userId),
+  );
+}
+
+export async function createFamily(
+  userId: string,
+  userName: string,
+  name: string,
+): Promise<{ family: FamilyView; token: string }> {
+  const token = randomBytes(24).toString("hex");
+  const now = new Date().toISOString();
+  const family = await mutate((db) => {
+    if (familyForUser(db, userId)) throw new Error("You already belong to a family");
+    const record: Family = {
+      id: randomId("family", 8),
+      name: name.trim().slice(0, 60) || "My family",
+      ownerUserId: userId,
+      inviteTokenHash: familyTokenHash(token),
+      createdAt: now,
+      updatedAt: now,
+      members: [
+        {
+          id: randomId("fmember", 6),
+          userId,
+          name: userName,
+          role: "owner",
+          joinedAt: now,
+        },
+      ],
+    };
+    db.families ??= [];
+    db.families.push(record);
+    recordAudit(db, {
+      actorRole: "customer",
+      actorId: userId,
+      actorName: userName,
+      action: "family.create",
+      entity: "auth",
+      entityId: record.id,
+      summary: `Created family ${record.name}`,
+    });
+    return record;
+  });
+  return { family: familyView(family), token };
+}
+
+export async function getFamilyForUser(userId: string): Promise<FamilyView | undefined> {
+  const family = familyForUser(await getDb(), userId);
+  return family ? familyView(family) : undefined;
+}
+
+export async function joinFamily(input: {
+  token: string;
+  userId: string;
+  userName: string;
+}): Promise<FamilyView> {
+  return mutate((db) => {
+    if (familyForUser(db, input.userId)) {
+      throw new Error("You already belong to a family");
+    }
+    const family = db.families?.find(
+      (entry) => entry.inviteTokenHash === familyTokenHash(input.token),
+    );
+    if (!family) throw new Error("Invalid family invitation");
+    family.members.push({
+      id: randomId("fmember", 6),
+      userId: input.userId,
+      name: input.userName,
+      role: "adult",
+      joinedAt: new Date().toISOString(),
+    });
+    family.updatedAt = new Date().toISOString();
+    recordAudit(db, {
+      actorRole: "customer",
+      actorId: input.userId,
+      actorName: input.userName,
+      action: "family.join",
+      entity: "auth",
+      entityId: family.id,
+      summary: `Joined family ${family.name}`,
+    });
+    return familyView(family);
+  });
+}
+
+export async function regenerateFamilyInvite(
+  userId: string,
+): Promise<{ family: FamilyView; token: string }> {
+  const token = randomBytes(24).toString("hex");
+  const family = await mutate((db) => {
+    const record = familyForUser(db, userId);
+    if (!record) throw new Error("You do not belong to a family");
+    if (record.ownerUserId !== userId) throw new Error("Only the owner can invite");
+    record.inviteTokenHash = familyTokenHash(token);
+    record.updatedAt = new Date().toISOString();
+    return record;
+  });
+  return { family: familyView(family), token };
+}
+
+export async function updateFamilyMemberRole(input: {
+  userId: string;
+  memberId: string;
+  role: Exclude<FamilyRole, "owner">;
+}): Promise<FamilyView> {
+  return mutate((db) => {
+    const family = familyForUser(db, input.userId);
+    if (!family) throw new Error("You do not belong to a family");
+    if (family.ownerUserId !== input.userId) throw new Error("Only the owner can change roles");
+    const member = family.members.find((entry) => entry.id === input.memberId);
+    if (!member || member.role === "owner") throw new Error("Member not found");
+    member.role = input.role;
+    family.updatedAt = new Date().toISOString();
+    return familyView(family);
+  });
+}
+
+export async function removeFamilyMember(
+  userId: string,
+  memberId: string,
+): Promise<FamilyView> {
+  return mutate((db) => {
+    const family = familyForUser(db, userId);
+    if (!family) throw new Error("You do not belong to a family");
+    if (family.ownerUserId !== userId) throw new Error("Only the owner can remove members");
+    const member = family.members.find((entry) => entry.id === memberId);
+    if (!member || member.role === "owner") throw new Error("Member not found");
+    family.members = family.members.filter((entry) => entry.id !== memberId);
+    family.updatedAt = new Date().toISOString();
+    return familyView(family);
+  });
+}
+
+export async function leaveFamily(userId: string): Promise<void> {
+  await mutate((db) => {
+    const family = familyForUser(db, userId);
+    if (!family) return;
+    if (family.ownerUserId === userId) {
+      throw new Error("The owner must transfer or delete the family first");
+    }
+    family.members = family.members.filter((member) => member.userId !== userId);
+    family.updatedAt = new Date().toISOString();
+  });
 }

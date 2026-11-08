@@ -933,6 +933,28 @@ export interface RecurringOrder {
   updatedAt: string;
 }
 
+
+export type FamilyRole = "owner" | "adult" | "restricted";
+
+export interface FamilyMember {
+  id: string;
+  userId: string;
+  name: string;
+  role: FamilyRole;
+  joinedAt: string;
+}
+
+export interface Family {
+  id: string;
+  name: string;
+  ownerUserId: string;
+  /** SHA-256 hash of the invitation token; raw tokens are returned once. */
+  inviteTokenHash: string;
+  createdAt: string;
+  updatedAt: string;
+  members: FamilyMember[];
+}
+
 export interface Database {
   users: User[];
   cities: City[];
@@ -964,6 +986,7 @@ export interface Database {
   businessOrders?: BusinessOrder[];
   groupOrders?: GroupOrder[];
   recurringOrders?: RecurringOrder[];
+  families?: Family[];
 }
 
 /**
