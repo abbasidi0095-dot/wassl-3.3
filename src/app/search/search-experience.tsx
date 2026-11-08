@@ -15,7 +15,7 @@ import {
   X,
 } from "lucide-react";
 import type { City } from "@/lib/types";
-import type { SearchGroup, SearchHit, SearchKind, SearchResult } from "@/lib/search";
+import type { ProductComparison, SearchGroup, SearchHit, SearchKind, SearchResult } from "@/lib/search";
 import { useI18n } from "@/components/locale-provider";
 import { cn } from "@/lib/utils";
 
@@ -138,6 +138,7 @@ export function SearchExperience({
   }, [result, query]);
 
   const groups = result?.groups ?? [];
+  const comparisons = result?.comparisons ?? [];
   const hasQuery = Boolean(query.trim());
   const total = result?.total ?? 0;
   const showLanding = !hasQuery && !loading && !error;
@@ -322,6 +323,10 @@ export function SearchExperience({
         </div>
       ) : null}
 
+      {!loading && !error && comparisons.length ? (
+        <ComparisonSection comparisons={comparisons} />
+      ) : null}
+
       {!loading && !error && groups.length ? (
         <div className="mt-7 space-y-7">
           {groups.map((group) => (
@@ -347,6 +352,120 @@ export function SearchExperience({
         </div>
       ) : null}
     </div>
+  );
+}
+
+function ComparisonSection({ comparisons }: { comparisons: ProductComparison[] }) {
+  const { t } = useI18n();
+  return (
+    <section className="mt-7">
+      <div className="flex flex-wrap items-end justify-between gap-2 border-b border-line pb-2">
+        <div>
+          <h2 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-muted">
+            {t("Compare nearby stores")}
+          </h2>
+          <p className="mt-1 text-[11px] text-muted">
+            {t("The same item across nearby stores. Prices and stock are live.")}
+          </p>
+        </div>
+        <span className="text-[11px] text-muted">
+          {comparisons.length} {t("products")}
+        </span>
+      </div>
+      <div className="mt-3 grid gap-3 lg:grid-cols-2">
+        {comparisons.map((comparison) => (
+          <article
+            key={comparison.key}
+            className="rounded-[20px] border border-line bg-surface p-3"
+          >
+            <div className="flex items-center gap-3">
+              <span className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-[12px] border border-line bg-surface-2">
+                {comparison.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={comparison.image}
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <Package size={18} className="text-muted" />
+                )}
+              </span>
+              <div className="min-w-0 flex-1">
+                <h3 className="truncate font-display text-[18px] font-semibold tracking-[-0.02em]">
+                  {comparison.title}
+                </h3>
+                <p className="truncate text-[11px] text-muted">
+                  {[comparison.unit, comparison.category]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </p>
+              </div>
+              <div className="shrink-0 text-end">
+                <div className="text-[10px] text-muted">{t("Best price")}</div>
+                <div className="text-[16px] font-semibold tnum">
+                  {comparison.bestPrice} MAD
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-3 divide-y divide-line border-t border-line">
+              {comparison.offers.slice(0, 4).map((offer) => (
+                <Link
+                  key={`${comparison.key}-${offer.storeId}`}
+                  href={offer.href}
+                  className="flex items-center justify-between gap-3 py-2.5 transition-colors hover:text-brand"
+                >
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-[12px] font-semibold">
+                      {offer.storeName}
+                    </span>
+                    <span className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] text-muted">
+                      <span className="inline-flex items-center gap-1">
+                        <Sparkles size={9} className="text-signal" />
+                        {offer.storeRating.toFixed(1)}
+                      </span>
+                      {offer.distanceKm !== undefined ? (
+                        <span>{offer.distanceKm.toFixed(1)} km</span>
+                      ) : null}
+                      {offer.etaMinutes !== undefined ? (
+                        <span className="inline-flex items-center gap-1">
+                          <Clock3 size={9} />
+                          {offer.etaMinutes} min
+                        </span>
+                      ) : null}
+                      <span>{offer.deliveryFee} MAD delivery</span>
+                      <span
+                        className={
+                          offer.stockStatus === "low_stock"
+                            ? "text-signal-ink"
+                            : "text-success"
+                        }
+                      >
+                        {t(
+                          offer.stockStatus === "low_stock"
+                            ? "Low stock"
+                            : "In stock",
+                        )}
+                      </span>
+                      {offer.promotion ? (
+                        <span className="rounded-full border border-signal/40 bg-signal/10 px-1.5 py-0.5 text-signal-ink">
+                          {offer.promotion}
+                        </span>
+                      ) : null}
+                    </span>
+                  </span>
+                  <span className="shrink-0 text-[15px] font-semibold tnum">
+                    {offer.price} MAD
+                  </span>
+                  <ChevronRight size={14} className="shrink-0 text-muted rtl:-scale-x-100" />
+                </Link>
+              ))}
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -437,6 +556,57 @@ function SearchHitRow({
           {subtitle ? (
             <span className="mt-0.5 block truncate text-[11px] text-muted">
               {subtitle}
+            </span>
+          ) : null}
+          {hit.kind === "product" || hit.kind === "store" ? (
+            <span className="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[10px] font-medium text-muted">
+              {hit.storeRating ? (
+                <span className="inline-flex items-center gap-1">
+                  <Sparkles size={10} className="text-signal" />
+                  {hit.storeRating.toFixed(1)}
+                </span>
+              ) : null}
+              {hit.distanceKm !== undefined ? (
+                <span>{hit.distanceKm.toFixed(1)} km</span>
+              ) : null}
+              {hit.etaMinutes !== undefined ? (
+                <span className="inline-flex items-center gap-1">
+                  <Clock3 size={10} />
+                  {hit.etaMinutes} min
+                </span>
+              ) : null}
+              {hit.deliveryFee !== undefined && hit.kind === "product" ? (
+                <span>{hit.deliveryFee} MAD delivery</span>
+              ) : null}
+              {hit.stockStatus && hit.kind === "product" ? (
+                <span
+                  className={
+                    hit.stockStatus === "sold_out"
+                      ? "text-danger"
+                      : hit.stockStatus === "low_stock"
+                        ? "text-signal-ink"
+                        : "text-success"
+                  }
+                >
+                  {t(
+                    hit.stockStatus === "sold_out"
+                      ? "Sold out"
+                      : hit.stockStatus === "low_stock"
+                        ? "Low stock"
+                        : "In stock",
+                  )}
+                </span>
+              ) : null}
+              {hit.promotion ? (
+                <span className="rounded-full border border-signal/40 bg-signal/10 px-1.5 py-0.5 text-signal-ink">
+                  {hit.promotion}
+                </span>
+              ) : null}
+              {hit.sponsored ? (
+                <span className="rounded-full border border-line px-1.5 py-0.5">
+                  {t("Sponsored")}
+                </span>
+              ) : null}
             </span>
           ) : null}
         </span>
