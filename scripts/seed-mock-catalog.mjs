@@ -46,21 +46,34 @@ try {
   let images = 0;
 
   for (const store of catalog.stores) {
-    if (!storeSlugs.has(store.slug)) {
+    const existing = db.stores.find((candidate) => candidate.slug === store.slug);
+    if (!existing) {
       db.stores.push(store);
       storeSlugs.add(store.slug);
       addedStores += 1;
+    } else if (existing.id?.startsWith("store_mock_")) {
+      Object.assign(existing, store);
     }
   }
 
   for (const product of catalog.products) {
     const key = `${product.storeId}::${product.name}`;
-    if (!productIds.has(product.id) && !storeProductNames.has(key)) {
+    const existing = db.products.find(
+      (candidate) => candidate.id === product.id || `${candidate.storeId}::${candidate.name}` === key,
+    );
+    if (!existing) {
       db.products.push(product);
       productIds.add(product.id);
       storeProductNames.add(key);
       addedProducts += 1;
+    } else if (existing.id?.startsWith("product_mock_")) {
+      Object.assign(existing, product);
     }
+  }
+
+  const liveCitySlugs = new Set(catalog.stores.map((store) => store.citySlug));
+  for (const city of db.cities ?? []) {
+    if (liveCitySlugs.has(city.slug)) city.launchStatus = "live";
   }
 
   for (const product of db.products) {

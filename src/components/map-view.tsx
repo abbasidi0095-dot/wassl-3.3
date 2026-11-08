@@ -8,10 +8,15 @@ import {
   NavigationControl,
   AttributionControl,
   LngLatBounds,
+  setWorkerUrl,
   type MapOptions,
   type GeoJSONSource,
 } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+
+if (typeof window !== "undefined") {
+  setWorkerUrl("/maplibre/maplibre-gl-worker.mjs");
+}
 
 export type MapPoint = {
   id: string;

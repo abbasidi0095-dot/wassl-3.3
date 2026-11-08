@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-08T01:52:17.391Z",
+  "generatedAt": "2026-11-08T01:56:32.104Z",
   "stores": [
     {
       "id": "store_mock_dakhla-dakhla-catch",
@@ -34,8 +34,8 @@
       "openingHours": [
         {
           "days": "Mon–Sun",
-          "open": "10:00",
-          "close": "23:30"
+          "open": "00:00",
+          "close": "23:59"
         }
       ],
       "image": "/images/stores/grill-1.jpg"
@@ -73,8 +73,8 @@
       "openingHours": [
         {
           "days": "Mon–Sun",
-          "open": "08:00",
-          "close": "23:00"
+          "open": "00:00",
+          "close": "23:59"
         }
       ],
       "image": "/images/stores/grocery-2.jpg",
@@ -142,8 +142,8 @@
       "openingHours": [
         {
           "days": "Mon–Sun",
-          "open": "10:00",
-          "close": "23:30"
+          "open": "00:00",
+          "close": "23:59"
         }
       ],
       "image": "/images/stores/grill-2.jpg"
@@ -181,8 +181,8 @@
       "openingHours": [
         {
           "days": "Mon–Sun",
-          "open": "08:00",
-          "close": "23:00"
+          "open": "00:00",
+          "close": "23:59"
         }
       ],
       "image": "/images/stores/grocery-3.jpg",
@@ -250,8 +250,8 @@
       "openingHours": [
         {
           "days": "Mon–Sun",
-          "open": "10:00",
-          "close": "23:30"
+          "open": "00:00",
+          "close": "23:59"
         }
       ],
       "image": "/images/stores/cafe-3.jpg"
@@ -289,8 +289,8 @@
       "openingHours": [
         {
           "days": "Mon–Sun",
-          "open": "08:00",
-          "close": "23:00"
+          "open": "00:00",
+          "close": "23:59"
         }
       ],
       "image": "/images/stores/grocery-4.jpg",
@@ -358,8 +358,8 @@
       "openingHours": [
         {
           "days": "Mon–Sun",
-          "open": "10:00",
-          "close": "23:30"
+          "open": "00:00",
+          "close": "23:59"
         }
       ],
       "image": "/images/stores/tagine-1.jpg"
@@ -397,8 +397,8 @@
       "openingHours": [
         {
           "days": "Mon–Sun",
-          "open": "08:00",
-          "close": "23:00"
+          "open": "00:00",
+          "close": "23:59"
         }
       ],
       "image": "/images/stores/grocery-1.jpg",
@@ -466,8 +466,8 @@
       "openingHours": [
         {
           "days": "Mon–Sun",
-          "open": "10:00",
-          "close": "23:30"
+          "open": "00:00",
+          "close": "23:59"
         }
       ],
       "image": "/images/stores/tagine-2.jpg"
@@ -505,8 +505,8 @@
       "openingHours": [
         {
           "days": "Mon–Sun",
-          "open": "08:00",
-          "close": "23:00"
+          "open": "00:00",
+          "close": "23:59"
         }
       ],
       "image": "/images/stores/grocery-2.jpg",
@@ -574,8 +574,8 @@
       "openingHours": [
         {
           "days": "Mon–Sun",
-          "open": "10:00",
-          "close": "23:30"
+          "open": "00:00",
+          "close": "23:59"
         }
       ],
       "image": "/images/stores/moroccan-1.jpg"
@@ -613,8 +613,8 @@
       "openingHours": [
         {
           "days": "Mon–Sun",
-          "open": "08:00",
-          "close": "23:00"
+          "open": "00:00",
+          "close": "23:59"
         }
       ],
       "image": "/images/stores/grocery-3.jpg",
@@ -650,6 +650,84 @@
       }
     },
     {
+      "id": "store_mock_casablanca-casa-corner-cafe",
+      "slug": "casablanca-casa-corner-cafe",
+      "name": "Casa Corner Cafe",
+      "nameAr": "مقهى زاوية الدار البيضاء",
+      "citySlug": "casablanca",
+      "category": "cafe",
+      "tagline": "A calm corner for breakfast",
+      "description": "Casa Corner Cafe serves a calm corner for breakfast in Casablanca, with cash on delivery and live tracking.",
+      "address": "Boulevard Mohammed V, Casablanca",
+      "landmark": "Behind the post office",
+      "lat": 33.5764,
+      "lng": -7.55785,
+      "accent": "#2447E0",
+      "rating": 4.4,
+      "reviews": 307,
+      "prepTime": 30,
+      "minOrder": 35,
+      "deliveryFee": 14,
+      "isOpen": true,
+      "commissionRate": 12,
+      "phone": "+212 660 17 27 37",
+      "ownerName": "Amina S.",
+      "dataOrigin": "wassl",
+      "priceLevel": 2,
+      "tags": [
+        "Coffee",
+        "Cash on delivery",
+        "Local"
+      ],
+      "openingHours": [
+        {
+          "days": "Mon–Sun",
+          "open": "00:00",
+          "close": "23:59"
+        }
+      ],
+      "image": "/images/stores/cafe-2.jpg"
+    },
+    {
+      "id": "store_mock_casablanca-casa-pharmacy",
+      "slug": "casablanca-casa-pharmacy",
+      "name": "Casa Pharmacy",
+      "nameAr": "صيدلية الدار البيضاء",
+      "citySlug": "casablanca",
+      "category": "pharmacy",
+      "tagline": "Health and care, delivered discreetly",
+      "description": "Over-the-counter health, baby and personal care from Casa Pharmacy, delivered discreetly across Casablanca.",
+      "address": "Avenue Al Massira, Casablanca",
+      "landmark": "By the corniche",
+      "lat": 33.5804,
+      "lng": -7.553850000000001,
+      "accent": "#0F766E",
+      "rating": 4.5,
+      "reviews": 344,
+      "prepTime": 15,
+      "minOrder": 45,
+      "deliveryFee": 8,
+      "isOpen": true,
+      "commissionRate": 12,
+      "phone": "+212 660 18 28 38",
+      "ownerName": "Brahim L.",
+      "dataOrigin": "wassl",
+      "priceLevel": 2,
+      "tags": [
+        "Pharmacy",
+        "Health",
+        "Care"
+      ],
+      "openingHours": [
+        {
+          "days": "Mon–Sun",
+          "open": "00:00",
+          "close": "23:59"
+        }
+      ],
+      "image": "/images/stores/pharmacy-1.jpg"
+    },
+    {
       "id": "store_mock_rabat-rabat-table",
       "slug": "rabat-rabat-table",
       "name": "Rabat Table",
@@ -682,8 +760,8 @@
       "openingHours": [
         {
           "days": "Mon–Sun",
-          "open": "10:00",
-          "close": "23:30"
+          "open": "00:00",
+          "close": "23:59"
         }
       ],
       "image": "/images/stores/moroccan-2.jpg"
@@ -721,8 +799,8 @@
       "openingHours": [
         {
           "days": "Mon–Sun",
-          "open": "08:00",
-          "close": "23:00"
+          "open": "00:00",
+          "close": "23:59"
         }
       ],
       "image": "/images/stores/grocery-4.jpg",
@@ -758,6 +836,84 @@
       }
     },
     {
+      "id": "store_mock_rabat-rabat-corner-cafe",
+      "slug": "rabat-rabat-corner-cafe",
+      "name": "Rabat Corner Cafe",
+      "nameAr": "مقهى زاوية الرباط",
+      "citySlug": "rabat",
+      "category": "cafe",
+      "tagline": "Coffee, msemen and something sweet",
+      "description": "Rabat Corner Cafe serves coffee, msemen and something sweet in Rabat, with cash on delivery and live tracking.",
+      "address": "Avenue Al Massira, Rabat",
+      "landmark": "By the corniche",
+      "lat": 34.00525,
+      "lng": -6.828550000000001,
+      "accent": "#0F766E",
+      "rating": 4.5,
+      "reviews": 344,
+      "prepTime": 15,
+      "minOrder": 45,
+      "deliveryFee": 8,
+      "isOpen": true,
+      "commissionRate": 12,
+      "phone": "+212 660 18 28 38",
+      "ownerName": "Brahim L.",
+      "dataOrigin": "wassl",
+      "priceLevel": 2,
+      "tags": [
+        "Coffee",
+        "Cash on delivery",
+        "Local"
+      ],
+      "openingHours": [
+        {
+          "days": "Mon–Sun",
+          "open": "00:00",
+          "close": "23:59"
+        }
+      ],
+      "image": "/images/stores/cafe-3.jpg"
+    },
+    {
+      "id": "store_mock_rabat-rabat-pharmacy",
+      "slug": "rabat-rabat-pharmacy",
+      "name": "Rabat Pharmacy",
+      "nameAr": "صيدلية الرباط",
+      "citySlug": "rabat",
+      "category": "pharmacy",
+      "tagline": "Health and care, delivered discreetly",
+      "description": "Over-the-counter health, baby and personal care from Rabat Pharmacy, delivered discreetly across Rabat.",
+      "address": "Rue de la Corniche, Rabat",
+      "landmark": "Next to the taxi stand",
+      "lat": 34.00925,
+      "lng": -6.82455,
+      "accent": "#B45309",
+      "rating": 4.6,
+      "reviews": 61,
+      "prepTime": 20,
+      "minOrder": 25,
+      "deliveryFee": 10,
+      "isOpen": true,
+      "commissionRate": 12,
+      "phone": "+212 660 19 29 39",
+      "ownerName": "Salma T.",
+      "dataOrigin": "wassl",
+      "priceLevel": 2,
+      "tags": [
+        "Pharmacy",
+        "Health",
+        "Care"
+      ],
+      "openingHours": [
+        {
+          "days": "Mon–Sun",
+          "open": "00:00",
+          "close": "23:59"
+        }
+      ],
+      "image": "/images/stores/pharmacy-2.jpg"
+    },
+    {
       "id": "store_mock_marrakesh-marrakesh-medina-kitchen",
       "slug": "marrakesh-marrakesh-medina-kitchen",
       "name": "Marrakesh Medina Kitchen",
@@ -790,8 +946,8 @@
       "openingHours": [
         {
           "days": "Mon–Sun",
-          "open": "10:00",
-          "close": "23:30"
+          "open": "00:00",
+          "close": "23:59"
         }
       ],
       "image": "/images/stores/couscous-1.jpg"
@@ -829,8 +985,8 @@
       "openingHours": [
         {
           "days": "Mon–Sun",
-          "open": "08:00",
-          "close": "23:00"
+          "open": "00:00",
+          "close": "23:59"
         }
       ],
       "image": "/images/stores/grocery-1.jpg",
@@ -866,6 +1022,84 @@
       }
     },
     {
+      "id": "store_mock_marrakesh-medina-cafe",
+      "slug": "marrakesh-medina-cafe",
+      "name": "Medina Cafe",
+      "nameAr": "مقهى المدينة",
+      "citySlug": "marrakesh",
+      "category": "cafe",
+      "tagline": "A calm corner for breakfast",
+      "description": "Medina Cafe serves a calm corner for breakfast in Marrakesh, with cash on delivery and live tracking.",
+      "address": "Rue de la Corniche, Marrakesh",
+      "landmark": "Next to the taxi stand",
+      "lat": 31.63016,
+      "lng": -7.99194,
+      "accent": "#B45309",
+      "rating": 4.6,
+      "reviews": 61,
+      "prepTime": 20,
+      "minOrder": 25,
+      "deliveryFee": 10,
+      "isOpen": true,
+      "commissionRate": 12,
+      "phone": "+212 660 19 29 39",
+      "ownerName": "Salma T.",
+      "dataOrigin": "wassl",
+      "priceLevel": 2,
+      "tags": [
+        "Coffee",
+        "Cash on delivery",
+        "Local"
+      ],
+      "openingHours": [
+        {
+          "days": "Mon–Sun",
+          "open": "00:00",
+          "close": "23:59"
+        }
+      ],
+      "image": "/images/stores/cafe-4.jpg"
+    },
+    {
+      "id": "store_mock_marrakesh-marrakech-pharmacy",
+      "slug": "marrakesh-marrakech-pharmacy",
+      "name": "Marrakech Pharmacy",
+      "nameAr": "صيدلية مراكش",
+      "citySlug": "marrakesh",
+      "category": "pharmacy",
+      "tagline": "Health and care, delivered discreetly",
+      "description": "Over-the-counter health, baby and personal care from Marrakech Pharmacy, delivered discreetly across Marrakesh.",
+      "address": "Avenue Hassan II, Marrakesh",
+      "landmark": "Near the central market",
+      "lat": 31.63416,
+      "lng": -8.00794,
+      "accent": "#9A3412",
+      "rating": 4.7,
+      "reviews": 98,
+      "prepTime": 25,
+      "minOrder": 35,
+      "deliveryFee": 12,
+      "isOpen": true,
+      "commissionRate": 12,
+      "phone": "+212 660 20 30 40",
+      "ownerName": "Nour A.",
+      "dataOrigin": "wassl",
+      "priceLevel": 2,
+      "tags": [
+        "Pharmacy",
+        "Health",
+        "Care"
+      ],
+      "openingHours": [
+        {
+          "days": "Mon–Sun",
+          "open": "00:00",
+          "close": "23:59"
+        }
+      ],
+      "image": "/images/stores/pharmacy-3.jpg"
+    },
+    {
       "id": "store_mock_agadir-agadir-beach-grill",
       "slug": "agadir-agadir-beach-grill",
       "name": "Agadir Beach Grill",
@@ -898,8 +1132,8 @@
       "openingHours": [
         {
           "days": "Mon–Sun",
-          "open": "10:00",
-          "close": "23:30"
+          "open": "00:00",
+          "close": "23:59"
         }
       ],
       "image": "/images/stores/seafood-1.jpg"
@@ -937,8 +1171,8 @@
       "openingHours": [
         {
           "days": "Mon–Sun",
-          "open": "08:00",
-          "close": "23:00"
+          "open": "00:00",
+          "close": "23:59"
         }
       ],
       "image": "/images/stores/grocery-2.jpg",
@@ -974,6 +1208,84 @@
       }
     },
     {
+      "id": "store_mock_agadir-agadir-beach-cafe",
+      "slug": "agadir-agadir-beach-cafe",
+      "name": "Agadir Beach Cafe",
+      "nameAr": "مقهى شاطئ أكادير",
+      "citySlug": "agadir",
+      "category": "cafe",
+      "tagline": "Coffee, msemen and something sweet",
+      "description": "Agadir Beach Cafe serves coffee, msemen and something sweet in Agadir, with cash on delivery and live tracking.",
+      "address": "Avenue Hassan II, Agadir",
+      "landmark": "Near the central market",
+      "lat": 30.42018,
+      "lng": -9.60615,
+      "accent": "#9A3412",
+      "rating": 4.7,
+      "reviews": 98,
+      "prepTime": 25,
+      "minOrder": 35,
+      "deliveryFee": 12,
+      "isOpen": true,
+      "commissionRate": 12,
+      "phone": "+212 660 20 30 40",
+      "ownerName": "Nour A.",
+      "dataOrigin": "wassl",
+      "priceLevel": 2,
+      "tags": [
+        "Coffee",
+        "Cash on delivery",
+        "Local"
+      ],
+      "openingHours": [
+        {
+          "days": "Mon–Sun",
+          "open": "00:00",
+          "close": "23:59"
+        }
+      ],
+      "image": "/images/stores/cafe-5.jpg"
+    },
+    {
+      "id": "store_mock_agadir-agadir-pharmacy",
+      "slug": "agadir-agadir-pharmacy",
+      "name": "Agadir Pharmacy",
+      "nameAr": "صيدلية أكادير",
+      "citySlug": "agadir",
+      "category": "pharmacy",
+      "tagline": "Health and care, delivered discreetly",
+      "description": "Over-the-counter health, baby and personal care from Agadir Pharmacy, delivered discreetly across Agadir.",
+      "address": "Rue Ibn Sina, Agadir",
+      "landmark": "Opposite the main square",
+      "lat": 30.42418,
+      "lng": -9.60215,
+      "accent": "#15803D",
+      "rating": 4.8,
+      "reviews": 135,
+      "prepTime": 30,
+      "minOrder": 45,
+      "deliveryFee": 14,
+      "isOpen": true,
+      "commissionRate": 12,
+      "phone": "+212 660 21 31 41",
+      "ownerName": "Hassan E.",
+      "dataOrigin": "wassl",
+      "priceLevel": 2,
+      "tags": [
+        "Pharmacy",
+        "Health",
+        "Care"
+      ],
+      "openingHours": [
+        {
+          "days": "Mon–Sun",
+          "open": "00:00",
+          "close": "23:59"
+        }
+      ],
+      "image": "/images/stores/pharmacy-4.jpg"
+    },
+    {
       "id": "store_mock_tangier-tangier-bay-kitchen",
       "slug": "tangier-tangier-bay-kitchen",
       "name": "Tangier Bay Kitchen",
@@ -1006,8 +1318,8 @@
       "openingHours": [
         {
           "days": "Mon–Sun",
-          "open": "10:00",
-          "close": "23:30"
+          "open": "00:00",
+          "close": "23:59"
         }
       ],
       "image": "/images/stores/seafood-2.jpg"
@@ -1045,8 +1357,8 @@
       "openingHours": [
         {
           "days": "Mon–Sun",
-          "open": "08:00",
-          "close": "23:00"
+          "open": "00:00",
+          "close": "23:59"
         }
       ],
       "image": "/images/stores/grocery-3.jpg",
@@ -1082,6 +1394,84 @@
       }
     },
     {
+      "id": "store_mock_tangier-tangier-bay-cafe",
+      "slug": "tangier-tangier-bay-cafe",
+      "name": "Tangier Bay Cafe",
+      "nameAr": "مقهى خليج طنجة",
+      "citySlug": "tangier",
+      "category": "cafe",
+      "tagline": "A calm corner for breakfast",
+      "description": "Tangier Bay Cafe serves a calm corner for breakfast in Tangier, with cash on delivery and live tracking.",
+      "address": "Rue Ibn Sina, Tangier",
+      "landmark": "Opposite the main square",
+      "lat": 35.77127,
+      "lng": -5.80375,
+      "accent": "#15803D",
+      "rating": 4.8,
+      "reviews": 135,
+      "prepTime": 30,
+      "minOrder": 45,
+      "deliveryFee": 14,
+      "isOpen": true,
+      "commissionRate": 12,
+      "phone": "+212 660 21 31 41",
+      "ownerName": "Hassan E.",
+      "dataOrigin": "wassl",
+      "priceLevel": 2,
+      "tags": [
+        "Coffee",
+        "Cash on delivery",
+        "Local"
+      ],
+      "openingHours": [
+        {
+          "days": "Mon–Sun",
+          "open": "00:00",
+          "close": "23:59"
+        }
+      ],
+      "image": "/images/stores/bakery-1.jpg"
+    },
+    {
+      "id": "store_mock_tangier-tangier-pharmacy",
+      "slug": "tangier-tangier-pharmacy",
+      "name": "Tangier Pharmacy",
+      "nameAr": "صيدلية طنجة",
+      "citySlug": "tangier",
+      "category": "pharmacy",
+      "tagline": "Health and care, delivered discreetly",
+      "description": "Over-the-counter health, baby and personal care from Tangier Pharmacy, delivered discreetly across Tangier.",
+      "address": "Boulevard Mohammed V, Tangier",
+      "landmark": "Behind the post office",
+      "lat": 35.775270000000006,
+      "lng": -5.79975,
+      "accent": "#E95322",
+      "rating": 4.3,
+      "reviews": 172,
+      "prepTime": 15,
+      "minOrder": 25,
+      "deliveryFee": 8,
+      "isOpen": true,
+      "commissionRate": 12,
+      "phone": "+212 660 22 32 42",
+      "ownerName": "Youssef M.",
+      "dataOrigin": "wassl",
+      "priceLevel": 2,
+      "tags": [
+        "Pharmacy",
+        "Health",
+        "Care"
+      ],
+      "openingHours": [
+        {
+          "days": "Mon–Sun",
+          "open": "00:00",
+          "close": "23:59"
+        }
+      ],
+      "image": "/images/stores/pharmacy-1.jpg"
+    },
+    {
       "id": "store_mock_fes-fes-medina-table",
       "slug": "fes-fes-medina-table",
       "name": "Fes Medina Table",
@@ -1114,8 +1504,8 @@
       "openingHours": [
         {
           "days": "Mon–Sun",
-          "open": "10:00",
-          "close": "23:30"
+          "open": "00:00",
+          "close": "23:59"
         }
       ],
       "image": "/images/stores/fastfood-1.jpg"
@@ -1153,8 +1543,8 @@
       "openingHours": [
         {
           "days": "Mon–Sun",
-          "open": "08:00",
-          "close": "23:00"
+          "open": "00:00",
+          "close": "23:59"
         }
       ],
       "image": "/images/stores/grocery-4.jpg",
@@ -1190,6 +1580,84 @@
       }
     },
     {
+      "id": "store_mock_fes-fes-medina-cafe",
+      "slug": "fes-fes-medina-cafe",
+      "name": "Fes Medina Cafe",
+      "nameAr": "مقهى فاس",
+      "citySlug": "fes",
+      "category": "cafe",
+      "tagline": "Coffee, msemen and something sweet",
+      "description": "Fes Medina Cafe serves coffee, msemen and something sweet in Fes, with cash on delivery and live tracking.",
+      "address": "Boulevard Mohammed V, Fes",
+      "landmark": "Behind the post office",
+      "lat": 34.048,
+      "lng": -4.87,
+      "accent": "#E95322",
+      "rating": 4.3,
+      "reviews": 172,
+      "prepTime": 15,
+      "minOrder": 25,
+      "deliveryFee": 8,
+      "isOpen": true,
+      "commissionRate": 12,
+      "phone": "+212 660 22 32 42",
+      "ownerName": "Youssef M.",
+      "dataOrigin": "wassl",
+      "priceLevel": 2,
+      "tags": [
+        "Coffee",
+        "Cash on delivery",
+        "Local"
+      ],
+      "openingHours": [
+        {
+          "days": "Mon–Sun",
+          "open": "00:00",
+          "close": "23:59"
+        }
+      ],
+      "image": "/images/stores/cafe-1.jpg"
+    },
+    {
+      "id": "store_mock_fes-fes-pharmacy",
+      "slug": "fes-fes-pharmacy",
+      "name": "Fes Pharmacy",
+      "nameAr": "صيدلية فاس",
+      "citySlug": "fes",
+      "category": "pharmacy",
+      "tagline": "Health and care, delivered discreetly",
+      "description": "Over-the-counter health, baby and personal care from Fes Pharmacy, delivered discreetly across Fes.",
+      "address": "Avenue Al Massira, Fes",
+      "landmark": "By the corniche",
+      "lat": 34.052,
+      "lng": -4.8660000000000005,
+      "accent": "#2447E0",
+      "rating": 4.4,
+      "reviews": 209,
+      "prepTime": 20,
+      "minOrder": 35,
+      "deliveryFee": 10,
+      "isOpen": true,
+      "commissionRate": 12,
+      "phone": "+212 660 23 33 43",
+      "ownerName": "Amina S.",
+      "dataOrigin": "wassl",
+      "priceLevel": 2,
+      "tags": [
+        "Pharmacy",
+        "Health",
+        "Care"
+      ],
+      "openingHours": [
+        {
+          "days": "Mon–Sun",
+          "open": "00:00",
+          "close": "23:59"
+        }
+      ],
+      "image": "/images/stores/pharmacy-2.jpg"
+    },
+    {
       "id": "store_mock_meknes-meknes-olive-kitchen",
       "slug": "meknes-meknes-olive-kitchen",
       "name": "Meknes Olive Kitchen",
@@ -1222,8 +1690,8 @@
       "openingHours": [
         {
           "days": "Mon–Sun",
-          "open": "10:00",
-          "close": "23:30"
+          "open": "00:00",
+          "close": "23:59"
         }
       ],
       "image": "/images/stores/interior-1.jpg"
@@ -1261,8 +1729,8 @@
       "openingHours": [
         {
           "days": "Mon–Sun",
-          "open": "08:00",
-          "close": "23:00"
+          "open": "00:00",
+          "close": "23:59"
         }
       ],
       "image": "/images/stores/grocery-1.jpg",
@@ -1298,6 +1766,84 @@
       }
     },
     {
+      "id": "store_mock_meknes-meknes-cafe",
+      "slug": "meknes-meknes-cafe",
+      "name": "Meknes Cafe",
+      "nameAr": "مقهى مكناس",
+      "citySlug": "meknes",
+      "category": "cafe",
+      "tagline": "A calm corner for breakfast",
+      "description": "Meknes Cafe serves a calm corner for breakfast in Meknes, with cash on delivery and live tracking.",
+      "address": "Avenue Al Massira, Meknes",
+      "landmark": "By the corniche",
+      "lat": 33.98961,
+      "lng": -5.5209600000000005,
+      "accent": "#2447E0",
+      "rating": 4.4,
+      "reviews": 209,
+      "prepTime": 20,
+      "minOrder": 35,
+      "deliveryFee": 10,
+      "isOpen": true,
+      "commissionRate": 12,
+      "phone": "+212 660 23 33 43",
+      "ownerName": "Amina S.",
+      "dataOrigin": "wassl",
+      "priceLevel": 2,
+      "tags": [
+        "Coffee",
+        "Cash on delivery",
+        "Local"
+      ],
+      "openingHours": [
+        {
+          "days": "Mon–Sun",
+          "open": "00:00",
+          "close": "23:59"
+        }
+      ],
+      "image": "/images/stores/cafe-2.jpg"
+    },
+    {
+      "id": "store_mock_meknes-meknes-pharmacy",
+      "slug": "meknes-meknes-pharmacy",
+      "name": "Meknes Pharmacy",
+      "nameAr": "صيدلية مكناس",
+      "citySlug": "meknes",
+      "category": "pharmacy",
+      "tagline": "Health and care, delivered discreetly",
+      "description": "Over-the-counter health, baby and personal care from Meknes Pharmacy, delivered discreetly across Meknes.",
+      "address": "Rue de la Corniche, Meknes",
+      "landmark": "Next to the taxi stand",
+      "lat": 33.96561,
+      "lng": -5.51696,
+      "accent": "#0F766E",
+      "rating": 4.5,
+      "reviews": 246,
+      "prepTime": 25,
+      "minOrder": 45,
+      "deliveryFee": 12,
+      "isOpen": true,
+      "commissionRate": 12,
+      "phone": "+212 660 24 34 44",
+      "ownerName": "Brahim L.",
+      "dataOrigin": "wassl",
+      "priceLevel": 2,
+      "tags": [
+        "Pharmacy",
+        "Health",
+        "Care"
+      ],
+      "openingHours": [
+        {
+          "days": "Mon–Sun",
+          "open": "00:00",
+          "close": "23:59"
+        }
+      ],
+      "image": "/images/stores/pharmacy-3.jpg"
+    },
+    {
       "id": "store_mock_oujda-oujda-grill",
       "slug": "oujda-oujda-grill",
       "name": "Oujda Grill",
@@ -1330,8 +1876,8 @@
       "openingHours": [
         {
           "days": "Mon–Sun",
-          "open": "10:00",
-          "close": "23:30"
+          "open": "00:00",
+          "close": "23:59"
         }
       ],
       "image": "/images/stores/terrace-1.jpg"
@@ -1369,8 +1915,8 @@
       "openingHours": [
         {
           "days": "Mon–Sun",
-          "open": "08:00",
-          "close": "23:00"
+          "open": "00:00",
+          "close": "23:59"
         }
       ],
       "image": "/images/stores/grocery-2.jpg",
@@ -1406,6 +1952,84 @@
       }
     },
     {
+      "id": "store_mock_oujda-oujda-cafe",
+      "slug": "oujda-oujda-cafe",
+      "name": "Oujda Cafe",
+      "nameAr": "مقهى وجدة",
+      "citySlug": "oujda",
+      "category": "cafe",
+      "tagline": "Coffee, msemen and something sweet",
+      "description": "Oujda Cafe serves coffee, msemen and something sweet in Oujda, with cash on delivery and live tracking.",
+      "address": "Rue de la Corniche, Oujda",
+      "landmark": "Next to the taxi stand",
+      "lat": 34.66939,
+      "lng": -1.90058,
+      "accent": "#0F766E",
+      "rating": 4.5,
+      "reviews": 246,
+      "prepTime": 25,
+      "minOrder": 45,
+      "deliveryFee": 12,
+      "isOpen": true,
+      "commissionRate": 12,
+      "phone": "+212 660 24 34 44",
+      "ownerName": "Brahim L.",
+      "dataOrigin": "wassl",
+      "priceLevel": 2,
+      "tags": [
+        "Coffee",
+        "Cash on delivery",
+        "Local"
+      ],
+      "openingHours": [
+        {
+          "days": "Mon–Sun",
+          "open": "00:00",
+          "close": "23:59"
+        }
+      ],
+      "image": "/images/stores/cafe-3.jpg"
+    },
+    {
+      "id": "store_mock_oujda-oujda-pharmacy",
+      "slug": "oujda-oujda-pharmacy",
+      "name": "Oujda Pharmacy",
+      "nameAr": "صيدلية وجدة",
+      "citySlug": "oujda",
+      "category": "pharmacy",
+      "tagline": "Health and care, delivered discreetly",
+      "description": "Over-the-counter health, baby and personal care from Oujda Pharmacy, delivered discreetly across Oujda.",
+      "address": "Avenue Hassan II, Oujda",
+      "landmark": "Near the central market",
+      "lat": 34.67339,
+      "lng": -1.91658,
+      "accent": "#B45309",
+      "rating": 4.6,
+      "reviews": 283,
+      "prepTime": 30,
+      "minOrder": 25,
+      "deliveryFee": 14,
+      "isOpen": true,
+      "commissionRate": 12,
+      "phone": "+212 660 25 35 45",
+      "ownerName": "Salma T.",
+      "dataOrigin": "wassl",
+      "priceLevel": 2,
+      "tags": [
+        "Pharmacy",
+        "Health",
+        "Care"
+      ],
+      "openingHours": [
+        {
+          "days": "Mon–Sun",
+          "open": "00:00",
+          "close": "23:59"
+        }
+      ],
+      "image": "/images/stores/pharmacy-4.jpg"
+    },
+    {
       "id": "store_mock_kenitra-kenitra-pizza-kitchen",
       "slug": "kenitra-kenitra-pizza-kitchen",
       "name": "Kenitra Pizza Kitchen",
@@ -1438,8 +2062,8 @@
       "openingHours": [
         {
           "days": "Mon–Sun",
-          "open": "10:00",
-          "close": "23:30"
+          "open": "00:00",
+          "close": "23:59"
         }
       ],
       "image": "/images/stores/grill-1.jpg"
@@ -1477,8 +2101,8 @@
       "openingHours": [
         {
           "days": "Mon–Sun",
-          "open": "08:00",
-          "close": "23:00"
+          "open": "00:00",
+          "close": "23:59"
         }
       ],
       "image": "/images/stores/grocery-3.jpg",
@@ -1514,6 +2138,84 @@
       }
     },
     {
+      "id": "store_mock_kenitra-kenitra-cafe",
+      "slug": "kenitra-kenitra-cafe",
+      "name": "Kenitra Cafe",
+      "nameAr": "مقهى القنيطرة",
+      "citySlug": "kenitra",
+      "category": "cafe",
+      "tagline": "A calm corner for breakfast",
+      "description": "Kenitra Cafe serves a calm corner for breakfast in Kenitra, with cash on delivery and live tracking.",
+      "address": "Avenue Hassan II, Kenitra",
+      "landmark": "Near the central market",
+      "lat": 34.253009999999996,
+      "lng": -6.5882,
+      "accent": "#B45309",
+      "rating": 4.6,
+      "reviews": 283,
+      "prepTime": 30,
+      "minOrder": 25,
+      "deliveryFee": 14,
+      "isOpen": true,
+      "commissionRate": 12,
+      "phone": "+212 660 25 35 45",
+      "ownerName": "Salma T.",
+      "dataOrigin": "wassl",
+      "priceLevel": 2,
+      "tags": [
+        "Coffee",
+        "Cash on delivery",
+        "Local"
+      ],
+      "openingHours": [
+        {
+          "days": "Mon–Sun",
+          "open": "00:00",
+          "close": "23:59"
+        }
+      ],
+      "image": "/images/stores/cafe-4.jpg"
+    },
+    {
+      "id": "store_mock_kenitra-kenitra-pharmacy",
+      "slug": "kenitra-kenitra-pharmacy",
+      "name": "Kenitra Pharmacy",
+      "nameAr": "صيدلية القنيطرة",
+      "citySlug": "kenitra",
+      "category": "pharmacy",
+      "tagline": "Health and care, delivered discreetly",
+      "description": "Over-the-counter health, baby and personal care from Kenitra Pharmacy, delivered discreetly across Kenitra.",
+      "address": "Rue Ibn Sina, Kenitra",
+      "landmark": "Opposite the main square",
+      "lat": 34.25701,
+      "lng": -6.584199999999999,
+      "accent": "#9A3412",
+      "rating": 4.7,
+      "reviews": 320,
+      "prepTime": 15,
+      "minOrder": 35,
+      "deliveryFee": 8,
+      "isOpen": true,
+      "commissionRate": 12,
+      "phone": "+212 660 26 36 46",
+      "ownerName": "Nour A.",
+      "dataOrigin": "wassl",
+      "priceLevel": 2,
+      "tags": [
+        "Pharmacy",
+        "Health",
+        "Care"
+      ],
+      "openingHours": [
+        {
+          "days": "Mon–Sun",
+          "open": "00:00",
+          "close": "23:59"
+        }
+      ],
+      "image": "/images/stores/pharmacy-1.jpg"
+    },
+    {
       "id": "store_mock_tetouan-tetouan-cedar-cafe",
       "slug": "tetouan-tetouan-cedar-cafe",
       "name": "Tetouan Cedar Cafe",
@@ -1546,8 +2248,8 @@
       "openingHours": [
         {
           "days": "Mon–Sun",
-          "open": "10:00",
-          "close": "23:30"
+          "open": "00:00",
+          "close": "23:59"
         }
       ],
       "image": "/images/stores/cafe-3.jpg"
@@ -1585,8 +2287,8 @@
       "openingHours": [
         {
           "days": "Mon–Sun",
-          "open": "08:00",
-          "close": "23:00"
+          "open": "00:00",
+          "close": "23:59"
         }
       ],
       "image": "/images/stores/grocery-4.jpg",
@@ -1620,6 +2322,84 @@
         "lowStockThreshold": 5,
         "loyaltyPointsPer10Mad": 1
       }
+    },
+    {
+      "id": "store_mock_tetouan-tetouan-cafe",
+      "slug": "tetouan-tetouan-cafe",
+      "name": "Tetouan Cafe",
+      "nameAr": "مقهى تطوان",
+      "citySlug": "tetouan",
+      "category": "cafe",
+      "tagline": "Coffee, msemen and something sweet",
+      "description": "Tetouan Cafe serves coffee, msemen and something sweet in Tetouan, with cash on delivery and live tracking.",
+      "address": "Rue Ibn Sina, Tetouan",
+      "landmark": "Opposite the main square",
+      "lat": 35.57933,
+      "lng": -5.504,
+      "accent": "#9A3412",
+      "rating": 4.7,
+      "reviews": 320,
+      "prepTime": 15,
+      "minOrder": 35,
+      "deliveryFee": 8,
+      "isOpen": true,
+      "commissionRate": 12,
+      "phone": "+212 660 26 36 46",
+      "ownerName": "Nour A.",
+      "dataOrigin": "wassl",
+      "priceLevel": 2,
+      "tags": [
+        "Coffee",
+        "Cash on delivery",
+        "Local"
+      ],
+      "openingHours": [
+        {
+          "days": "Mon–Sun",
+          "open": "00:00",
+          "close": "23:59"
+        }
+      ],
+      "image": "/images/stores/cafe-5.jpg"
+    },
+    {
+      "id": "store_mock_tetouan-tetouan-pharmacy",
+      "slug": "tetouan-tetouan-pharmacy",
+      "name": "Tetouan Pharmacy",
+      "nameAr": "صيدلية تطوان",
+      "citySlug": "tetouan",
+      "category": "pharmacy",
+      "tagline": "Health and care, delivered discreetly",
+      "description": "Over-the-counter health, baby and personal care from Tetouan Pharmacy, delivered discreetly across Tetouan.",
+      "address": "Boulevard Mohammed V, Tetouan",
+      "landmark": "Behind the post office",
+      "lat": 35.58333,
+      "lng": -5.5,
+      "accent": "#15803D",
+      "rating": 4.8,
+      "reviews": 357,
+      "prepTime": 20,
+      "minOrder": 45,
+      "deliveryFee": 10,
+      "isOpen": true,
+      "commissionRate": 12,
+      "phone": "+212 660 27 37 47",
+      "ownerName": "Hassan E.",
+      "dataOrigin": "wassl",
+      "priceLevel": 2,
+      "tags": [
+        "Pharmacy",
+        "Health",
+        "Care"
+      ],
+      "openingHours": [
+        {
+          "days": "Mon–Sun",
+          "open": "00:00",
+          "close": "23:59"
+        }
+      ],
+      "image": "/images/stores/pharmacy-2.jpg"
     }
   ],
   "products": [
@@ -3236,6 +4016,164 @@
       "substitutionAllowed": true
     },
     {
+      "id": "product_mock_casablanca-casa-corner-cafe_msemen",
+      "storeId": "store_mock_casablanca-casa-corner-cafe",
+      "category": "Breakfast",
+      "name": "Msemen & Amlou",
+      "description": "Warm msemen with argan amlou",
+      "price": 26,
+      "emoji": "",
+      "image": "/images/products/msemen.jpg",
+      "available": true,
+      "popular": true,
+      "calories": 460,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_casablanca-casa-corner-cafe_avocado_toast",
+      "storeId": "store_mock_casablanca-casa-corner-cafe",
+      "category": "Breakfast",
+      "name": "Avocado Toast",
+      "description": "Sourdough, avocado, poached egg",
+      "price": 38,
+      "emoji": "",
+      "image": "/images/products/avocado_toast.jpg",
+      "available": true,
+      "popular": true,
+      "calories": 420,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_casablanca-casa-corner-cafe_flat_white",
+      "storeId": "store_mock_casablanca-casa-corner-cafe",
+      "category": "Coffee",
+      "name": "Flat White",
+      "description": "Double espresso, steamed milk",
+      "price": 22,
+      "emoji": "",
+      "image": "/images/products/flat_white.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_casablanca-casa-corner-cafe_orange_juice",
+      "storeId": "store_mock_casablanca-casa-corner-cafe",
+      "category": "Juice",
+      "name": "Fresh Orange Juice",
+      "description": "Pressed to order, 40cl",
+      "price": 20,
+      "emoji": "",
+      "image": "/images/products/orange_juice.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_casablanca-casa-corner-cafe_crepe",
+      "storeId": "store_mock_casablanca-casa-corner-cafe",
+      "category": "Sweet",
+      "name": "Nutella Crêpe",
+      "description": "Fresh crêpe, banana, Nutella",
+      "price": 32,
+      "emoji": "",
+      "image": "/images/products/crepe.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_casablanca-casa-pharmacy_paracetamol",
+      "storeId": "store_mock_casablanca-casa-pharmacy",
+      "category": "Health",
+      "name": "Paracetamol 500mg",
+      "description": "20 tablets",
+      "price": 18,
+      "emoji": "",
+      "image": "/images/products/paracetamol.jpg",
+      "available": true,
+      "popular": true,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_casablanca-casa-pharmacy_vitamin_c",
+      "storeId": "store_mock_casablanca-casa-pharmacy",
+      "category": "Health",
+      "name": "Vitamin C",
+      "description": "Effervescent, 20 tablets",
+      "price": 42,
+      "emoji": "",
+      "image": "/images/products/vitamin_c.jpg",
+      "available": true,
+      "popular": true,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_casablanca-casa-pharmacy_baby_wipes",
+      "storeId": "store_mock_casablanca-casa-pharmacy",
+      "category": "Baby",
+      "name": "Baby Wipes 72",
+      "description": "Fragrance-free wipes",
+      "price": 32,
+      "emoji": "",
+      "image": "/images/products/baby_wipes.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_casablanca-casa-pharmacy_sunscreen",
+      "storeId": "store_mock_casablanca-casa-pharmacy",
+      "category": "Care",
+      "name": "Sunscreen SPF 50",
+      "description": "Face and body lotion",
+      "price": 89,
+      "emoji": "",
+      "image": "/images/products/sunscreen.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_casablanca-casa-pharmacy_lip_balm",
+      "storeId": "store_mock_casablanca-casa-pharmacy",
+      "category": "Care",
+      "name": "Lip Balm",
+      "description": "Moisturising balm",
+      "price": 16,
+      "emoji": "",
+      "image": "/images/products/lip_balm.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_casablanca-casa-pharmacy_shampoo",
+      "storeId": "store_mock_casablanca-casa-pharmacy",
+      "category": "Care",
+      "name": "Shampoo 400ml",
+      "description": "Everyday shampoo",
+      "price": 35,
+      "emoji": "",
+      "image": "/images/products/shampoo.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_casablanca-casa-pharmacy_toothpaste",
+      "storeId": "store_mock_casablanca-casa-pharmacy",
+      "category": "Care",
+      "name": "Toothpaste 100ml",
+      "description": "Fluoride toothpaste",
+      "price": 18,
+      "emoji": "",
+      "image": "/images/products/toothpaste.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
       "id": "product_mock_rabat-rabat-table_tagine_chicken",
       "storeId": "store_mock_rabat-rabat-table",
       "category": "Tagines",
@@ -3503,6 +4441,164 @@
       "lowStockThreshold": 5,
       "aisle": "Pantry",
       "substitutionAllowed": true
+    },
+    {
+      "id": "product_mock_rabat-rabat-corner-cafe_msemen",
+      "storeId": "store_mock_rabat-rabat-corner-cafe",
+      "category": "Breakfast",
+      "name": "Msemen & Amlou",
+      "description": "Warm msemen with argan amlou",
+      "price": 26,
+      "emoji": "",
+      "image": "/images/products/msemen.jpg",
+      "available": true,
+      "popular": true,
+      "calories": 460,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_rabat-rabat-corner-cafe_avocado_toast",
+      "storeId": "store_mock_rabat-rabat-corner-cafe",
+      "category": "Breakfast",
+      "name": "Avocado Toast",
+      "description": "Sourdough, avocado, poached egg",
+      "price": 38,
+      "emoji": "",
+      "image": "/images/products/avocado_toast.jpg",
+      "available": true,
+      "popular": true,
+      "calories": 420,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_rabat-rabat-corner-cafe_flat_white",
+      "storeId": "store_mock_rabat-rabat-corner-cafe",
+      "category": "Coffee",
+      "name": "Flat White",
+      "description": "Double espresso, steamed milk",
+      "price": 22,
+      "emoji": "",
+      "image": "/images/products/flat_white.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_rabat-rabat-corner-cafe_orange_juice",
+      "storeId": "store_mock_rabat-rabat-corner-cafe",
+      "category": "Juice",
+      "name": "Fresh Orange Juice",
+      "description": "Pressed to order, 40cl",
+      "price": 20,
+      "emoji": "",
+      "image": "/images/products/orange_juice.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_rabat-rabat-corner-cafe_crepe",
+      "storeId": "store_mock_rabat-rabat-corner-cafe",
+      "category": "Sweet",
+      "name": "Nutella Crêpe",
+      "description": "Fresh crêpe, banana, Nutella",
+      "price": 32,
+      "emoji": "",
+      "image": "/images/products/crepe.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_rabat-rabat-pharmacy_paracetamol",
+      "storeId": "store_mock_rabat-rabat-pharmacy",
+      "category": "Health",
+      "name": "Paracetamol 500mg",
+      "description": "20 tablets",
+      "price": 18,
+      "emoji": "",
+      "image": "/images/products/paracetamol.jpg",
+      "available": true,
+      "popular": true,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_rabat-rabat-pharmacy_vitamin_c",
+      "storeId": "store_mock_rabat-rabat-pharmacy",
+      "category": "Health",
+      "name": "Vitamin C",
+      "description": "Effervescent, 20 tablets",
+      "price": 42,
+      "emoji": "",
+      "image": "/images/products/vitamin_c.jpg",
+      "available": true,
+      "popular": true,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_rabat-rabat-pharmacy_baby_wipes",
+      "storeId": "store_mock_rabat-rabat-pharmacy",
+      "category": "Baby",
+      "name": "Baby Wipes 72",
+      "description": "Fragrance-free wipes",
+      "price": 32,
+      "emoji": "",
+      "image": "/images/products/baby_wipes.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_rabat-rabat-pharmacy_sunscreen",
+      "storeId": "store_mock_rabat-rabat-pharmacy",
+      "category": "Care",
+      "name": "Sunscreen SPF 50",
+      "description": "Face and body lotion",
+      "price": 89,
+      "emoji": "",
+      "image": "/images/products/sunscreen.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_rabat-rabat-pharmacy_lip_balm",
+      "storeId": "store_mock_rabat-rabat-pharmacy",
+      "category": "Care",
+      "name": "Lip Balm",
+      "description": "Moisturising balm",
+      "price": 16,
+      "emoji": "",
+      "image": "/images/products/lip_balm.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_rabat-rabat-pharmacy_shampoo",
+      "storeId": "store_mock_rabat-rabat-pharmacy",
+      "category": "Care",
+      "name": "Shampoo 400ml",
+      "description": "Everyday shampoo",
+      "price": 35,
+      "emoji": "",
+      "image": "/images/products/shampoo.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_rabat-rabat-pharmacy_toothpaste",
+      "storeId": "store_mock_rabat-rabat-pharmacy",
+      "category": "Care",
+      "name": "Toothpaste 100ml",
+      "description": "Fluoride toothpaste",
+      "price": 18,
+      "emoji": "",
+      "image": "/images/products/toothpaste.jpg",
+      "available": true,
+      "popular": false
     },
     {
       "id": "product_mock_marrakesh-marrakesh-medina-kitchen_tagine_chicken",
@@ -3774,6 +4870,164 @@
       "substitutionAllowed": true
     },
     {
+      "id": "product_mock_marrakesh-medina-cafe_msemen",
+      "storeId": "store_mock_marrakesh-medina-cafe",
+      "category": "Breakfast",
+      "name": "Msemen & Amlou",
+      "description": "Warm msemen with argan amlou",
+      "price": 26,
+      "emoji": "",
+      "image": "/images/products/msemen.jpg",
+      "available": true,
+      "popular": true,
+      "calories": 460,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_marrakesh-medina-cafe_avocado_toast",
+      "storeId": "store_mock_marrakesh-medina-cafe",
+      "category": "Breakfast",
+      "name": "Avocado Toast",
+      "description": "Sourdough, avocado, poached egg",
+      "price": 38,
+      "emoji": "",
+      "image": "/images/products/avocado_toast.jpg",
+      "available": true,
+      "popular": true,
+      "calories": 420,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_marrakesh-medina-cafe_flat_white",
+      "storeId": "store_mock_marrakesh-medina-cafe",
+      "category": "Coffee",
+      "name": "Flat White",
+      "description": "Double espresso, steamed milk",
+      "price": 22,
+      "emoji": "",
+      "image": "/images/products/flat_white.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_marrakesh-medina-cafe_orange_juice",
+      "storeId": "store_mock_marrakesh-medina-cafe",
+      "category": "Juice",
+      "name": "Fresh Orange Juice",
+      "description": "Pressed to order, 40cl",
+      "price": 20,
+      "emoji": "",
+      "image": "/images/products/orange_juice.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_marrakesh-medina-cafe_crepe",
+      "storeId": "store_mock_marrakesh-medina-cafe",
+      "category": "Sweet",
+      "name": "Nutella Crêpe",
+      "description": "Fresh crêpe, banana, Nutella",
+      "price": 32,
+      "emoji": "",
+      "image": "/images/products/crepe.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_marrakesh-marrakech-pharmacy_paracetamol",
+      "storeId": "store_mock_marrakesh-marrakech-pharmacy",
+      "category": "Health",
+      "name": "Paracetamol 500mg",
+      "description": "20 tablets",
+      "price": 18,
+      "emoji": "",
+      "image": "/images/products/paracetamol.jpg",
+      "available": true,
+      "popular": true,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_marrakesh-marrakech-pharmacy_vitamin_c",
+      "storeId": "store_mock_marrakesh-marrakech-pharmacy",
+      "category": "Health",
+      "name": "Vitamin C",
+      "description": "Effervescent, 20 tablets",
+      "price": 42,
+      "emoji": "",
+      "image": "/images/products/vitamin_c.jpg",
+      "available": true,
+      "popular": true,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_marrakesh-marrakech-pharmacy_baby_wipes",
+      "storeId": "store_mock_marrakesh-marrakech-pharmacy",
+      "category": "Baby",
+      "name": "Baby Wipes 72",
+      "description": "Fragrance-free wipes",
+      "price": 32,
+      "emoji": "",
+      "image": "/images/products/baby_wipes.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_marrakesh-marrakech-pharmacy_sunscreen",
+      "storeId": "store_mock_marrakesh-marrakech-pharmacy",
+      "category": "Care",
+      "name": "Sunscreen SPF 50",
+      "description": "Face and body lotion",
+      "price": 89,
+      "emoji": "",
+      "image": "/images/products/sunscreen.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_marrakesh-marrakech-pharmacy_lip_balm",
+      "storeId": "store_mock_marrakesh-marrakech-pharmacy",
+      "category": "Care",
+      "name": "Lip Balm",
+      "description": "Moisturising balm",
+      "price": 16,
+      "emoji": "",
+      "image": "/images/products/lip_balm.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_marrakesh-marrakech-pharmacy_shampoo",
+      "storeId": "store_mock_marrakesh-marrakech-pharmacy",
+      "category": "Care",
+      "name": "Shampoo 400ml",
+      "description": "Everyday shampoo",
+      "price": 35,
+      "emoji": "",
+      "image": "/images/products/shampoo.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_marrakesh-marrakech-pharmacy_toothpaste",
+      "storeId": "store_mock_marrakesh-marrakech-pharmacy",
+      "category": "Care",
+      "name": "Toothpaste 100ml",
+      "description": "Fluoride toothpaste",
+      "price": 18,
+      "emoji": "",
+      "image": "/images/products/toothpaste.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
       "id": "product_mock_agadir-agadir-beach-grill_sea_bream",
       "storeId": "store_mock_agadir-agadir-beach-grill",
       "category": "Seafood",
@@ -4041,6 +5295,164 @@
       "lowStockThreshold": 5,
       "aisle": "Fresh produce",
       "substitutionAllowed": true
+    },
+    {
+      "id": "product_mock_agadir-agadir-beach-cafe_msemen",
+      "storeId": "store_mock_agadir-agadir-beach-cafe",
+      "category": "Breakfast",
+      "name": "Msemen & Amlou",
+      "description": "Warm msemen with argan amlou",
+      "price": 26,
+      "emoji": "",
+      "image": "/images/products/msemen.jpg",
+      "available": true,
+      "popular": true,
+      "calories": 460,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_agadir-agadir-beach-cafe_avocado_toast",
+      "storeId": "store_mock_agadir-agadir-beach-cafe",
+      "category": "Breakfast",
+      "name": "Avocado Toast",
+      "description": "Sourdough, avocado, poached egg",
+      "price": 38,
+      "emoji": "",
+      "image": "/images/products/avocado_toast.jpg",
+      "available": true,
+      "popular": true,
+      "calories": 420,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_agadir-agadir-beach-cafe_flat_white",
+      "storeId": "store_mock_agadir-agadir-beach-cafe",
+      "category": "Coffee",
+      "name": "Flat White",
+      "description": "Double espresso, steamed milk",
+      "price": 22,
+      "emoji": "",
+      "image": "/images/products/flat_white.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_agadir-agadir-beach-cafe_orange_juice",
+      "storeId": "store_mock_agadir-agadir-beach-cafe",
+      "category": "Juice",
+      "name": "Fresh Orange Juice",
+      "description": "Pressed to order, 40cl",
+      "price": 20,
+      "emoji": "",
+      "image": "/images/products/orange_juice.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_agadir-agadir-beach-cafe_crepe",
+      "storeId": "store_mock_agadir-agadir-beach-cafe",
+      "category": "Sweet",
+      "name": "Nutella Crêpe",
+      "description": "Fresh crêpe, banana, Nutella",
+      "price": 32,
+      "emoji": "",
+      "image": "/images/products/crepe.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_agadir-agadir-pharmacy_paracetamol",
+      "storeId": "store_mock_agadir-agadir-pharmacy",
+      "category": "Health",
+      "name": "Paracetamol 500mg",
+      "description": "20 tablets",
+      "price": 18,
+      "emoji": "",
+      "image": "/images/products/paracetamol.jpg",
+      "available": true,
+      "popular": true,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_agadir-agadir-pharmacy_vitamin_c",
+      "storeId": "store_mock_agadir-agadir-pharmacy",
+      "category": "Health",
+      "name": "Vitamin C",
+      "description": "Effervescent, 20 tablets",
+      "price": 42,
+      "emoji": "",
+      "image": "/images/products/vitamin_c.jpg",
+      "available": true,
+      "popular": true,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_agadir-agadir-pharmacy_baby_wipes",
+      "storeId": "store_mock_agadir-agadir-pharmacy",
+      "category": "Baby",
+      "name": "Baby Wipes 72",
+      "description": "Fragrance-free wipes",
+      "price": 32,
+      "emoji": "",
+      "image": "/images/products/baby_wipes.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_agadir-agadir-pharmacy_sunscreen",
+      "storeId": "store_mock_agadir-agadir-pharmacy",
+      "category": "Care",
+      "name": "Sunscreen SPF 50",
+      "description": "Face and body lotion",
+      "price": 89,
+      "emoji": "",
+      "image": "/images/products/sunscreen.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_agadir-agadir-pharmacy_lip_balm",
+      "storeId": "store_mock_agadir-agadir-pharmacy",
+      "category": "Care",
+      "name": "Lip Balm",
+      "description": "Moisturising balm",
+      "price": 16,
+      "emoji": "",
+      "image": "/images/products/lip_balm.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_agadir-agadir-pharmacy_shampoo",
+      "storeId": "store_mock_agadir-agadir-pharmacy",
+      "category": "Care",
+      "name": "Shampoo 400ml",
+      "description": "Everyday shampoo",
+      "price": 35,
+      "emoji": "",
+      "image": "/images/products/shampoo.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_agadir-agadir-pharmacy_toothpaste",
+      "storeId": "store_mock_agadir-agadir-pharmacy",
+      "category": "Care",
+      "name": "Toothpaste 100ml",
+      "description": "Fluoride toothpaste",
+      "price": 18,
+      "emoji": "",
+      "image": "/images/products/toothpaste.jpg",
+      "available": true,
+      "popular": false
     },
     {
       "id": "product_mock_tangier-tangier-bay-kitchen_sea_bream",
@@ -4312,6 +5724,164 @@
       "substitutionAllowed": true
     },
     {
+      "id": "product_mock_tangier-tangier-bay-cafe_msemen",
+      "storeId": "store_mock_tangier-tangier-bay-cafe",
+      "category": "Breakfast",
+      "name": "Msemen & Amlou",
+      "description": "Warm msemen with argan amlou",
+      "price": 26,
+      "emoji": "",
+      "image": "/images/products/msemen.jpg",
+      "available": true,
+      "popular": true,
+      "calories": 460,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_tangier-tangier-bay-cafe_avocado_toast",
+      "storeId": "store_mock_tangier-tangier-bay-cafe",
+      "category": "Breakfast",
+      "name": "Avocado Toast",
+      "description": "Sourdough, avocado, poached egg",
+      "price": 38,
+      "emoji": "",
+      "image": "/images/products/avocado_toast.jpg",
+      "available": true,
+      "popular": true,
+      "calories": 420,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_tangier-tangier-bay-cafe_flat_white",
+      "storeId": "store_mock_tangier-tangier-bay-cafe",
+      "category": "Coffee",
+      "name": "Flat White",
+      "description": "Double espresso, steamed milk",
+      "price": 22,
+      "emoji": "",
+      "image": "/images/products/flat_white.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_tangier-tangier-bay-cafe_orange_juice",
+      "storeId": "store_mock_tangier-tangier-bay-cafe",
+      "category": "Juice",
+      "name": "Fresh Orange Juice",
+      "description": "Pressed to order, 40cl",
+      "price": 20,
+      "emoji": "",
+      "image": "/images/products/orange_juice.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_tangier-tangier-bay-cafe_crepe",
+      "storeId": "store_mock_tangier-tangier-bay-cafe",
+      "category": "Sweet",
+      "name": "Nutella Crêpe",
+      "description": "Fresh crêpe, banana, Nutella",
+      "price": 32,
+      "emoji": "",
+      "image": "/images/products/crepe.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_tangier-tangier-pharmacy_paracetamol",
+      "storeId": "store_mock_tangier-tangier-pharmacy",
+      "category": "Health",
+      "name": "Paracetamol 500mg",
+      "description": "20 tablets",
+      "price": 18,
+      "emoji": "",
+      "image": "/images/products/paracetamol.jpg",
+      "available": true,
+      "popular": true,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_tangier-tangier-pharmacy_vitamin_c",
+      "storeId": "store_mock_tangier-tangier-pharmacy",
+      "category": "Health",
+      "name": "Vitamin C",
+      "description": "Effervescent, 20 tablets",
+      "price": 42,
+      "emoji": "",
+      "image": "/images/products/vitamin_c.jpg",
+      "available": true,
+      "popular": true,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_tangier-tangier-pharmacy_baby_wipes",
+      "storeId": "store_mock_tangier-tangier-pharmacy",
+      "category": "Baby",
+      "name": "Baby Wipes 72",
+      "description": "Fragrance-free wipes",
+      "price": 32,
+      "emoji": "",
+      "image": "/images/products/baby_wipes.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_tangier-tangier-pharmacy_sunscreen",
+      "storeId": "store_mock_tangier-tangier-pharmacy",
+      "category": "Care",
+      "name": "Sunscreen SPF 50",
+      "description": "Face and body lotion",
+      "price": 89,
+      "emoji": "",
+      "image": "/images/products/sunscreen.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_tangier-tangier-pharmacy_lip_balm",
+      "storeId": "store_mock_tangier-tangier-pharmacy",
+      "category": "Care",
+      "name": "Lip Balm",
+      "description": "Moisturising balm",
+      "price": 16,
+      "emoji": "",
+      "image": "/images/products/lip_balm.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_tangier-tangier-pharmacy_shampoo",
+      "storeId": "store_mock_tangier-tangier-pharmacy",
+      "category": "Care",
+      "name": "Shampoo 400ml",
+      "description": "Everyday shampoo",
+      "price": 35,
+      "emoji": "",
+      "image": "/images/products/shampoo.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_tangier-tangier-pharmacy_toothpaste",
+      "storeId": "store_mock_tangier-tangier-pharmacy",
+      "category": "Care",
+      "name": "Toothpaste 100ml",
+      "description": "Fluoride toothpaste",
+      "price": 18,
+      "emoji": "",
+      "image": "/images/products/toothpaste.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
       "id": "product_mock_fes-fes-medina-table_tagine_chicken",
       "storeId": "store_mock_fes-fes-medina-table",
       "category": "Tagines",
@@ -4579,6 +6149,164 @@
       "lowStockThreshold": 5,
       "aisle": "Pantry",
       "substitutionAllowed": true
+    },
+    {
+      "id": "product_mock_fes-fes-medina-cafe_msemen",
+      "storeId": "store_mock_fes-fes-medina-cafe",
+      "category": "Breakfast",
+      "name": "Msemen & Amlou",
+      "description": "Warm msemen with argan amlou",
+      "price": 26,
+      "emoji": "",
+      "image": "/images/products/msemen.jpg",
+      "available": true,
+      "popular": true,
+      "calories": 460,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_fes-fes-medina-cafe_avocado_toast",
+      "storeId": "store_mock_fes-fes-medina-cafe",
+      "category": "Breakfast",
+      "name": "Avocado Toast",
+      "description": "Sourdough, avocado, poached egg",
+      "price": 38,
+      "emoji": "",
+      "image": "/images/products/avocado_toast.jpg",
+      "available": true,
+      "popular": true,
+      "calories": 420,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_fes-fes-medina-cafe_flat_white",
+      "storeId": "store_mock_fes-fes-medina-cafe",
+      "category": "Coffee",
+      "name": "Flat White",
+      "description": "Double espresso, steamed milk",
+      "price": 22,
+      "emoji": "",
+      "image": "/images/products/flat_white.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_fes-fes-medina-cafe_orange_juice",
+      "storeId": "store_mock_fes-fes-medina-cafe",
+      "category": "Juice",
+      "name": "Fresh Orange Juice",
+      "description": "Pressed to order, 40cl",
+      "price": 20,
+      "emoji": "",
+      "image": "/images/products/orange_juice.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_fes-fes-medina-cafe_crepe",
+      "storeId": "store_mock_fes-fes-medina-cafe",
+      "category": "Sweet",
+      "name": "Nutella Crêpe",
+      "description": "Fresh crêpe, banana, Nutella",
+      "price": 32,
+      "emoji": "",
+      "image": "/images/products/crepe.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_fes-fes-pharmacy_paracetamol",
+      "storeId": "store_mock_fes-fes-pharmacy",
+      "category": "Health",
+      "name": "Paracetamol 500mg",
+      "description": "20 tablets",
+      "price": 18,
+      "emoji": "",
+      "image": "/images/products/paracetamol.jpg",
+      "available": true,
+      "popular": true,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_fes-fes-pharmacy_vitamin_c",
+      "storeId": "store_mock_fes-fes-pharmacy",
+      "category": "Health",
+      "name": "Vitamin C",
+      "description": "Effervescent, 20 tablets",
+      "price": 42,
+      "emoji": "",
+      "image": "/images/products/vitamin_c.jpg",
+      "available": true,
+      "popular": true,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_fes-fes-pharmacy_baby_wipes",
+      "storeId": "store_mock_fes-fes-pharmacy",
+      "category": "Baby",
+      "name": "Baby Wipes 72",
+      "description": "Fragrance-free wipes",
+      "price": 32,
+      "emoji": "",
+      "image": "/images/products/baby_wipes.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_fes-fes-pharmacy_sunscreen",
+      "storeId": "store_mock_fes-fes-pharmacy",
+      "category": "Care",
+      "name": "Sunscreen SPF 50",
+      "description": "Face and body lotion",
+      "price": 89,
+      "emoji": "",
+      "image": "/images/products/sunscreen.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_fes-fes-pharmacy_lip_balm",
+      "storeId": "store_mock_fes-fes-pharmacy",
+      "category": "Care",
+      "name": "Lip Balm",
+      "description": "Moisturising balm",
+      "price": 16,
+      "emoji": "",
+      "image": "/images/products/lip_balm.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_fes-fes-pharmacy_shampoo",
+      "storeId": "store_mock_fes-fes-pharmacy",
+      "category": "Care",
+      "name": "Shampoo 400ml",
+      "description": "Everyday shampoo",
+      "price": 35,
+      "emoji": "",
+      "image": "/images/products/shampoo.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_fes-fes-pharmacy_toothpaste",
+      "storeId": "store_mock_fes-fes-pharmacy",
+      "category": "Care",
+      "name": "Toothpaste 100ml",
+      "description": "Fluoride toothpaste",
+      "price": 18,
+      "emoji": "",
+      "image": "/images/products/toothpaste.jpg",
+      "available": true,
+      "popular": false
     },
     {
       "id": "product_mock_meknes-meknes-olive-kitchen_mixed_grill",
@@ -4850,6 +6578,164 @@
       "substitutionAllowed": true
     },
     {
+      "id": "product_mock_meknes-meknes-cafe_msemen",
+      "storeId": "store_mock_meknes-meknes-cafe",
+      "category": "Breakfast",
+      "name": "Msemen & Amlou",
+      "description": "Warm msemen with argan amlou",
+      "price": 26,
+      "emoji": "",
+      "image": "/images/products/msemen.jpg",
+      "available": true,
+      "popular": true,
+      "calories": 460,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_meknes-meknes-cafe_avocado_toast",
+      "storeId": "store_mock_meknes-meknes-cafe",
+      "category": "Breakfast",
+      "name": "Avocado Toast",
+      "description": "Sourdough, avocado, poached egg",
+      "price": 38,
+      "emoji": "",
+      "image": "/images/products/avocado_toast.jpg",
+      "available": true,
+      "popular": true,
+      "calories": 420,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_meknes-meknes-cafe_flat_white",
+      "storeId": "store_mock_meknes-meknes-cafe",
+      "category": "Coffee",
+      "name": "Flat White",
+      "description": "Double espresso, steamed milk",
+      "price": 22,
+      "emoji": "",
+      "image": "/images/products/flat_white.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_meknes-meknes-cafe_orange_juice",
+      "storeId": "store_mock_meknes-meknes-cafe",
+      "category": "Juice",
+      "name": "Fresh Orange Juice",
+      "description": "Pressed to order, 40cl",
+      "price": 20,
+      "emoji": "",
+      "image": "/images/products/orange_juice.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_meknes-meknes-cafe_crepe",
+      "storeId": "store_mock_meknes-meknes-cafe",
+      "category": "Sweet",
+      "name": "Nutella Crêpe",
+      "description": "Fresh crêpe, banana, Nutella",
+      "price": 32,
+      "emoji": "",
+      "image": "/images/products/crepe.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_meknes-meknes-pharmacy_paracetamol",
+      "storeId": "store_mock_meknes-meknes-pharmacy",
+      "category": "Health",
+      "name": "Paracetamol 500mg",
+      "description": "20 tablets",
+      "price": 18,
+      "emoji": "",
+      "image": "/images/products/paracetamol.jpg",
+      "available": true,
+      "popular": true,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_meknes-meknes-pharmacy_vitamin_c",
+      "storeId": "store_mock_meknes-meknes-pharmacy",
+      "category": "Health",
+      "name": "Vitamin C",
+      "description": "Effervescent, 20 tablets",
+      "price": 42,
+      "emoji": "",
+      "image": "/images/products/vitamin_c.jpg",
+      "available": true,
+      "popular": true,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_meknes-meknes-pharmacy_baby_wipes",
+      "storeId": "store_mock_meknes-meknes-pharmacy",
+      "category": "Baby",
+      "name": "Baby Wipes 72",
+      "description": "Fragrance-free wipes",
+      "price": 32,
+      "emoji": "",
+      "image": "/images/products/baby_wipes.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_meknes-meknes-pharmacy_sunscreen",
+      "storeId": "store_mock_meknes-meknes-pharmacy",
+      "category": "Care",
+      "name": "Sunscreen SPF 50",
+      "description": "Face and body lotion",
+      "price": 89,
+      "emoji": "",
+      "image": "/images/products/sunscreen.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_meknes-meknes-pharmacy_lip_balm",
+      "storeId": "store_mock_meknes-meknes-pharmacy",
+      "category": "Care",
+      "name": "Lip Balm",
+      "description": "Moisturising balm",
+      "price": 16,
+      "emoji": "",
+      "image": "/images/products/lip_balm.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_meknes-meknes-pharmacy_shampoo",
+      "storeId": "store_mock_meknes-meknes-pharmacy",
+      "category": "Care",
+      "name": "Shampoo 400ml",
+      "description": "Everyday shampoo",
+      "price": 35,
+      "emoji": "",
+      "image": "/images/products/shampoo.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_meknes-meknes-pharmacy_toothpaste",
+      "storeId": "store_mock_meknes-meknes-pharmacy",
+      "category": "Care",
+      "name": "Toothpaste 100ml",
+      "description": "Fluoride toothpaste",
+      "price": 18,
+      "emoji": "",
+      "image": "/images/products/toothpaste.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
       "id": "product_mock_oujda-oujda-grill_mixed_grill",
       "storeId": "store_mock_oujda-oujda-grill",
       "category": "Grill",
@@ -5119,6 +7005,164 @@
       "substitutionAllowed": true
     },
     {
+      "id": "product_mock_oujda-oujda-cafe_msemen",
+      "storeId": "store_mock_oujda-oujda-cafe",
+      "category": "Breakfast",
+      "name": "Msemen & Amlou",
+      "description": "Warm msemen with argan amlou",
+      "price": 26,
+      "emoji": "",
+      "image": "/images/products/msemen.jpg",
+      "available": true,
+      "popular": true,
+      "calories": 460,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_oujda-oujda-cafe_avocado_toast",
+      "storeId": "store_mock_oujda-oujda-cafe",
+      "category": "Breakfast",
+      "name": "Avocado Toast",
+      "description": "Sourdough, avocado, poached egg",
+      "price": 38,
+      "emoji": "",
+      "image": "/images/products/avocado_toast.jpg",
+      "available": true,
+      "popular": true,
+      "calories": 420,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_oujda-oujda-cafe_flat_white",
+      "storeId": "store_mock_oujda-oujda-cafe",
+      "category": "Coffee",
+      "name": "Flat White",
+      "description": "Double espresso, steamed milk",
+      "price": 22,
+      "emoji": "",
+      "image": "/images/products/flat_white.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_oujda-oujda-cafe_orange_juice",
+      "storeId": "store_mock_oujda-oujda-cafe",
+      "category": "Juice",
+      "name": "Fresh Orange Juice",
+      "description": "Pressed to order, 40cl",
+      "price": 20,
+      "emoji": "",
+      "image": "/images/products/orange_juice.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_oujda-oujda-cafe_crepe",
+      "storeId": "store_mock_oujda-oujda-cafe",
+      "category": "Sweet",
+      "name": "Nutella Crêpe",
+      "description": "Fresh crêpe, banana, Nutella",
+      "price": 32,
+      "emoji": "",
+      "image": "/images/products/crepe.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_oujda-oujda-pharmacy_paracetamol",
+      "storeId": "store_mock_oujda-oujda-pharmacy",
+      "category": "Health",
+      "name": "Paracetamol 500mg",
+      "description": "20 tablets",
+      "price": 18,
+      "emoji": "",
+      "image": "/images/products/paracetamol.jpg",
+      "available": true,
+      "popular": true,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_oujda-oujda-pharmacy_vitamin_c",
+      "storeId": "store_mock_oujda-oujda-pharmacy",
+      "category": "Health",
+      "name": "Vitamin C",
+      "description": "Effervescent, 20 tablets",
+      "price": 42,
+      "emoji": "",
+      "image": "/images/products/vitamin_c.jpg",
+      "available": true,
+      "popular": true,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_oujda-oujda-pharmacy_baby_wipes",
+      "storeId": "store_mock_oujda-oujda-pharmacy",
+      "category": "Baby",
+      "name": "Baby Wipes 72",
+      "description": "Fragrance-free wipes",
+      "price": 32,
+      "emoji": "",
+      "image": "/images/products/baby_wipes.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_oujda-oujda-pharmacy_sunscreen",
+      "storeId": "store_mock_oujda-oujda-pharmacy",
+      "category": "Care",
+      "name": "Sunscreen SPF 50",
+      "description": "Face and body lotion",
+      "price": 89,
+      "emoji": "",
+      "image": "/images/products/sunscreen.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_oujda-oujda-pharmacy_lip_balm",
+      "storeId": "store_mock_oujda-oujda-pharmacy",
+      "category": "Care",
+      "name": "Lip Balm",
+      "description": "Moisturising balm",
+      "price": 16,
+      "emoji": "",
+      "image": "/images/products/lip_balm.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_oujda-oujda-pharmacy_shampoo",
+      "storeId": "store_mock_oujda-oujda-pharmacy",
+      "category": "Care",
+      "name": "Shampoo 400ml",
+      "description": "Everyday shampoo",
+      "price": 35,
+      "emoji": "",
+      "image": "/images/products/shampoo.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_oujda-oujda-pharmacy_toothpaste",
+      "storeId": "store_mock_oujda-oujda-pharmacy",
+      "category": "Care",
+      "name": "Toothpaste 100ml",
+      "description": "Fluoride toothpaste",
+      "price": 18,
+      "emoji": "",
+      "image": "/images/products/toothpaste.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
       "id": "product_mock_kenitra-kenitra-pizza-kitchen_pizza_margherita",
       "storeId": "store_mock_kenitra-kenitra-pizza-kitchen",
       "category": "Pizza",
@@ -5383,6 +7427,164 @@
       "lowStockThreshold": 5,
       "aisle": "Dairy",
       "substitutionAllowed": true
+    },
+    {
+      "id": "product_mock_kenitra-kenitra-cafe_msemen",
+      "storeId": "store_mock_kenitra-kenitra-cafe",
+      "category": "Breakfast",
+      "name": "Msemen & Amlou",
+      "description": "Warm msemen with argan amlou",
+      "price": 26,
+      "emoji": "",
+      "image": "/images/products/msemen.jpg",
+      "available": true,
+      "popular": true,
+      "calories": 460,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_kenitra-kenitra-cafe_avocado_toast",
+      "storeId": "store_mock_kenitra-kenitra-cafe",
+      "category": "Breakfast",
+      "name": "Avocado Toast",
+      "description": "Sourdough, avocado, poached egg",
+      "price": 38,
+      "emoji": "",
+      "image": "/images/products/avocado_toast.jpg",
+      "available": true,
+      "popular": true,
+      "calories": 420,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_kenitra-kenitra-cafe_flat_white",
+      "storeId": "store_mock_kenitra-kenitra-cafe",
+      "category": "Coffee",
+      "name": "Flat White",
+      "description": "Double espresso, steamed milk",
+      "price": 22,
+      "emoji": "",
+      "image": "/images/products/flat_white.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_kenitra-kenitra-cafe_orange_juice",
+      "storeId": "store_mock_kenitra-kenitra-cafe",
+      "category": "Juice",
+      "name": "Fresh Orange Juice",
+      "description": "Pressed to order, 40cl",
+      "price": 20,
+      "emoji": "",
+      "image": "/images/products/orange_juice.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_kenitra-kenitra-cafe_crepe",
+      "storeId": "store_mock_kenitra-kenitra-cafe",
+      "category": "Sweet",
+      "name": "Nutella Crêpe",
+      "description": "Fresh crêpe, banana, Nutella",
+      "price": 32,
+      "emoji": "",
+      "image": "/images/products/crepe.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_kenitra-kenitra-pharmacy_paracetamol",
+      "storeId": "store_mock_kenitra-kenitra-pharmacy",
+      "category": "Health",
+      "name": "Paracetamol 500mg",
+      "description": "20 tablets",
+      "price": 18,
+      "emoji": "",
+      "image": "/images/products/paracetamol.jpg",
+      "available": true,
+      "popular": true,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_kenitra-kenitra-pharmacy_vitamin_c",
+      "storeId": "store_mock_kenitra-kenitra-pharmacy",
+      "category": "Health",
+      "name": "Vitamin C",
+      "description": "Effervescent, 20 tablets",
+      "price": 42,
+      "emoji": "",
+      "image": "/images/products/vitamin_c.jpg",
+      "available": true,
+      "popular": true,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_kenitra-kenitra-pharmacy_baby_wipes",
+      "storeId": "store_mock_kenitra-kenitra-pharmacy",
+      "category": "Baby",
+      "name": "Baby Wipes 72",
+      "description": "Fragrance-free wipes",
+      "price": 32,
+      "emoji": "",
+      "image": "/images/products/baby_wipes.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_kenitra-kenitra-pharmacy_sunscreen",
+      "storeId": "store_mock_kenitra-kenitra-pharmacy",
+      "category": "Care",
+      "name": "Sunscreen SPF 50",
+      "description": "Face and body lotion",
+      "price": 89,
+      "emoji": "",
+      "image": "/images/products/sunscreen.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_kenitra-kenitra-pharmacy_lip_balm",
+      "storeId": "store_mock_kenitra-kenitra-pharmacy",
+      "category": "Care",
+      "name": "Lip Balm",
+      "description": "Moisturising balm",
+      "price": 16,
+      "emoji": "",
+      "image": "/images/products/lip_balm.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_kenitra-kenitra-pharmacy_shampoo",
+      "storeId": "store_mock_kenitra-kenitra-pharmacy",
+      "category": "Care",
+      "name": "Shampoo 400ml",
+      "description": "Everyday shampoo",
+      "price": 35,
+      "emoji": "",
+      "image": "/images/products/shampoo.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_kenitra-kenitra-pharmacy_toothpaste",
+      "storeId": "store_mock_kenitra-kenitra-pharmacy",
+      "category": "Care",
+      "name": "Toothpaste 100ml",
+      "description": "Fluoride toothpaste",
+      "price": 18,
+      "emoji": "",
+      "image": "/images/products/toothpaste.jpg",
+      "available": true,
+      "popular": false
     },
     {
       "id": "product_mock_tetouan-tetouan-cedar-cafe_msemen",
@@ -5651,6 +7853,164 @@
       "lowStockThreshold": 5,
       "aisle": "Personal care",
       "substitutionAllowed": true
+    },
+    {
+      "id": "product_mock_tetouan-tetouan-cafe_msemen",
+      "storeId": "store_mock_tetouan-tetouan-cafe",
+      "category": "Breakfast",
+      "name": "Msemen & Amlou",
+      "description": "Warm msemen with argan amlou",
+      "price": 26,
+      "emoji": "",
+      "image": "/images/products/msemen.jpg",
+      "available": true,
+      "popular": true,
+      "calories": 460,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_tetouan-tetouan-cafe_avocado_toast",
+      "storeId": "store_mock_tetouan-tetouan-cafe",
+      "category": "Breakfast",
+      "name": "Avocado Toast",
+      "description": "Sourdough, avocado, poached egg",
+      "price": 38,
+      "emoji": "",
+      "image": "/images/products/avocado_toast.jpg",
+      "available": true,
+      "popular": true,
+      "calories": 420,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_tetouan-tetouan-cafe_flat_white",
+      "storeId": "store_mock_tetouan-tetouan-cafe",
+      "category": "Coffee",
+      "name": "Flat White",
+      "description": "Double espresso, steamed milk",
+      "price": 22,
+      "emoji": "",
+      "image": "/images/products/flat_white.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_tetouan-tetouan-cafe_orange_juice",
+      "storeId": "store_mock_tetouan-tetouan-cafe",
+      "category": "Juice",
+      "name": "Fresh Orange Juice",
+      "description": "Pressed to order, 40cl",
+      "price": 20,
+      "emoji": "",
+      "image": "/images/products/orange_juice.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_tetouan-tetouan-cafe_crepe",
+      "storeId": "store_mock_tetouan-tetouan-cafe",
+      "category": "Sweet",
+      "name": "Nutella Crêpe",
+      "description": "Fresh crêpe, banana, Nutella",
+      "price": 32,
+      "emoji": "",
+      "image": "/images/products/crepe.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_tetouan-tetouan-pharmacy_paracetamol",
+      "storeId": "store_mock_tetouan-tetouan-pharmacy",
+      "category": "Health",
+      "name": "Paracetamol 500mg",
+      "description": "20 tablets",
+      "price": 18,
+      "emoji": "",
+      "image": "/images/products/paracetamol.jpg",
+      "available": true,
+      "popular": true,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_tetouan-tetouan-pharmacy_vitamin_c",
+      "storeId": "store_mock_tetouan-tetouan-pharmacy",
+      "category": "Health",
+      "name": "Vitamin C",
+      "description": "Effervescent, 20 tablets",
+      "price": 42,
+      "emoji": "",
+      "image": "/images/products/vitamin_c.jpg",
+      "available": true,
+      "popular": true,
+      "tags": [
+        "Popular"
+      ]
+    },
+    {
+      "id": "product_mock_tetouan-tetouan-pharmacy_baby_wipes",
+      "storeId": "store_mock_tetouan-tetouan-pharmacy",
+      "category": "Baby",
+      "name": "Baby Wipes 72",
+      "description": "Fragrance-free wipes",
+      "price": 32,
+      "emoji": "",
+      "image": "/images/products/baby_wipes.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_tetouan-tetouan-pharmacy_sunscreen",
+      "storeId": "store_mock_tetouan-tetouan-pharmacy",
+      "category": "Care",
+      "name": "Sunscreen SPF 50",
+      "description": "Face and body lotion",
+      "price": 89,
+      "emoji": "",
+      "image": "/images/products/sunscreen.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_tetouan-tetouan-pharmacy_lip_balm",
+      "storeId": "store_mock_tetouan-tetouan-pharmacy",
+      "category": "Care",
+      "name": "Lip Balm",
+      "description": "Moisturising balm",
+      "price": 16,
+      "emoji": "",
+      "image": "/images/products/lip_balm.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_tetouan-tetouan-pharmacy_shampoo",
+      "storeId": "store_mock_tetouan-tetouan-pharmacy",
+      "category": "Care",
+      "name": "Shampoo 400ml",
+      "description": "Everyday shampoo",
+      "price": 35,
+      "emoji": "",
+      "image": "/images/products/shampoo.jpg",
+      "available": true,
+      "popular": false
+    },
+    {
+      "id": "product_mock_tetouan-tetouan-pharmacy_toothpaste",
+      "storeId": "store_mock_tetouan-tetouan-pharmacy",
+      "category": "Care",
+      "name": "Toothpaste 100ml",
+      "description": "Fluoride toothpaste",
+      "price": 18,
+      "emoji": "",
+      "image": "/images/products/toothpaste.jpg",
+      "available": true,
+      "popular": false
     }
   ],
   "existingProductImages": {
