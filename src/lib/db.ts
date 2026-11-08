@@ -5898,6 +5898,22 @@ export async function setSavedBasketReminder(
 }
 
 
+export async function listFamilyShoppingLists(userId: string): Promise<
+  Array<{ ownerName: string; list: NonNullable<Database["users"][number]["shoppingLists"]>[number] }>
+> {
+  const db = await getDb();
+  const family = familyForUser(db, userId);
+  if (!family) return [];
+  const memberIds = new Set(family.members.map((member) => member.userId));
+  memberIds.delete(userId);
+  return db.users
+    .filter((user) => memberIds.has(user.id))
+    .flatMap((user) =>
+      (user.shoppingLists ?? []).map((list) => ({ ownerName: user.name, list })),
+    )
+    .slice(0, 20);
+}
+
 export type FamilySummary = {
   memberCount: number;
   orderCount: number;

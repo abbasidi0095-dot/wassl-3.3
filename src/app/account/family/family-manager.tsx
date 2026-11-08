@@ -15,11 +15,13 @@ const ROLE_LABELS: Record<FamilyRole, string> = {
 export function FamilyManager({
   family: initialFamily,
   summary,
+  familyLists,
   currentUserId,
   initialToken,
 }: {
   family: FamilyView | null;
   summary: FamilySummary | null;
+  familyLists: Array<{ ownerName: string; list: { id: string; name: string; items: Array<{ qty: number }> } }>;
   currentUserId: string;
   initialToken: string;
 }) {
@@ -197,6 +199,23 @@ export function FamilyManager({
                   <span className="block truncate text-[11px] font-semibold">{item.name}</span>
                   <span className="block truncate text-[10px] text-muted">{item.storeName}</span>
                 </span>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {familyLists.length ? (
+        <section className="card mt-4 p-4">
+          <h2 className="text-[13px] font-semibold">{t("Shared shopping lists")}</h2>
+          <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {familyLists.map(({ ownerName, list }) => (
+              <div key={`${ownerName}-${list.id}`} className="rounded-[10px] border border-line bg-surface p-3">
+                <div className="truncate text-[12px] font-semibold">{list.name}</div>
+                <div className="mt-0.5 text-[10px] text-muted">
+                  {ownerName} · {list.items.reduce((sum, item) => sum + item.qty, 0)} {t("items")}
+                </div>
+                <div className="mt-2 text-[10px] text-muted">{t("Read-only from the household")}</div>
               </div>
             ))}
           </div>

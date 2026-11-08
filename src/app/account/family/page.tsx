@@ -1,5 +1,5 @@
 import { requireRole } from "@/lib/auth";
-import { getFamilyForUser, getFamilySummary } from "@/lib/db";
+import { getFamilyForUser, getFamilySummary, listFamilyShoppingLists } from "@/lib/db";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getCities } from "@/lib/db";
@@ -18,6 +18,7 @@ export default async function FamilyPage({
   const { token } = await searchParams;
   const family = await getFamilyForUser(session.userId);
   const summary = family ? await getFamilySummary(session.userId) : null;
+  const familyLists = family ? await listFamilyShoppingLists(session.userId) : [];
   const cities = await getCities();
   const city = await getPreferredCity(cities);
 
@@ -28,6 +29,7 @@ export default async function FamilyPage({
         <FamilyManager
           family={family ?? null}
           summary={summary}
+          familyLists={familyLists}
           currentUserId={session.userId}
           initialToken={token ?? ""}
         />
