@@ -26,6 +26,15 @@ import { quotePromo, type PromoQuote } from "@/lib/promos";
 import { money } from "@/lib/utils";
 import { useI18n } from "@/components/locale-provider";
 
+type AddressSuggestion = {
+  id: string;
+  label: string;
+  address: string;
+  landmark: string;
+  lat: number;
+  lng: number;
+};
+
 type SavedAddress = {
   id: string;
   label: string;
@@ -57,6 +66,9 @@ export function CheckoutForm({
   const [phone, setPhone] = useState(initialPhone);
   const [email, setEmail] = useState(initialEmail);
   const [address, setAddress] = useState("");
+  const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
+  const [geocoding, setGeocoding] = useState(false);
+  const applyingAddress = useRef(false);
   const [landmark, setLandmark] = useState("");
   const [notes, setNotes] = useState("");
   const [scheduled, setScheduled] = useState("");
@@ -158,6 +170,45 @@ export function CheckoutForm({
       active = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (applyingAddress.current) return;
+    const term = address.trim();
+    if (term.length < 3) {
+      setSuggestions([]);
+      return;
+    }
+    let active = true;
+    const handle = window.setTimeout(async () => {
+      setGeocoding(true);
+      try {
+        const response = await fetch(`/api/geocode?q=${encodeURIComponent(term)}`, {
+          cache: "force-cache",
+        });
+        const data = (await response.json()) as { suggestions?: AddressSuggestion[] };
+        if (active) setSuggestions(data.suggestions ?? []);
+      } catch {
+        if (active) setSuggestions([]);
+      } finally {
+        if (active) setGeocoding(false);
+      }
+    }, 450);
+    return () => {
+      active = false;
+      window.clearTimeout(handle);
+    };
+  }, [address]);
+
+  function chooseSuggestion(suggestion: AddressSuggestion) {
+    applyingAddress.current = true;
+    setAddress(suggestion.address);
+    setLandmark(suggestion.landmark || suggestion.label.split(",").slice(0, 2).join(", "));
+    setPin({ lat: suggestion.lat, lng: suggestion.lng });
+    setSuggestions([]);
+    window.setTimeout(() => {
+      applyingAddress.current = false;
+    }, 700);
+  }
 
   function useMyLocation() {
     if (!navigator.geolocation) {
@@ -437,15 +488,40 @@ export function CheckoutForm({
                 />
               </div>
             </label>
-            <label className="block sm:col-span-2">
+            <label className="relative block sm:col-span-2">
               <span className="label">{t("Address")}</span>
               <input
                 value={address}
                 onChange={(event) => setAddress(event.target.value)}
                 className="input"
-                placeholder="Hay, street, building or villa number"
+                placeholder="Start typing a street, neighbourhood or landmark"
+                autoComplete="off"
                 required
               />
+              {geocoding ? (
+                <span className="absolute end-3 top-[38px] text-[10px] text-muted">
+                  {t("Searching…")}
+                </span>
+              ) : null}
+              {suggestions.length ? (
+                <div className="absolute inset-x-0 top-full z-30 mt-1 overflow-hidden rounded-[10px] border border-line bg-surface shadow-[var(--shadow)]">
+                  {suggestions.map((suggestion) => (
+                    <button
+                      key={suggestion.id}
+                      type="button"
+                      onClick={() => chooseSuggestion(suggestion)}
+                      className="block w-full border-b border-line px-3 py-2 text-start last:border-b-0 hover:bg-surface-2"
+                    >
+                      <span className="block truncate text-[12px] font-semibold">
+                        {suggestion.address}
+                      </span>
+                      <span className="mt-0.5 block truncate text-[10px] text-muted">
+                        {suggestion.label}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              ) : null}
             </label>
             <label className="block sm:col-span-2">
               <span className="label">{t("Landmark · repère")}</span>
