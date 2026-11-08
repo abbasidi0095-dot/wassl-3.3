@@ -1,5 +1,5 @@
 /* Wassl service worker — Web Push and v11 cache refresh. */
-const WASSL_SW_VERSION = "wassl-v11-2026-11-01-push";
+const WASSL_SW_VERSION = "wassl-v12-2026-11-08-customer";
 self.addEventListener("install", (event) => {
   self.skipWaiting();
 });
