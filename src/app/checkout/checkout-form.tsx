@@ -500,7 +500,18 @@ export function CheckoutForm({
               </div>
             </label>
             <label className="relative block sm:col-span-2">
-              <span className="label">{t("Address")}</span>
+              <span className="flex items-center justify-between gap-2">
+                <span className="label">{t("Address")}</span>
+                <button
+                  type="button"
+                  onClick={useMyLocation}
+                  className="inline-flex items-center gap-1 text-[11px] font-semibold text-brand"
+                  disabled={locating}
+                >
+                  <LocateFixed size={12} />
+                  {locating ? t("Locating…") : t("Use my location")}
+                </button>
+              </span>
               <input
                 value={address}
                 onChange={(event) => setAddress(event.target.value)}
@@ -509,6 +520,9 @@ export function CheckoutForm({
                 autoComplete="off"
                 required
               />
+              {pinError ? (
+                <span className="mt-1 block text-[10px] text-danger">{pinError}</span>
+              ) : null}
               {geocoding ? (
                 <span className="absolute end-3 top-[38px] text-[10px] text-muted">
                   {t("Searching…")}
