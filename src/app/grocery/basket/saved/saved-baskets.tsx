@@ -19,9 +19,11 @@ const STORAGE_KEY = "wassl_basket_v1";
 
 export function SavedBaskets({
   baskets: initial,
+  familyBaskets,
   shared,
 }: {
   baskets: SavedBasketView[];
+  familyBaskets: SavedBasketView[];
   shared: SavedBasketView | null;
 }) {
   const { t } = useI18n();
@@ -221,6 +223,26 @@ export function SavedBaskets({
               </div>
             ) : null}
           </div>
+
+          {familyBaskets.length ? (
+            <div className="mt-6">
+              <h2 className="text-[13px] font-semibold">{t("Family baskets")}</h2>
+              <div className="mt-2 space-y-2">
+                {familyBaskets.map((basket) => (
+                  <article key={`family-${basket.id}`} className="card p-4">
+                    <h3 className="truncate text-[13px] font-semibold">{basket.name}</h3>
+                    <p className="mt-0.5 text-[11px] text-muted">
+                      {basket.itemCount} {t("items")} · {basket.storeCount} {t("stores")} · {basket.subtotal} MAD
+                    </p>
+                    <div className="mt-2 flex gap-1.5">
+                      <button type="button" onClick={() => useBasket(basket)} className="btn btn-ghost btn-sm">{t("Use basket")}</button>
+                      <button type="button" onClick={() => duplicate(basket)} className="btn btn-ghost btn-sm">{t("Copy to my baskets")}</button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </section>
       </div>
 

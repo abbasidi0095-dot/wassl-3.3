@@ -1,5 +1,5 @@
 import { requireRole } from "@/lib/auth";
-import { getSavedBasketByShareToken, listSavedBaskets } from "@/lib/db";
+import { getSavedBasketByShareToken, listFamilySavedBaskets, listSavedBaskets } from "@/lib/db";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getCities } from "@/lib/db";
@@ -16,8 +16,9 @@ export default async function SavedBasketsPage({
 }) {
   const session = await requireRole("customer");
   const { share } = await searchParams;
-  const [baskets, shared, cities] = await Promise.all([
+  const [baskets, familyBaskets, shared, cities] = await Promise.all([
     listSavedBaskets(session.userId),
+    listFamilySavedBaskets(session.userId),
     share ? getSavedBasketByShareToken(share) : Promise.resolve(undefined),
     getCities(),
   ]);
@@ -27,7 +28,7 @@ export default async function SavedBasketsPage({
     <>
       <SiteHeader cities={cities} currentCity={city} />
       <main className="container-wassl pb-16 pt-6 lg:pt-8">
-        <SavedBaskets baskets={baskets} shared={shared ?? null} />
+        <SavedBaskets baskets={baskets} familyBaskets={familyBaskets} shared={shared ?? null} />
       </main>
       <SiteFooter />
     </>

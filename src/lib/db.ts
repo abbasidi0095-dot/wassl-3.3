@@ -5813,6 +5813,19 @@ export async function listSavedBaskets(userId: string): Promise<SavedBasketView[
     .map(savedBasketView);
 }
 
+export async function listFamilySavedBaskets(userId: string): Promise<SavedBasketView[]> {
+  const db = await getDb();
+  const family = familyForUser(db, userId);
+  if (!family) return [];
+  const memberIds = new Set(family.members.map((member) => member.userId));
+  memberIds.delete(userId);
+  return (db.savedBaskets ?? [])
+    .filter((basket) => memberIds.has(basket.userId))
+    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+    .slice(0, 20)
+    .map(savedBasketView);
+}
+
 export async function deleteSavedBasket(id: string, userId: string): Promise<void> {
   await mutate((db) => {
     db.savedBaskets = (db.savedBaskets ?? []).filter(
