@@ -91,6 +91,7 @@ function hydrate(db: Database): Database {
   db.serviceBookings ??= [];
   db.businessAccounts ??= [];
   db.businessOrders ??= [];
+  db.groupOrders ??= [];
 
   // Migrate the legacy scalar balance into an immutable, ledger-backed account.
   for (const user of db.users) {

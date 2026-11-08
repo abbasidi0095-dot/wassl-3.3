@@ -1,3 +1,4 @@
+import { createHash, randomBytes } from "node:crypto";
 import { notifyOrderStatusChange } from "./email";
 import { closeDatabase, getDatabaseBackend } from "./db-backend";
 import {
@@ -63,6 +64,8 @@ import type {
   BusinessAccountStatus,
   BusinessOrder,
   BusinessOrderStatus,
+  GroupOrder,
+  GroupOrderParticipant,
   ChatMessage,
   ChatThread,
   ChatThreadStatus,
@@ -5018,5 +5021,313 @@ export async function updateBusinessOrderStatus(
     order.status = status;
     order.updatedAt = new Date().toISOString();
     return order;
+  });
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* Group orders                                                               */
+/* -------------------------------------------------------------------------- */
+
+export type GroupOrderView = Omit<GroupOrder, "inviteTokenHash" | "participants"> & {
+  itemCount: number;
+  subtotal: number;
+  participants: Array<
+    GroupOrderParticipant & { subtotal: number; itemCount: number }
+  >;
+};
+
+function groupTokenHash(token: string): string {
+  return createHash("sha256").update(token).digest("hex");
+}
+
+function groupOrderView(order: GroupOrder): GroupOrderView {
+  const { inviteTokenHash: _hash, ...publicOrder } = order;
+  const participants = order.participants.map((participant) => ({
+    ...participant,
+    subtotal: participant.items.reduce((sum, item) => sum + item.price * item.qty, 0),
+    itemCount: participant.items.reduce((sum, item) => sum + item.qty, 0),
+  }));
+  return {
+    ...publicOrder,
+    participants,
+    itemCount: participants.reduce((sum, participant) => sum + participant.itemCount, 0),
+    subtotal: participants.reduce((sum, participant) => sum + participant.subtotal, 0),
+  };
+}
+
+function findGroupOrder(db: Database, code: string): GroupOrder | undefined {
+  return db.groupOrders?.find(
+    (order) => order.code.toLowerCase() === code.toLowerCase(),
+  );
+}
+
+export async function createGroupOrder(input: {
+  userId: string;
+  userName: string;
+  storeId: string;
+  title: string;
+  deadline: string;
+}): Promise<{ order: GroupOrderView; token: string }> {
+  const deadline = new Date(input.deadline);
+  if (!Number.isFinite(deadline.getTime()) || deadline.getTime() < Date.now()) {
+    throw new Error("Choose a deadline in the future");
+  }
+  if (deadline.getTime() > Date.now() + 14 * 24 * 60 * 60 * 1000) {
+    throw new Error("Group order deadlines are limited to 14 days");
+  }
+  const token = randomBytes(24).toString("hex");
+  const now = new Date().toISOString();
+  const order = await mutate((db) => {
+    const store = db.stores.find((entry) => entry.id === input.storeId);
+    if (!store) throw new Error("Store not found");
+    let code = orderCode();
+    while (findGroupOrder(db, code)) code = orderCode();
+    const group: GroupOrder = {
+      id: randomId("group", 8),
+      code,
+      inviteTokenHash: groupTokenHash(token),
+      ownerUserId: input.userId,
+      ownerName: input.userName,
+      storeId: store.id,
+      storeSlug: store.slug,
+      storeName: store.name,
+      citySlug: store.citySlug,
+      title: input.title.trim().slice(0, 80) || "Group order",
+      status: "open",
+      deadline: deadline.toISOString(),
+      createdAt: now,
+      updatedAt: now,
+      participants: [
+        {
+          id: randomId("gmember", 6),
+          userId: input.userId,
+          name: input.userName,
+          joinedAt: now,
+          items: [],
+        },
+      ],
+    };
+    db.groupOrders ??= [];
+    db.groupOrders.push(group);
+    recordAudit(db, {
+      actorRole: "customer",
+      actorId: input.userId,
+      actorName: input.userName,
+      action: "group.create",
+      entity: "order",
+      entityId: group.id,
+      summary: `Created group order ${group.code} at ${store.name}`,
+    });
+    return group;
+  });
+  return { order: groupOrderView(order), token };
+}
+
+export async function getGroupOrder(code: string): Promise<GroupOrderView | undefined> {
+  const order = findGroupOrder(await getDb(), code);
+  return order ? groupOrderView(order) : undefined;
+}
+
+export async function listGroupOrders(userId: string): Promise<GroupOrderView[]> {
+  const db = await getDb();
+  return (db.groupOrders ?? [])
+    .filter(
+      (order) =>
+        order.ownerUserId === userId ||
+        order.participants.some((participant) => participant.userId === userId),
+    )
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    .slice(0, 30)
+    .map(groupOrderView);
+}
+
+export async function joinGroupOrder(input: {
+  code: string;
+  token: string;
+  userId: string;
+  userName: string;
+}): Promise<GroupOrderView> {
+  return mutate((db) => {
+    const order = findGroupOrder(db, input.code);
+    if (!order) throw new Error("Group order not found");
+    if (order.status !== "open") throw new Error("This group order is locked");
+    if (new Date(order.deadline).getTime() < Date.now()) {
+      throw new Error("This group order has expired");
+    }
+    if (groupTokenHash(input.token) !== order.inviteTokenHash) {
+      throw new Error("Invalid invitation");
+    }
+    if (!order.participants.some((participant) => participant.userId === input.userId)) {
+      order.participants.push({
+        id: randomId("gmember", 6),
+        userId: input.userId,
+        name: input.userName,
+        joinedAt: new Date().toISOString(),
+        items: [],
+      });
+      order.updatedAt = new Date().toISOString();
+      recordAudit(db, {
+        actorRole: "customer",
+        actorId: input.userId,
+        actorName: input.userName,
+        action: "group.join",
+        entity: "order",
+        entityId: order.id,
+        summary: `Joined group order ${order.code}`,
+      });
+    }
+    return groupOrderView(order);
+  });
+}
+
+export async function setGroupOrderItem(input: {
+  code: string;
+  userId: string;
+  productId: string;
+  qty: number;
+}): Promise<GroupOrderView> {
+  return mutate((db) => {
+    const order = findGroupOrder(db, input.code);
+    if (!order) throw new Error("Group order not found");
+    if (order.status !== "open") throw new Error("This group order is locked");
+    if (new Date(order.deadline).getTime() < Date.now()) {
+      throw new Error("This group order has expired");
+    }
+    const participant = order.participants.find(
+      (entry) => entry.userId === input.userId,
+    );
+    if (!participant) throw new Error("Join the group order first");
+    const product = db.products.find((entry) => entry.id === input.productId);
+    if (!product || product.storeId !== order.storeId) {
+      throw new Error("Product is not in this store");
+    }
+    if (!product.available) throw new Error("Product is sold out");
+    const stock = product.variants?.length
+      ? product.variants.reduce((sum, variant) => sum + variant.stock, 0)
+      : (product.stock ?? 1);
+    if (stock <= 0) throw new Error("Product is sold out");
+    const qty = Math.max(0, Math.min(20, Math.floor(input.qty), stock));
+    const index = participant.items.findIndex(
+      (entry) => entry.productId === product.id,
+    );
+    if (qty <= 0) {
+      if (index >= 0) participant.items.splice(index, 1);
+    } else if (index >= 0) {
+      participant.items[index] = {
+        productId: product.id,
+        name: product.name,
+        price: product.price,
+        qty,
+        image: product.image,
+        unit: product.unit,
+      };
+    } else {
+      participant.items.push({
+        productId: product.id,
+        name: product.name,
+        price: product.price,
+        qty,
+        image: product.image,
+        unit: product.unit,
+      });
+    }
+    order.updatedAt = new Date().toISOString();
+    return groupOrderView(order);
+  });
+}
+
+export async function lockGroupOrder(code: string, userId: string): Promise<GroupOrderView> {
+  return mutate((db) => {
+    const order = findGroupOrder(db, code);
+    if (!order) throw new Error("Group order not found");
+    if (order.ownerUserId !== userId) throw new Error("Only the owner can lock");
+    if (order.status !== "open") throw new Error("Group order is not open");
+    const itemCount = order.participants.reduce(
+      (sum, participant) => sum + participant.items.length,
+      0,
+    );
+    if (!itemCount) throw new Error("Add at least one item first");
+    order.status = "locked";
+    order.lockedAt = new Date().toISOString();
+    order.updatedAt = order.lockedAt;
+    recordAudit(db, {
+      actorRole: "customer",
+      actorId: userId,
+      action: "group.lock",
+      entity: "order",
+      entityId: order.id,
+      summary: `Locked group order ${order.code}`,
+    });
+    return groupOrderView(order);
+  });
+}
+
+export async function checkoutGroupOrder(input: {
+  code: string;
+  userId: string;
+  customerName: string;
+  customerPhone: string;
+  customerEmail?: string;
+  address: string;
+  landmark: string;
+  notes?: string;
+  lat: number;
+  lng: number;
+}): Promise<{ orderId: string }> {
+  const db = await getDb();
+  const group = findGroupOrder(db, input.code);
+  if (!group) throw new Error("Group order not found");
+  if (group.ownerUserId !== input.userId) throw new Error("Only the owner can checkout");
+  if (group.status !== "locked") throw new Error("Lock the group order before checkout");
+  const items = group.participants.flatMap((participant) =>
+    participant.items.map((item) => ({ productId: item.productId, qty: item.qty })),
+  );
+  if (!items.length) throw new Error("Group order has no items");
+  const order = await createOrder(
+    {
+      citySlug: group.citySlug,
+      storeId: group.storeId,
+      customerName: input.customerName,
+      customerPhone: input.customerPhone,
+      customerEmail: input.customerEmail,
+      address: input.address,
+      landmark: input.landmark,
+      notes: input.notes,
+      lat: input.lat,
+      lng: input.lng,
+      items,
+      idempotencyKey: `group:${group.id}`,
+    },
+    { role: "customer" },
+  );
+  await mutate((database) => {
+    const current = findGroupOrder(database, input.code);
+    if (current) {
+      current.status = "placed";
+      current.placedOrderId = order.id;
+      current.updatedAt = new Date().toISOString();
+      recordAudit(database, {
+        actorRole: "customer",
+        actorId: input.userId,
+        action: "group.checkout",
+        entity: "order",
+        entityId: current.id,
+        summary: `Group order ${current.code} placed as ${order.code}`,
+      });
+    }
+  });
+  return { orderId: order.id };
+}
+
+export async function cancelGroupOrder(code: string, userId: string): Promise<GroupOrderView> {
+  return mutate((db) => {
+    const order = findGroupOrder(db, code);
+    if (!order) throw new Error("Group order not found");
+    if (order.ownerUserId !== userId) throw new Error("Only the owner can cancel");
+    if (order.status === "placed") throw new Error("Placed group orders cannot be cancelled here");
+    order.status = "cancelled";
+    order.updatedAt = new Date().toISOString();
+    return groupOrderView(order);
   });
 }

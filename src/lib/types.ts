@@ -840,6 +840,47 @@ export interface RefundRequest {
   updatedAt: string;
 }
 
+
+export type GroupOrderStatus = "open" | "locked" | "placed" | "cancelled";
+
+export interface GroupOrderItem {
+  productId: string;
+  name: string;
+  price: number;
+  qty: number;
+  image?: string;
+  unit?: string;
+}
+
+export interface GroupOrderParticipant {
+  id: string;
+  userId: string;
+  name: string;
+  joinedAt: string;
+  items: GroupOrderItem[];
+}
+
+export interface GroupOrder {
+  id: string;
+  code: string;
+  /** SHA-256 hash of the invitation token; the raw token is only returned once. */
+  inviteTokenHash: string;
+  ownerUserId: string;
+  ownerName: string;
+  storeId: string;
+  storeSlug: string;
+  storeName: string;
+  citySlug: string;
+  title: string;
+  status: GroupOrderStatus;
+  deadline: string;
+  createdAt: string;
+  updatedAt: string;
+  lockedAt?: string;
+  placedOrderId?: string;
+  participants: GroupOrderParticipant[];
+}
+
 export interface Database {
   users: User[];
   cities: City[];
@@ -869,6 +910,7 @@ export interface Database {
   serviceBookings?: ServiceBooking[];
   businessAccounts?: BusinessAccount[];
   businessOrders?: BusinessOrder[];
+  groupOrders?: GroupOrder[];
 }
 
 /**

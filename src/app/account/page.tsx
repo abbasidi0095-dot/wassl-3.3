@@ -15,6 +15,7 @@ import {
   ShoppingBasket,
   Star,
   UserRound,
+  Users,
 } from "lucide-react";
 import { requireRole } from "@/lib/auth";
 import { isEmailVerified } from "@/lib/email-verification";
@@ -98,6 +99,12 @@ export default async function AccountPage() {
       label: t("Shopping lists"),
       note: t("Plan the week, add it in one go"),
       icon: ListChecks,
+    },
+    {
+      href: "/group",
+      label: t("Group orders"),
+      note: t("Order together, pay once"),
+      icon: Users,
     },
     {
       href: "/orders",
