@@ -41,6 +41,7 @@ const STEPS: { status: string; label: string; caption: string }[] = [
 export function OrderTracking({ initial }: { initial: OrderView }) {
   const [order, setOrder] = useState(initial);
   const [refreshing, setRefreshing] = useState(false);
+  const [liveRoute, setLiveRoute] = useState<[number, number][] | undefined>();
 
   useEffect(() => {
     try {
@@ -70,6 +71,27 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
   useLiveEvents({ orderId: order.id }, () => {
     void refresh(true);
   });
+
+  useEffect(() => {
+    if (!order.driver || order.status === "delivered" || order.status === "cancelled") {
+      setLiveRoute(undefined);
+      return;
+    }
+    let active = true;
+    const driver = order.driver;
+    fetch(
+      `/api/route?fromLat=${driver.lat}&fromLng=${driver.lng}&toLat=${order.lat}&toLng=${order.lng}`,
+      { cache: "no-store" },
+    )
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data: { coordinates?: [number, number][] } | null) => {
+        if (active && data?.coordinates?.length) setLiveRoute(data.coordinates);
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, [order.driver?.lat, order.driver?.lng, order.lat, order.lng, order.status]);
 
   useEffect(() => {
     const timer = window.setInterval(() => refresh(true), 10000);
@@ -124,12 +146,13 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
     [order],
   );
 
-  const route = order.store
+  const fallbackRoute = order.store
     ? ([
         [order.store.lat, order.store.lng],
         [order.lat, order.lng],
       ] as [number, number][])
     : undefined;
+  const route = liveRoute?.length ? liveRoute : fallbackRoute;
 
   const whatsappPhone = order.driver?.phone.replace(/[^0-9]/g, "");
   const meta = STATUS_META[order.status];

@@ -220,11 +220,21 @@ export function CheckoutForm({
     setPinError("");
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        setPin({
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        });
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        setPin({ lat, lng });
         setLocating(false);
+        void fetch(
+          `/api/geocode/reverse?lat=${lat}&lng=${lng}&city=${encodeURIComponent(store?.citySlug ?? "")}`,
+          { cache: "force-cache" },
+        )
+          .then((response) => (response.ok ? response.json() : null))
+          .then((data: { address?: string; landmark?: string } | null) => {
+            if (!data?.address) return;
+            setAddress(data.address);
+            setLandmark(data.landmark || "");
+          })
+          .catch(() => undefined);
       },
       () => {
         setPinError(t("Location permission was denied. Move the pin manually."));
