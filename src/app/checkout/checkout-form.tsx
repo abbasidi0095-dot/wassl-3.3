@@ -137,6 +137,23 @@ export function CheckoutForm({
         }
       })
       .catch(() => {});
+    fetch("/api/family/addresses", { cache: "no-store" })
+      .then((response) => (response.ok ? response.json() : { addresses: [] }))
+      .then((data: { addresses?: Array<Omit<SavedAddress, "lastUsedAt"> & { createdAt?: string }> }) => {
+        if (!active || !data.addresses?.length) return;
+        const family = data.addresses.map((entry) => ({
+          ...entry,
+          lastUsedAt: entry.createdAt ?? new Date().toISOString(),
+        }));
+        setSavedAddresses((current) => {
+          const seen = new Set(current.map((entry) => `${entry.address}|${entry.landmark}`));
+          return [
+            ...current,
+            ...family.filter((entry) => !seen.has(`${entry.address}|${entry.landmark}`)),
+          ];
+        });
+      })
+      .catch(() => undefined);
     return () => {
       active = false;
     };

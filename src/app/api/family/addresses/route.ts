@@ -1,9 +1,16 @@
 import { NextResponse } from "next/server";
 import { requireApiRole, isResponse } from "@/lib/api-auth";
-import { addFamilyAddress, removeFamilyAddress } from "@/lib/db";
+import { addFamilyAddress, getFamilyForUser, removeFamilyAddress } from "@/lib/db";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+export async function GET(request: Request) {
+  const session = requireApiRole(request, ["customer"]);
+  if (isResponse(session)) return session;
+  const family = await getFamilyForUser(session.userId);
+  return NextResponse.json({ addresses: family?.addresses ?? [] });
+}
 
 export async function POST(request: Request) {
   const session = requireApiRole(request, ["customer"]);
