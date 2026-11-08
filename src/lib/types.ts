@@ -850,6 +850,9 @@ export interface GroupOrderItem {
   qty: number;
   image?: string;
   unit?: string;
+  /** Default required modifiers chosen for this group item. */
+  optionIds?: string[];
+  variantId?: string;
 }
 
 export interface GroupOrderParticipant {

@@ -5208,29 +5208,36 @@ export async function setGroupOrderItem(input: {
       : (product.stock ?? 1);
     if (stock <= 0) throw new Error("Product is sold out");
     const qty = Math.max(0, Math.min(20, Math.floor(input.qty), stock));
+    let optionDelta = 0;
+    const optionIds = (product.modifiers ?? [])
+      .filter((group) => group.required)
+      .map((group) => {
+        const option = group.options.find((entry) => !entry.soldOut);
+        if (option) optionDelta += option.priceDelta;
+        return option?.id;
+      })
+      .filter((id): id is string => Boolean(id));
+    const variant = product.variants?.[0];
+    const price = (variant?.price ?? product.price) + optionDelta;
     const index = participant.items.findIndex(
       (entry) => entry.productId === product.id,
     );
+    const line = {
+      productId: product.id,
+      name: product.name,
+      price,
+      qty,
+      image: product.image,
+      unit: variant?.unit ?? product.unit,
+      optionIds,
+      variantId: variant?.id,
+    };
     if (qty <= 0) {
       if (index >= 0) participant.items.splice(index, 1);
     } else if (index >= 0) {
-      participant.items[index] = {
-        productId: product.id,
-        name: product.name,
-        price: product.price,
-        qty,
-        image: product.image,
-        unit: product.unit,
-      };
+      participant.items[index] = line;
     } else {
-      participant.items.push({
-        productId: product.id,
-        name: product.name,
-        price: product.price,
-        qty,
-        image: product.image,
-        unit: product.unit,
-      });
+      participant.items.push(line);
     }
     order.updatedAt = new Date().toISOString();
     return groupOrderView(order);
@@ -5281,7 +5288,12 @@ export async function checkoutGroupOrder(input: {
   if (group.ownerUserId !== input.userId) throw new Error("Only the owner can checkout");
   if (group.status !== "locked") throw new Error("Lock the group order before checkout");
   const items = group.participants.flatMap((participant) =>
-    participant.items.map((item) => ({ productId: item.productId, qty: item.qty })),
+    participant.items.map((item) => ({
+      productId: item.productId,
+      qty: item.qty,
+      optionIds: item.optionIds,
+      variantId: item.variantId,
+    })),
   );
   if (!items.length) throw new Error("Group order has no items");
   const order = await createOrder(
