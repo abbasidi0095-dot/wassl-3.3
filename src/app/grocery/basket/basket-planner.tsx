@@ -191,6 +191,9 @@ export function BasketPlanner({
             <Link href="/grocery/scan" className="btn btn-ghost btn-sm">
               <ScanBarcode size={12} /> {t("Scan barcode")}
             </Link>
+            <Link href="/grocery/basket/saved" className="btn btn-ghost btn-sm">
+              <ShoppingBasket size={12} /> {t("Saved baskets")}
+            </Link>
             <button type="button" onClick={clearBasket} className="btn btn-ghost btn-sm">
               <Trash2 size={12} /> {t("Clear basket")}
             </button>

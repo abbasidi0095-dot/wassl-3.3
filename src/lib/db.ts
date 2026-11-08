@@ -25,7 +25,7 @@ import type { PhoneOtpChannel } from "./types";
 import { groceryAvailability, groceryFees, grocerySettings, resolveProductStock } from "./grocery";
 import { casablancaNow } from "./hours";
 import { sanitizeCityServices } from "./city-services";
-import { nextRecurringDate } from "./basket";
+import { nextRecurringDate, parseBasket } from "./basket";
 import {
   DEFAULT_LOYALTY_REWARDS,
   makeReferralCode,
@@ -69,6 +69,8 @@ import type {
   Family,
   FamilyMember,
   FamilyRole,
+  SavedBasket,
+  SavedBasketItem,
   RecurringOrder,
   RecurringOrderAddress,
   RecurringOrderFrequency,
@@ -5754,5 +5756,130 @@ export async function leaveFamily(userId: string): Promise<void> {
     }
     family.members = family.members.filter((member) => member.userId !== userId);
     family.updatedAt = new Date().toISOString();
+  });
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* Saved baskets                                                              */
+/* -------------------------------------------------------------------------- */
+
+export type SavedBasketView = Omit<SavedBasket, "shareTokenHash"> & {
+  itemCount: number;
+  subtotal: number;
+  storeCount: number;
+};
+
+function savedBasketView(basket: SavedBasket): SavedBasketView {
+  const { shareTokenHash: _hash, ...view } = basket;
+  return {
+    ...view,
+    itemCount: basket.items.reduce((sum, item) => sum + item.qty, 0),
+    subtotal: basket.items.reduce((sum, item) => sum + item.price * item.qty, 0),
+    storeCount: new Set(basket.items.map((item) => item.storeId)).size,
+  };
+}
+
+export async function createSavedBasket(input: {
+  userId: string;
+  name: string;
+  items: unknown;
+}): Promise<SavedBasketView> {
+  const items = parseBasket(input.items) as SavedBasketItem[];
+  if (!items.length) throw new Error("Add products before saving a basket");
+  const now = new Date().toISOString();
+  return mutate((db) => {
+    db.savedBaskets ??= [];
+    if (db.savedBaskets.filter((basket) => basket.userId === input.userId).length >= 30) {
+      throw new Error("You can keep up to 30 saved baskets");
+    }
+    const basket: SavedBasket = {
+      id: randomId("basket", 8),
+      userId: input.userId,
+      name: input.name.trim().slice(0, 60) || "Saved basket",
+      items,
+      createdAt: now,
+      updatedAt: now,
+    };
+    db.savedBaskets.unshift(basket);
+    return savedBasketView(basket);
+  });
+}
+
+export async function listSavedBaskets(userId: string): Promise<SavedBasketView[]> {
+  return ((await getDb()).savedBaskets ?? [])
+    .filter((basket) => basket.userId === userId)
+    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+    .map(savedBasketView);
+}
+
+export async function deleteSavedBasket(id: string, userId: string): Promise<void> {
+  await mutate((db) => {
+    db.savedBaskets = (db.savedBaskets ?? []).filter(
+      (basket) => basket.id !== id || basket.userId !== userId,
+    );
+  });
+}
+
+export async function duplicateSavedBasket(
+  id: string,
+  userId: string,
+): Promise<SavedBasketView> {
+  return mutate((db) => {
+    const basket = db.savedBaskets?.find((entry) => entry.id === id && entry.userId === userId);
+    if (!basket) throw new Error("Saved basket not found");
+    const copy: SavedBasket = {
+      ...basket,
+      id: randomId("basket", 8),
+      name: `${basket.name} copy`.slice(0, 60),
+      shareTokenHash: undefined,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    db.savedBaskets ??= [];
+    db.savedBaskets.unshift(copy);
+    return savedBasketView(copy);
+  });
+}
+
+export async function shareSavedBasket(
+  id: string,
+  userId: string,
+): Promise<{ basket: SavedBasketView; token: string }> {
+  const token = randomBytes(24).toString("hex");
+  return mutate((db) => {
+    const basket = db.savedBaskets?.find((entry) => entry.id === id && entry.userId === userId);
+    if (!basket) throw new Error("Saved basket not found");
+    basket.shareTokenHash = createHash("sha256").update(token).digest("hex");
+    basket.updatedAt = new Date().toISOString();
+    return { basket: savedBasketView(basket), token };
+  });
+}
+
+export async function getSavedBasketByShareToken(token: string): Promise<SavedBasketView | undefined> {
+  const hash = createHash("sha256").update(token).digest("hex");
+  const basket = (await getDb()).savedBaskets?.find(
+    (entry) => entry.shareTokenHash === hash,
+  );
+  return basket ? savedBasketView(basket) : undefined;
+}
+
+export async function setSavedBasketReminder(
+  id: string,
+  userId: string,
+  remindAt: string | undefined,
+): Promise<SavedBasketView> {
+  return mutate((db) => {
+    const basket = db.savedBaskets?.find((entry) => entry.id === id && entry.userId === userId);
+    if (!basket) throw new Error("Saved basket not found");
+    if (remindAt) {
+      const date = new Date(remindAt);
+      if (!Number.isFinite(date.getTime())) throw new Error("Choose a valid reminder date");
+      basket.remindAt = date.toISOString();
+    } else {
+      basket.remindAt = undefined;
+    }
+    basket.updatedAt = new Date().toISOString();
+    return savedBasketView(basket);
   });
 }

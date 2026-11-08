@@ -955,6 +955,39 @@ export interface Family {
   members: FamilyMember[];
 }
 
+
+export interface SavedBasketItem {
+  productId: string;
+  storeId: string;
+  storeSlug: string;
+  storeName: string;
+  storeCategory: "restaurant" | "grocery" | "pharmacy" | "cafe" | "gifts";
+  citySlug: string;
+  storeLat: number;
+  storeLng: number;
+  name: string;
+  image?: string;
+  price: number;
+  unit?: string;
+  qty: number;
+  stock: number;
+  deliveryFee: number;
+  minOrder: number;
+  substitution: "allow" | "refund" | "contact";
+  barcode?: string;
+}
+
+export interface SavedBasket {
+  id: string;
+  userId: string;
+  name: string;
+  items: SavedBasketItem[];
+  shareTokenHash?: string;
+  remindAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Database {
   users: User[];
   cities: City[];
@@ -987,6 +1020,7 @@ export interface Database {
   groupOrders?: GroupOrder[];
   recurringOrders?: RecurringOrder[];
   families?: Family[];
+  savedBaskets?: SavedBasket[];
 }
 
 /**
