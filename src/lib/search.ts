@@ -565,9 +565,8 @@ export function searchPlatform(db: Database, input: SearchInput): SearchResult {
     const store = storeById.get(product.storeId);
     if (!store) continue;
     const variants = product.variants ?? [];
-    const fields = [
+    const nameFields = [
       product.name,
-      product.description,
       product.brand,
       product.category,
       product.aisle,
@@ -587,7 +586,10 @@ export function searchPlatform(db: Database, input: SearchInput): SearchResult {
         : store.citySlug === citySlug
           ? 10
           : 0
-      : expandedMatchScore(query, fields);
+      : Math.max(
+          expandedMatchScore(query, nameFields),
+          expandedMatchScore(query, [product.description]) * 0.45,
+        );
     if (!base) continue;
     const stock = stockCount(product);
     const status = stockState(product);
@@ -652,7 +654,6 @@ export function searchPlatform(db: Database, input: SearchInput): SearchResult {
       if (status === "sold_out") continue;
       const base = expandedMatchScore(query, [
         product.name,
-        product.description,
         product.brand,
         product.category,
         product.aisle,
@@ -662,6 +663,16 @@ export function searchPlatform(db: Database, input: SearchInput): SearchResult {
       if (!base) continue;
       const family = productFamily(product);
       if (!family) continue;
+      // Comparisons must be the same item, not any product whose description
+      // happens to mention the query. Require a query word in the family name.
+      const familyWords = family.split(" ").filter(Boolean);
+      const queryWords = new Set(
+        expandSearchQuery(query).flatMap((variant) => variant.split(" ")),
+      );
+      const familyMatches = [...queryWords].some(
+        (word) => word.length > 1 && familyWords.includes(word),
+      );
+      if (!familyMatches) continue;
       const distance = distanceFor(store, city);
       const promotion =
         store.category === "grocery" && db.promotions?.length
