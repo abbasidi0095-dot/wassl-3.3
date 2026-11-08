@@ -70,6 +70,15 @@ describe("unified search", () => {
     expect(product?.sponsored).toBe(false);
   });
 
+  it("keeps results inside the selected city", () => {
+    const result = searchPlatform(db, { query: "burger", citySlug: "dakhla" });
+    const hits = result.groups.flatMap((group) => group.hits);
+    expect(hits.length).toBeGreaterThan(0);
+    expect(hits.every((hit) => hit.citySlug === "dakhla" || hit.kind !== "store")).toBe(
+      true,
+    );
+  });
+
   it("returns real services and delivery choices for an empty query", () => {
     const result = searchPlatform(db, { query: "", citySlug: "dakhla" });
     expect(result.groups.some((group) => group.kind === "service")).toBe(true);

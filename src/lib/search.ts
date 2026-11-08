@@ -286,8 +286,18 @@ export function matchScore(query: string, fields: Array<string | undefined>): nu
       best = Math.max(best, 120);
       continue;
     }
-    if (haystack.includes(` ${needle}`) || haystack.includes(needle)) {
+    const words = haystack.split(" ");
+    const wordMatch =
+      words.includes(needle) ||
+      haystack.startsWith(`${needle} `) ||
+      haystack.endsWith(` ${needle}`) ||
+      haystack.includes(` ${needle} `);
+    if (wordMatch) {
       best = Math.max(best, 95);
+      continue;
+    }
+    if (haystack.includes(needle)) {
+      best = Math.max(best, 58);
       continue;
     }
 
@@ -519,6 +529,7 @@ export function searchPlatform(db: Database, input: SearchInput): SearchResult {
 
   const stores: SearchHit[] = [];
   for (const store of db.stores) {
+    if (store.citySlug !== citySlug) continue;
     const fields = [
       store.name,
       store.nameAr,
@@ -550,6 +561,7 @@ export function searchPlatform(db: Database, input: SearchInput): SearchResult {
       href: `/store/${store.slug}`,
       meta: store.isOpen ? "Open" : "Closed",
       image: shortImage(store.image),
+      citySlug: store.citySlug,
       distanceKm: distance,
       etaMinutes: etaFor(store, distance),
       storeRating: store.rating,
@@ -563,7 +575,7 @@ export function searchPlatform(db: Database, input: SearchInput): SearchResult {
   const products: SearchHit[] = [];
   for (const product of db.products) {
     const store = storeById.get(product.storeId);
-    if (!store) continue;
+    if (!store || store.citySlug !== citySlug) continue;
     const variants = product.variants ?? [];
     const nameFields = [
       product.name,
