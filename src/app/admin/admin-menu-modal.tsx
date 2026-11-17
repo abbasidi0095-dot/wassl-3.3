@@ -1,5 +1,7 @@
 "use client";
 
+import { useI18n } from "@/components/locale-provider";
+
 import { useCallback, useEffect, useState } from "react";
 import {
   ImagePlus,
@@ -20,6 +22,7 @@ export function AdminMenuModal({
   store: Store;
   onClose: () => void;
 }) {
+  const { t } = useI18n();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState("");
@@ -138,7 +141,7 @@ export function AdminMenuModal({
               type="button"
               onClick={() => void load()}
               className="grid h-9 w-9 place-items-center rounded-[6px] text-muted hover:bg-surface-2 hover:text-ink"
-              aria-label="Refresh menu"
+              aria-label={t("Refresh menu")}
             >
               <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
             </button>
@@ -146,7 +149,7 @@ export function AdminMenuModal({
               type="button"
               onClick={onClose}
               className="grid h-9 w-9 place-items-center rounded-[6px] text-muted hover:bg-surface-2 hover:text-ink"
-              aria-label="Close"
+              aria-label={t("Close")}
             >
               <X size={16} />
             </button>
@@ -160,7 +163,7 @@ export function AdminMenuModal({
             onClick={() => setOpen((value) => !value)}
             className="btn btn-primary btn-sm"
           >
-            <Plus size={13} /> Add item
+            <Plus size={13} /> {t("Add item")}
           </button>
         </div>
 
@@ -170,19 +173,19 @@ export function AdminMenuModal({
             className="mt-3 grid gap-2 rounded-[8px] border border-line bg-surface-2/50 p-3 sm:grid-cols-2"
           >
             <label className="block sm:col-span-2">
-              <span className="label">Item name</span>
+              <span className="label">{t("Item name")}</span>
               <input
                 className="input"
                 value={draft.name}
                 onChange={(event) =>
                   setDraft((current) => ({ ...current, name: event.target.value }))
                 }
-                placeholder="Chicken tagine"
+                placeholder={t("Chicken tagine")}
                 required
               />
             </label>
             <label className="block">
-              <span className="label">Category</span>
+              <span className="label">{t("Category")}</span>
               <input
                 className="input"
                 value={draft.category}
@@ -193,7 +196,7 @@ export function AdminMenuModal({
               />
             </label>
             <label className="block">
-              <span className="label">Price (MAD)</span>
+              <span className="label">{t("Price (MAD)")}</span>
               <input
                 className="input"
                 type="number"
@@ -206,7 +209,7 @@ export function AdminMenuModal({
               />
             </label>
             <label className="block">
-              <span className="label">Unit</span>
+              <span className="label">{t("Unit")}</span>
               <input
                 className="input"
                 value={draft.unit}
@@ -217,7 +220,7 @@ export function AdminMenuModal({
               />
             </label>
             <label className="block">
-              <span className="label">Stock</span>
+              <span className="label">{t("Stock")}</span>
               <input
                 className="input"
                 type="number"
@@ -226,7 +229,7 @@ export function AdminMenuModal({
                 onChange={(event) =>
                   setDraft((current) => ({ ...current, stock: event.target.value }))
                 }
-                placeholder="Optional"
+                placeholder={t("Optional")}
               />
             </label>
             <div className="flex items-center gap-3 rounded-[6px] border border-line p-2 sm:col-span-2">
@@ -239,11 +242,11 @@ export function AdminMenuModal({
                 </span>
               )}
               <div className="min-w-0 flex-1">
-                <div className="text-[11px] font-semibold">Item photo</div>
-                <div className="text-[10px] text-muted">Optional menu image.</div>
+                <div className="text-[11px] font-semibold">{t("Item photo")}</div>
+                <div className="text-[10px] text-muted">{t("Optional menu image.")}</div>
               </div>
               <label className="btn btn-ghost btn-sm cursor-pointer">
-                Upload
+                {t("Upload")}
                 <input
                   type="file"
                   accept="image/png,image/jpeg,image/webp"
@@ -262,19 +265,19 @@ export function AdminMenuModal({
               </label>
             </div>
             <label className="block sm:col-span-2">
-              <span className="label">Description</span>
+              <span className="label">{t("Description")}</span>
               <textarea
                 className="input min-h-[64px]"
                 value={draft.description}
                 onChange={(event) =>
                   setDraft((current) => ({ ...current, description: event.target.value }))
                 }
-                placeholder="Short description"
+                placeholder={t("Short description")}
               />
             </label>
             <div className="flex gap-2 sm:col-span-2">
               <button type="button" onClick={() => setOpen(false)} className="btn btn-ghost flex-1">
-                Cancel
+                {t("Cancel")}
               </button>
               <button type="submit" disabled={busy === "new"} className="btn btn-primary flex-1">
                 {busy === "new" ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
@@ -330,7 +333,7 @@ export function AdminMenuModal({
             ))
           ) : (
             <div className="px-4 py-10 text-center text-[12px] text-muted">
-              No items yet. Add the first one above.
+              {t("No items yet. Add the first one above.")}
             </div>
           )}
         </div>

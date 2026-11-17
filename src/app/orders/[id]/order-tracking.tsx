@@ -24,6 +24,7 @@ import { clock, money, timeAgo } from "@/lib/utils";
 import { MapView } from "@/components/map-view";
 import { OrderRefundPanel } from "./order-refund-panel";
 import { StartChatButton } from "@/components/start-chat-button";
+import { CallDock } from "@/components/call-dock";
 import { RatingPrompt } from "@/components/rating-prompt";
 import { useLiveEvents } from "@/lib/use-live-events";
 
@@ -102,14 +103,11 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
   const currentIndex = STEPS.findIndex((step) => step.status === order.status);
   const cancelled = order.status === "cancelled";
   const delivered = order.status === "delivered";
-  const etaMinutes =
-    order.status === "placed" || order.status === "accepted"
-      ? (order.store?.prepTime || 25) + 18
-      : order.status === "preparing"
-        ? 28
-        : order.status === "ready"
-          ? 20
-          : 16;
+  // Only an estimate published by dispatch or the courier is shown. No guess.
+  const etaMinutes = order.etaMinutes;
+  const canCall =
+    Boolean(order.driver) &&
+    ["assigned", "picked_up", "en_route"].includes(order.status);
 
   const points = useMemo(
     () => [
@@ -182,9 +180,20 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
           {!delivered && !cancelled ? (
             <div className="rounded-[10px] border border-teal/15 bg-brand-soft px-4 py-2.5 text-end">
               <div className="text-[11px] font-medium text-brand">
-                Estimated arrival
+                {etaMinutes ? "Estimated arrival" : "Delivery estimate"}
               </div>
-              <div className="text-lg font-semibold">{etaMinutes} min</div>
+              {etaMinutes ? (
+                <div className="text-lg font-semibold">{etaMinutes} min</div>
+              ) : (
+                <div className="text-[12px] font-semibold text-muted">
+                  Awaiting courier
+                </div>
+              )}
+              {etaMinutes && order.etaSetBy ? (
+                <div className="text-[10px] text-muted">
+                  set by {order.etaSetBy === "admin" ? "dispatch" : "courier"}
+                </div>
+              ) : null}
             </div>
           ) : null}
           <button type="button" onClick={() => void refresh()} className="btn btn-ghost btn-sm self-center">
@@ -281,9 +290,13 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
                 </div>
               </div>
               <div className="flex gap-2">
-                <a href={`tel:${order.driver.phone.replace(/\s/g, "")}`} className="btn btn-ghost btn-sm">
-                  <Phone size={13} /> Call
-                </a>
+                {canCall ? (
+                  <CallDock orderId={order.id} role="customer" peerName={order.driver.name} />
+                ) : (
+                  <a href={`tel:${order.driver.phone.replace(/\s/g, "")}`} className="btn btn-ghost btn-sm">
+                    <Phone size={13} /> Call
+                  </a>
+                )}
                 {whatsappPhone ? (
                   <a
                     href={`https://wa.me/${whatsappPhone}`}

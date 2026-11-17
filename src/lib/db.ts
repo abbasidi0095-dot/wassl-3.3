@@ -1872,16 +1872,34 @@ export async function updateOrderStatus(
     const check = checkTransition(order, next, actor, options);
     if (!check.ok) throw new OrderRuleError(check.code, check.error);
 
-    if (next === "delivered" && actor.role !== "admin" && order.deliveryPin) {
+    if (next === "delivered" && actor.role !== "admin") {
+      // The four-digit handover code is mandatory for every completion except
+      // an explicit dispatch override. Older orders may predate the code, so
+      // mint one first rather than letting the check fall through.
+      if (!order.deliveryPin) {
+        order.deliveryPin = String(1000 + Math.floor(Math.random() * 9000));
+        if (order.fulfillment === "pickup" && !order.pickupCode) {
+          order.pickupCode = `P${order.deliveryPin}`;
+        }
+        order.handoverRequired = true;
+      }
       const supplied = (options.proofPin ?? "").replace(/\D/g, "");
       const expected = (order.deliveryPin ?? "").replace(/\D/g, "");
       const pickupExpected = (order.pickupCode ?? "").replace(/\D/g, "");
-      if (!supplied || (supplied !== expected && supplied !== pickupExpected)) {
+      if (!supplied) {
         throw new OrderRuleError(
           "proof_required",
           isPickup
-            ? "Enter the customer pickup code to complete this order"
-            : "Enter the customer delivery PIN to complete this order",
+            ? "The customer's pickup code is required to complete this order"
+            : "The customer's four-digit handover code is required to complete this delivery",
+        );
+      }
+      if (supplied !== expected && supplied !== pickupExpected) {
+        throw new OrderRuleError(
+          "proof_required",
+          isPickup
+            ? "That pickup code does not match this order"
+            : "That code does not match the customer's handover code",
         );
       }
     }
@@ -1909,7 +1927,15 @@ export async function updateOrderStatus(
       order.cashCollected = true;
       order.proofOfDelivery = {
         method: "pin",
-        note: options.note?.trim() || undefined,
+        note:
+          [
+            options.note?.trim(),
+            actor.role === "admin" && !options.proofPin
+              ? "Dispatch override — handover code bypassed"
+              : undefined,
+          ]
+            .filter(Boolean)
+            .join(" · ") || undefined,
         at: now,
       };
       if (!isPickup) {
@@ -1999,6 +2025,84 @@ export async function updateOrderStatus(
       citySlug: order.citySlug,
       driverId: order.driverId,
       status: next,
+    });
+    return order;
+  });
+}
+
+/**
+ * Dispatch or the assigned courier publishes the delivery estimate.
+ * Nothing in the UI invents an ETA: an order without `etaMinutes` simply has
+ * no estimate yet.
+ */
+export async function setOrderEta(
+  orderId: string,
+  minutes: number,
+  actor: OrderActor,
+): Promise<Order> {
+  const value = Math.round(Number(minutes));
+  if (!Number.isFinite(value) || value < 1 || value > 240) {
+    throw new OrderRuleError("invalid_eta", "Give an estimate between 1 and 240 minutes");
+  }
+  if (actor.role !== "admin" && actor.role !== "driver") {
+    throw new OrderRuleError(
+      "role_not_allowed",
+      "Only dispatch or the assigned courier can set the delivery estimate",
+    );
+  }
+  return mutate((db) => {
+    const order = db.orders.find(
+      (item) => item.id === orderId || item.code.toLowerCase() === orderId.toLowerCase(),
+    );
+    if (!order) throw new OrderRuleError("not_found", "Order not found");
+    if (order.status === "delivered" || order.status === "cancelled") {
+      throw new OrderRuleError("illegal_transition", "This order is already closed");
+    }
+    if (actor.role === "driver" && order.driverId !== actor.driverId) {
+      throw new OrderRuleError(
+        "wrong_driver",
+        "Only the courier assigned to this order can set its estimate",
+      );
+    }
+
+    const now = new Date().toISOString();
+    const previous = order.etaMinutes;
+    order.etaMinutes = value;
+    order.etaSetAt = now;
+    order.etaSetBy = actor.role === "admin" ? "admin" : "driver";
+    order.updatedAt = now;
+
+    pushEvent(
+      order,
+      order.status,
+      previous && previous !== value
+        ? `Delivery estimate updated: ${value} min — set by ${
+            actor.role === "admin" ? "dispatch" : "courier"
+          }`
+        : `Delivery estimate: ${value} min — set by ${
+            actor.role === "admin" ? "dispatch" : "courier"
+          }`,
+    );
+
+    recordAudit(db, {
+      actorRole: actor.role,
+      actorId: actor.id,
+      actorName: actor.name,
+      action: "order.set_eta",
+      entity: "order",
+      entityId: order.id,
+      summary: `${order.code}: delivery estimate ${previous ?? "—"} → ${value} min`,
+      note: `set by ${actor.role}`,
+      metadata: { storeId: order.storeId, driverId: order.driverId },
+    });
+
+    publish({
+      type: "order",
+      orderId: order.id,
+      storeId: order.storeId,
+      citySlug: order.citySlug,
+      driverId: order.driverId,
+      status: order.status,
     });
     return order;
   });

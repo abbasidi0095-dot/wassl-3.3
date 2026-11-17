@@ -1,5 +1,7 @@
 "use client";
 
+import { useI18n } from "@/components/locale-provider";
+
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -48,7 +50,7 @@ export function AccountsManager({
   stores: Store[];
   drivers: Driver[];
 }) {
-  const router = useRouter();
+  const { t } = useI18n();  const router = useRouter();
   const [users, setUsers] = useState(initialUsers);
   const [drafts, setDrafts] = useState<Record<string, Draft>>(() =>
     Object.fromEntries(
@@ -295,7 +297,7 @@ export function AccountsManager({
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search name, email or store…"
+            placeholder={t("Search name, email or store…")}
             className="input h-9 w-56 text-xs"
           />
         </div>
@@ -317,11 +319,11 @@ export function AccountsManager({
           <table className="data">
             <thead>
               <tr>
-                <th>Account</th>
-                <th>Role</th>
-                <th>Store / driver</th>
-                <th>Status</th>
-                <th>Points</th>
+                <th>{t("Account")}</th>
+                <th>{t("Role")}</th>
+                <th>{t("Store / driver")}</th>
+                <th>{t("Status")}</th>
+                <th>{t("Points")}</th>
                 <th />
               </tr>
             </thead>
@@ -375,10 +377,10 @@ export function AccountsManager({
                         }
                         className="input h-8 w-32 text-xs"
                       >
-                        <option value="customer">Customer</option>
-                        <option value="merchant">Store owner</option>
-                        <option value="driver">Driver</option>
-                        <option value="admin">Operations</option>
+                        <option value="customer">{t("Customer")}</option>
+                        <option value="merchant">{t("Store owner")}</option>
+                        <option value="driver">{t("Driver")}</option>
+                        <option value="admin">{t("Operations")}</option>
                       </select>
                     </td>
                     <td>
@@ -391,7 +393,7 @@ export function AccountsManager({
                           }
                           className="input h-8 w-52 text-xs"
                         >
-                          <option value="">Provision a new store on approval…</option>
+                          <option value="">{t("Provision a new store on approval…")}</option>
                           {stores.map((store) => (
                             <option key={store.id} value={store.id}>
                               {store.name} · {store.citySlug}
@@ -407,7 +409,7 @@ export function AccountsManager({
                           }
                           className="input h-8 w-52 text-xs"
                         >
-                          <option value="">Provision a new driver on approval…</option>
+                          <option value="">{t("Provision a new driver on approval…")}</option>
                           {drivers.map((driver) => (
                             <option key={driver.id} value={driver.id}>
                               {driver.name} · {driver.citySlug}
@@ -425,15 +427,15 @@ export function AccountsManager({
                     <td>
                       {status === "pending" ? (
                         <span className="rounded-full bg-saffron/20 px-2 py-1 text-[11px] font-semibold uppercase text-saffron-deep">
-                          Pending
+                          {t("Pending")}
                         </span>
                       ) : status === "rejected" ? (
                         <span className="rounded-full bg-danger-soft px-2 py-1 text-[11px] font-semibold uppercase text-danger">
-                          Rejected
+                          {t("Rejected")}
                         </span>
                       ) : (
                         <span className="rounded-full bg-brand-soft px-2 py-1 text-[11px] font-semibold uppercase text-brand">
-                          Active
+                          {t("Active")}
                         </span>
                       )}
                     </td>
@@ -450,7 +452,7 @@ export function AccountsManager({
                               disabled={working}
                               className="text-[11px] font-medium text-brand disabled:opacity-40"
                             >
-                              Adjust
+                              {t("Adjust")}
                             </button>
                             <button
                               type="button"
@@ -458,7 +460,7 @@ export function AccountsManager({
                               disabled={working}
                               className="text-[11px] font-medium text-brand disabled:opacity-40"
                             >
-                              Message
+                              {t("Message")}
                             </button>
                           </>
                         ) : null}
@@ -493,12 +495,12 @@ export function AccountsManager({
                             onClick={() => void grantAdmin(user)}
                             disabled={working}
                             className="btn btn-ghost btn-sm"
-                            title="Grant full operations access"
+                            title={t("Grant full operations access")}
                           >
-                            <ShieldCheck size={13} /> Grant admin
+                            <ShieldCheck size={13} /> {t("Grant admin")}
                           </button>
                         ) : adminCount > 1 ? (
-                          <span className="text-[10px] font-medium text-muted">Admin</span>
+                          <span className="text-[10px] font-medium text-muted">{t("Admin")}</span>
                         ) : null}
                         {user.phone && user.phoneVerified === false ? (
                           <button
@@ -521,9 +523,9 @@ export function AccountsManager({
                             }}
                             disabled={working}
                             className="btn btn-ghost btn-sm"
-                            title="Manual fallback when SMS and WhatsApp are unavailable"
+                            title={t("Manual fallback when SMS and WhatsApp are unavailable")}
                           >
-                            <Smartphone size={13} /> Verify mobile
+                            <Smartphone size={13} /> {t("Verify mobile")}
                           </button>
                         ) : null}
                         {dirty ? (
@@ -547,7 +549,7 @@ export function AccountsManager({
                             onClick={() => void reject(user)}
                             disabled={working}
                             className="btn btn-ghost btn-sm text-danger"
-                            title="Reject this account"
+                            title={t("Reject this account")}
                           >
                             <ShieldX size={13} />
                           </button>
@@ -562,7 +564,7 @@ export function AccountsManager({
         </div>
         {!ordered.length ? (
           <div className="px-4 py-10 text-center text-sm text-muted">
-            No accounts match.
+            {t("No accounts match.")}
           </div>
         ) : null}
       </div>

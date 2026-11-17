@@ -26,6 +26,7 @@ import { STATUS_META } from "@/lib/types";
 import { clock, distanceKm, money, timeAgo } from "@/lib/utils";
 import { MapView, type MapPoint } from "@/components/map-view";
 import { HandoverPrompt } from "@/components/handover-code";
+import { CallDock } from "@/components/call-dock";
 import { useLiveEvents } from "@/lib/use-live-events";
 
 type Action = { label: string; status: string; icon: typeof Bike };
@@ -226,7 +227,7 @@ export function DriverDashboard({
   async function advance(order: OrderView, proofPin?: string) {
     const action = NEXT_ACTION[order.status];
     if (!action) return;
-    if (action.status === "delivered" && order.handoverRequired && !proofPin) {
+    if (action.status === "delivered" && !proofPin) {
       setCodeError("");
       setCodeFor(order);
       return;
@@ -257,6 +258,26 @@ export function DriverDashboard({
       } else {
         setToast(action.label);
       }
+    } finally {
+      setBusy("");
+    }
+  }
+
+  async function setEta(order: OrderView, minutes: number) {
+    setBusy(order.id);
+    try {
+      const response = await fetch(`/api/orders/${order.id}/eta`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ minutes }),
+      });
+      const data = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        setToast(data.error || "Could not set the estimate");
+        return;
+      }
+      await refresh(true);
+      setToast(`Estimate sent to the customer: ${minutes} min`);
     } finally {
       setBusy("");
     }
@@ -344,6 +365,7 @@ export function DriverDashboard({
 
   return (
     <div>
+      <CallDock role="driver" watch enabled={online} />
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="eyebrow">{driver.citySlug} · shift</div>
@@ -518,7 +540,36 @@ export function DriverDashboard({
                         </div>
                       </div>
 
+                      <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-line pt-3 text-[11px]">
+                        <span className="inline-flex items-center gap-1 font-semibold text-muted">
+                          {order.etaMinutes ? `ETA ${order.etaMinutes} min` : "No estimate yet"}
+                        </span>
+                        <div className="ms-auto flex flex-wrap gap-1">
+                          {[15, 25, 40].map((minutes) => (
+                            <button
+                              key={minutes}
+                              type="button"
+                              onClick={() => void setEta(order, minutes)}
+                              disabled={busy === order.id}
+                              className={`rounded-[6px] border px-2 py-1 font-semibold transition-colors ${
+                                order.etaMinutes === minutes
+                                  ? "border-brand bg-brand-soft text-brand"
+                                  : "border-line text-muted hover:border-brand hover:text-brand"
+                              }`}
+                            >
+                              {minutes} min
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
                       <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-line pt-3">
+                        <CallDock
+                          orderId={order.id}
+                          role="driver"
+                          peerName={order.customerName}
+                          enabled={!online ? false : true}
+                        />
                         <a
                           href={`tel:${order.customerPhone.replace(/\s/g, "")}`}
                           className="btn btn-ghost btn-sm"

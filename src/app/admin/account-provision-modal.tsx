@@ -1,5 +1,7 @@
 "use client";
 
+import { useI18n } from "@/components/locale-provider";
+
 import { useMemo, useRef, useState } from "react";
 import {
   Bike,
@@ -75,6 +77,7 @@ export function AccountProvisionModal({
   onClose: () => void;
   onCreated: () => void | Promise<void>;
 }) {
+  const { t } = useI18n();
   const [role, setRole] = useState<"driver" | "merchant">(defaultRole);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -185,13 +188,13 @@ export function AccountProvisionModal({
               type="button"
               onClick={onClose}
               className="grid h-9 w-9 place-items-center rounded-[6px] text-muted hover:bg-surface-2 hover:text-ink"
-              aria-label="Close"
+              aria-label={t("Close")}
             >
               <X size={16} />
             </button>
           </div>
           <h2 className="mt-4 font-display text-[24px] font-semibold tracking-[-0.03em]">
-            Account created
+            {t("Account created")}
           </h2>
           <p className="mt-1 text-[12px] text-muted">
             {credentials.label}. Share these credentials once — the password is not
@@ -227,7 +230,7 @@ export function AccountProvisionModal({
             ))}
           </div>
           <button type="button" onClick={onClose} className="btn btn-primary mt-5 w-full">
-            Done
+            {t("Done")}
           </button>
         </div>
       </div>
@@ -243,7 +246,7 @@ export function AccountProvisionModal({
       <form
         role="dialog"
         aria-modal="true"
-        aria-label="Create an account"
+        aria-label={t("Create an account")}
         className="my-6 w-full max-w-xl rounded-[12px] bg-surface p-5 shadow-[var(--shadow-float)]"
         onClick={(event) => event.stopPropagation()}
         onSubmit={submit}
@@ -251,7 +254,7 @@ export function AccountProvisionModal({
         <div className="flex items-start justify-between gap-3">
           <div>
             <h2 className="font-display text-[24px] font-semibold tracking-[-0.03em]">
-              Create an account
+              {t("Create an account")}
             </h2>
             <p className="mt-1 text-[11px] leading-5 text-muted">
               Provision a driver or a store login. Leave email and password blank to
@@ -262,7 +265,7 @@ export function AccountProvisionModal({
             type="button"
             onClick={onClose}
             className="grid h-9 w-9 place-items-center rounded-[6px] text-muted hover:bg-surface-2 hover:text-ink"
-            aria-label="Close"
+            aria-label={t("Close")}
           >
             <X size={16} />
           </button>
@@ -294,18 +297,18 @@ export function AccountProvisionModal({
           <>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               <label className="block">
-                <span className="label">Full name</span>
+                <span className="label">{t("Full name")}</span>
                 <input
                   className="input"
                   value={name}
                   onChange={(event) => setName(event.target.value)}
-                  placeholder="Youssef El Amrani"
+                  placeholder={t("Youssef El Amrani")}
                   required
                   autoFocus
                 />
               </label>
               <label className="block">
-                <span className="label">Phone</span>
+                <span className="label">{t("Phone")}</span>
                 <input
                   className="input"
                   value={phone}
@@ -315,7 +318,7 @@ export function AccountProvisionModal({
                 />
               </label>
               <label className="block">
-                <span className="label">City</span>
+                <span className="label">{t("City")}</span>
                 <select
                   className="input"
                   value={citySlug}
@@ -329,7 +332,7 @@ export function AccountProvisionModal({
                 </select>
               </label>
               <label className="block">
-                <span className="label">Works as</span>
+                <span className="label">{t("Works as")}</span>
                 <select
                   className="input"
                   value={kind}
@@ -337,13 +340,13 @@ export function AccountProvisionModal({
                     setKind(event.target.value as "delivery" | "taxi" | "both")
                   }
                 >
-                  <option value="delivery">Delivery courier</option>
-                  <option value="taxi">Taxi driver</option>
-                  <option value="both">Delivery + taxi</option>
+                  <option value="delivery">{t("Delivery courier")}</option>
+                  <option value="taxi">{t("Taxi driver")}</option>
+                  <option value="both">{t("Delivery + taxi")}</option>
                 </select>
               </label>
               <label className="block">
-                <span className="label">Vehicle</span>
+                <span className="label">{t("Vehicle")}</span>
                 <select
                   className="input"
                   value={vehicle}
@@ -383,9 +386,9 @@ export function AccountProvisionModal({
                 </span>
               )}
               <div className="min-w-0 flex-1">
-                <div className="text-[12px] font-semibold">Driver photo</div>
+                <div className="text-[12px] font-semibold">{t("Driver photo")}</div>
                 <div className="text-[11px] text-muted">
-                  Shown in dispatch and when the driver accepts a ride.
+                  {t("Shown in dispatch and when the driver accepts a ride.")}
                 </div>
               </div>
               <input
@@ -400,21 +403,21 @@ export function AccountProvisionModal({
                 onClick={() => fileRef.current?.click()}
                 className="btn btn-ghost btn-sm"
               >
-                <Upload size={12} /> Upload
+                <Upload size={12} /> {t("Upload")}
               </button>
             </div>
           </>
         ) : (
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <label className="block sm:col-span-2">
-              <span className="label">Store</span>
+              <span className="label">{t("Store")}</span>
               <select
                 className="input"
                 value={storeId}
                 onChange={(event) => setStoreId(event.target.value)}
                 required
               >
-                <option value="">Choose a store…</option>
+                <option value="">{t("Choose a store…")}</option>
                 {stores.map((item) => (
                   <option key={item.id} value={item.id}>
                     {item.name} · {item.citySlug}
@@ -423,7 +426,7 @@ export function AccountProvisionModal({
               </select>
             </label>
             <label className="block">
-              <span className="label">Owner name</span>
+              <span className="label">{t("Owner name")}</span>
               <input
                 className="input"
                 value={name}
@@ -432,7 +435,7 @@ export function AccountProvisionModal({
               />
             </label>
             <label className="block">
-              <span className="label">Phone</span>
+              <span className="label">{t("Phone")}</span>
               <input
                 className="input"
                 value={phone}
@@ -445,22 +448,22 @@ export function AccountProvisionModal({
 
         <div className="mt-4 grid gap-3 border-t border-line pt-4 sm:grid-cols-2">
           <label className="block">
-            <span className="label">Login email (optional)</span>
+            <span className="label">{t("Login email (optional)")}</span>
             <input
               className="input"
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              placeholder="Generated automatically"
+              placeholder={t("Generated automatically")}
             />
           </label>
           <label className="block">
-            <span className="label">Password (optional)</span>
+            <span className="label">{t("Password (optional)")}</span>
             <input
               className="input"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              placeholder="Generated automatically"
+              placeholder={t("Generated automatically")}
             />
           </label>
         </div>
@@ -473,7 +476,7 @@ export function AccountProvisionModal({
 
         <div className="mt-5 flex gap-2">
           <button type="button" onClick={onClose} className="btn btn-ghost flex-1">
-            Cancel
+            {t("Cancel")}
           </button>
           <button type="submit" disabled={saving} className="btn btn-primary flex-1">
             {saving ? <Loader2 size={15} className="animate-spin" /> : <UserPlus size={15} />}

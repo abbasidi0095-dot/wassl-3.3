@@ -1,5 +1,7 @@
 "use client";
 
+import { useI18n } from "@/components/locale-provider";
+
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -162,6 +164,8 @@ export function AdminConsole({
   initialDataSource: DataSourceStatus;
   initialAlerts: OperationalAlert[];
 }) {
+  const { t } = useI18n();
+
   const [orders, setOrders] = useState(initialOrders);
   const [taxiRides, setTaxiRides] = useState(initialTaxiRides);
   const [stores, setStores] = useState(initialStores);
@@ -174,6 +178,7 @@ export function AdminConsole({
   const [dataSource, setDataSource] = useState(initialDataSource);
   const [activityEntity, setActivityEntity] = useState("all");
   const [cancelTarget, setCancelTarget] = useState<OrderView | null>(null);
+  const [deliverTarget, setDeliverTarget] = useState<OrderView | null>(null);
   const [cancelReason, setCancelReason] = useState("");
   const [tab, setTab] = useState<Tab>("overview");
   const [busy, setBusy] = useState("");
@@ -328,6 +333,26 @@ export function AdminConsole({
     }
   }
 
+  async function setEta(orderId: string, minutes: number) {
+    setBusy(orderId);
+    try {
+      const response = await fetch(`/api/orders/${orderId}/eta`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ minutes }),
+      });
+      const data = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        setToast(data.error || "Could not set the estimate");
+        return;
+      }
+      setToast(`Estimate set: ${minutes} min`);
+      await refresh(true);
+    } finally {
+      setBusy("");
+    }
+  }
+
   async function confirmCancel() {
     if (!cancelTarget) return;
     const ok = await setStatus(cancelTarget.id, "cancelled", cancelReason.trim());
@@ -389,7 +414,19 @@ export function AdminConsole({
       setCancelReason("");
       return;
     }
+    // Completing a delivery is the one path that skips the customer's code, so
+    // it always goes through an explicit, logged confirmation.
+    if (status === "delivered") {
+      setDeliverTarget(order);
+      return;
+    }
     void setStatus(order.id, status);
+  }
+
+  async function confirmDeliver() {
+    if (!deliverTarget) return;
+    const ok = await setStatus(deliverTarget.id, "delivered", "Dispatch override — handover code bypassed");
+    if (ok) setDeliverTarget(null);
   }
 
   async function toggleStore(store: Store) {
@@ -672,7 +709,7 @@ export function AdminConsole({
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="eyebrow">Platform operations · {settings.brandName}</div>
-          <h1 className="display mt-2 text-[clamp(2rem,1.5rem+1.8vw,3rem)]">Dispatch control room.</h1>
+          <h1 className="display mt-2 text-[clamp(2rem,1.5rem+1.8vw,3rem)]">{t("Dispatch control room.")}</h1>
           <div className="mt-3 flex flex-wrap items-center gap-3 text-[11px] text-muted">
             <span className="inline-flex items-center gap-1">
               <span className="status-dot live-dot text-brand" /> Live across {stats.liveCities} cities
@@ -698,7 +735,7 @@ export function AdminConsole({
             ) : null}
           </Link>
           <button type="button" onClick={() => refresh()} className="btn btn-ghost">
-            <RefreshCw size={14} className={refreshing ? "animate-spin" : ""} /> Refresh
+            <RefreshCw size={14} className={refreshing ? "animate-spin" : ""} /> {t("Refresh")}
           </button>
         </div>
       </div>
@@ -721,7 +758,7 @@ export function AdminConsole({
             </div>
           </div>
           <Link href="/admin/accounts" className="btn btn-primary btn-sm">
-            Review accounts <CheckCircle2 size={13} />
+            {t("Review accounts")} <CheckCircle2 size={13} />
           </Link>
         </div>
       ) : null}
@@ -770,7 +807,7 @@ export function AdminConsole({
           <div
             role="dialog"
             aria-modal="true"
-            aria-label="Cancel order"
+            aria-label={t("Cancel order")}
             className="w-full max-w-md rounded-[10px] bg-surface p-5 shadow-[var(--shadow-float)]"
             onClick={(event) => event.stopPropagation()}
           >
@@ -781,7 +818,7 @@ export function AdminConsole({
               <div>
                 <h2 className="text-base font-semibold">Cancel {cancelTarget.code}?</h2>
                 <p className="text-[11px] font-bold text-muted">
-                  The reason is saved on the order and in the activity trail.
+                  {t("The reason is saved on the order and in the activity trail.")}
                 </p>
               </div>
             </div>
@@ -798,7 +835,7 @@ export function AdminConsole({
                 onClick={() => setCancelTarget(null)}
                 className="btn btn-ghost btn-sm"
               >
-                Keep order
+                {t("Keep order")}
               </button>
               <button
                 type="button"
@@ -806,7 +843,54 @@ export function AdminConsole({
                 disabled={cancelReason.trim().length < 3 || busy === cancelTarget.id}
                 className="btn btn-sm bg-danger text-[#fffaf1] disabled:opacity-40"
               >
-                Cancel order
+                {t("Cancel order")}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {deliverTarget ? (
+        <div
+          className="fixed inset-0 z-[70] grid place-items-center bg-surface-20 p-4 backdrop-blur-sm"
+          role="presentation"
+          onClick={() => setDeliverTarget(null)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label={t("Complete delivery")}
+            className="w-full max-w-md rounded-[10px] bg-surface p-5 shadow-[var(--shadow-float)]"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-center gap-2">
+              <span className="grid h-9 w-9 place-items-center rounded-[6px] bg-saffron/15 text-saffron-deep">
+                <AlertTriangle size={17} />
+              </span>
+              <div>
+                <h2 className="text-base font-semibold">Complete {deliverTarget.code}?</h2>
+                <p className="text-[11px] font-bold text-muted">
+                  The courier must normally enter the customer&apos;s four-digit code.
+                </p>
+              </div>
+            </div>
+            <p className="mt-3 rounded-[6px] bg-surface-2 px-3 py-2 text-[11px] leading-5 text-muted">
+              Completing here bypasses the handover code and closes the order as
+              delivered. The override is written to the order timeline and the
+              activity trail — use it only when the code cannot be obtained
+              (customer unreachable, phone lost, code never delivered).
+            </p>
+            <div className="mt-4 flex justify-end gap-2">
+              <button type="button" onClick={() => setDeliverTarget(null)} className="btn btn-ghost btn-sm">
+                {t("Keep open")}
+              </button>
+              <button
+                type="button"
+                onClick={() => void confirmDeliver()}
+                disabled={busy === deliverTarget.id}
+                className="btn btn-sm btn-saffron disabled:opacity-40"
+              >
+                {t("Override and complete")}
               </button>
             </div>
           </div>
@@ -877,7 +961,7 @@ export function AdminConsole({
         {initialAlerts.length ? (
           <section className="mt-4">
             <div className="flex items-center justify-between gap-2">
-              <h2 className="text-[13px] font-semibold">Operational alerts</h2>
+              <h2 className="text-[13px] font-semibold">{t("Operational alerts")}</h2>
               <span className="pill">{initialAlerts.length}</span>
             </div>
             <div className="mt-2 grid gap-2 lg:grid-cols-2">
@@ -950,13 +1034,14 @@ export function AdminConsole({
                 onAssign={() => assign(order.id, driverChoice[order.id])}
                 onAuto={() => assign(order.id, undefined, true)}
                 onStatus={(status) => requestStatus(order, status)}
+                onEta={(minutes) => setEta(order.id, minutes)}
               />
             ))}
             {!activeOrders.length ? (
               <div className="card grid place-items-center px-6 py-14 text-center">
                 <CheckCircle2 size={28} className="text-brand" />
-                <h3 className="mt-3 text-lg font-semibold">All clear</h3>
-                <p className="mt-1 text-sm text-muted">No live orders right now.</p>
+                <h3 className="mt-3 text-lg font-semibold">{t("All clear")}</h3>
+                <p className="mt-1 text-sm text-muted">{t("No live orders right now.")}</p>
               </div>
             ) : null}
           </div>
@@ -1030,7 +1115,7 @@ export function AdminConsole({
           <div className="card p-5">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <h3 className="text-[15px] font-semibold">Commission detail</h3>
+                <h3 className="text-[15px] font-semibold">{t("Commission detail")}</h3>
                 <p className="mt-0.5 text-[10px] text-muted">
                   Live rates and earnings from delivered orders and completed rides.
                 </p>
@@ -1040,20 +1125,20 @@ export function AdminConsole({
                 onClick={() => setTab("settings")}
                 className="pill hover:text-brand"
               >
-                Set in Settings
+                {t("Set in Settings")}
               </button>
             </div>
             <div className="mt-4 overflow-x-auto">
               <table className="w-full text-[11px]">
                 <thead>
                   <tr className="border-b border-line text-start text-[9px] uppercase tracking-[0.06em] text-muted">
-                    <th className="pb-2 text-start font-medium">Service</th>
-                    <th className="hidden pb-2 text-start font-medium sm:table-cell">Basis</th>
-                    <th className="pb-2 text-end font-medium">Jobs</th>
-                    <th className="pb-2 text-end font-medium">Base</th>
-                    <th className="pb-2 text-end font-medium">Fixed</th>
-                    <th className="pb-2 text-end font-medium">Rate</th>
-                    <th className="pb-2 text-end font-medium">Earned</th>
+                    <th className="pb-2 text-start font-medium">{t("Service")}</th>
+                    <th className="hidden pb-2 text-start font-medium sm:table-cell">{t("Basis")}</th>
+                    <th className="pb-2 text-end font-medium">{t("Jobs")}</th>
+                    <th className="pb-2 text-end font-medium">{t("Base")}</th>
+                    <th className="pb-2 text-end font-medium">{t("Fixed")}</th>
+                    <th className="pb-2 text-end font-medium">{t("Rate")}</th>
+                    <th className="pb-2 text-end font-medium">{t("Earned")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1092,9 +1177,9 @@ export function AdminConsole({
             <div className="card p-5">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <h3 className="text-[15px] font-semibold">Profit, last 14 days</h3>
+                  <h3 className="text-[15px] font-semibold">{t("Profit, last 14 days")}</h3>
                   <p className="mt-0.5 text-[10px] text-muted">
-                    Delivered orders, completed rides and grocery margin.
+                    {t("Delivered orders, completed rides and grocery margin.")}
                   </p>
                 </div>
                 <span className="pill">{money(analytics.gmv)} GMV</span>
@@ -1128,7 +1213,7 @@ export function AdminConsole({
             </div>
 
             <div className="card p-5">
-              <h3 className="text-[15px] font-semibold">Volume</h3>
+              <h3 className="text-[15px] font-semibold">{t("Volume")}</h3>
               <dl className="mt-4 space-y-3 text-[12px]">
                 {[
                   { label: "Delivered orders", value: String(analytics.deliveredOrders) },
@@ -1149,7 +1234,7 @@ export function AdminConsole({
 
           <div className="grid gap-4 lg:grid-cols-2">
             <div className="card p-5">
-              <h3 className="text-[15px] font-semibold">Top stores by GMV</h3>
+              <h3 className="text-[15px] font-semibold">{t("Top stores by GMV")}</h3>
               <div className="mt-3 divide-y divide-line border-t border-line">
                 {analytics.topStores.length ? (
                   analytics.topStores.map((store, index) => (
@@ -1168,13 +1253,13 @@ export function AdminConsole({
                     </div>
                   ))
                 ) : (
-                  <p className="py-6 text-center text-[12px] text-muted">No delivered orders yet.</p>
+                  <p className="py-6 text-center text-[12px] text-muted">{t("No delivered orders yet.")}</p>
                 )}
               </div>
             </div>
 
             <div className="card p-5">
-              <h3 className="text-[15px] font-semibold">Recent margin</h3>
+              <h3 className="text-[15px] font-semibold">{t("Recent margin")}</h3>
               <div className="mt-3 divide-y divide-line border-t border-line">
                 {analytics.recent.length ? (
                   analytics.recent.map((event) => (
@@ -1198,7 +1283,7 @@ export function AdminConsole({
                     </div>
                   ))
                 ) : (
-                  <p className="py-6 text-center text-[12px] text-muted">No margin recorded yet.</p>
+                  <p className="py-6 text-center text-[12px] text-muted">{t("No margin recorded yet.")}</p>
                 )}
               </div>
             </div>
@@ -1209,7 +1294,7 @@ export function AdminConsole({
       {tab === "orders" ? (
         <section className="mt-4" id="orders">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold tracking-[-0.04em]">All orders</h2>
+            <h2 className="text-xl font-semibold tracking-[-0.04em]">{t("All orders")}</h2>
             <span className="text-[11px] font-bold text-muted">{orders.length} total</span>
           </div>
           <div className="mt-3 grid gap-3 lg:grid-cols-2">
@@ -1226,6 +1311,7 @@ export function AdminConsole({
                 onAssign={() => assign(order.id, driverChoice[order.id])}
                 onAuto={() => assign(order.id, undefined, true)}
                 onStatus={(status) => requestStatus(order, status)}
+                onEta={(minutes) => setEta(order.id, minutes)}
               />
             ))}
           </div>
@@ -1280,7 +1366,7 @@ export function AdminConsole({
                 onClick={() => setProvision({ role: "merchant" })}
                 className="btn btn-ghost btn-sm"
               >
-                <KeyRound size={13} /> Store login
+                <KeyRound size={13} /> {t("Store login")}
               </button>
             </div>
           </div>
@@ -1289,12 +1375,12 @@ export function AdminConsole({
               <table className="data">
                 <thead>
                   <tr>
-                    <th>Store</th>
-                    <th>City</th>
-                    <th>Category</th>
-                    <th>Rating</th>
-                    <th>Fee</th>
-                    <th>Status</th>
+                    <th>{t("Store")}</th>
+                    <th>{t("City")}</th>
+                    <th>{t("Category")}</th>
+                    <th>{t("Rating")}</th>
+                    <th>{t("Fee")}</th>
+                    <th>{t("Status")}</th>
                     <th />
                   </tr>
                 </thead>
@@ -1343,7 +1429,7 @@ export function AdminConsole({
                             onClick={() => setMenuStore(store)}
                             className="btn btn-ghost btn-sm"
                           >
-                            <Plus size={11} /> Menu
+                            <Plus size={11} /> {t("Menu")}
                           </button>
                           <button
                             type="button"
@@ -1352,7 +1438,7 @@ export function AdminConsole({
                             }}
                             className="btn btn-ghost btn-sm"
                           >
-                            <KeyRound size={11} /> Login
+                            <KeyRound size={11} /> {t("Login")}
                           </button>
                           <button
                             type="button"
@@ -1363,7 +1449,7 @@ export function AdminConsole({
                             disabled={busy === store.id}
                             className="btn btn-ghost btn-sm"
                           >
-                            <Pencil size={11} /> Edit
+                            <Pencil size={11} /> {t("Edit")}
                           </button>
                           <button
                             type="button"
@@ -1378,7 +1464,7 @@ export function AdminConsole({
                             onClick={() => void deleteStore(store)}
                             disabled={busy === store.id}
                             className="btn btn-ghost btn-sm text-danger"
-                            title="Delete store and menu"
+                            title={t("Delete store and menu")}
                           >
                             <Trash2 size={11} />
                           </button>
@@ -1409,7 +1495,7 @@ export function AdminConsole({
 
           <div className="mt-4 grid gap-4 lg:grid-cols-2">
             <DriverPanel
-              title="Delivery boys"
+              title={t("Delivery boys")}
               subtitle="Store-to-door couriers, COD and handover codes."
               icon="delivery"
               drivers={deliveryDrivers}
@@ -1418,7 +1504,7 @@ export function AdminConsole({
               onManage={(driver) => setEditingDriver(driver)}
             />
             <DriverPanel
-              title="Taxi drivers"
+              title={t("Taxi drivers")}
               subtitle="Ride-hailing fleet, vehicles, plates and photos."
               icon="taxi"
               drivers={taxiDrivers}
@@ -1434,7 +1520,7 @@ export function AdminConsole({
         <section className="mt-4" id="cities">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <h2 className="text-xl font-semibold tracking-[-0.04em]">City activation</h2>
+              <h2 className="text-xl font-semibold tracking-[-0.04em]">{t("City activation")}</h2>
               <p className="mt-1 text-[11px] text-muted">
                 Every Moroccan city is listed. Switch a city live when supply is ready.
               </p>
@@ -1448,7 +1534,7 @@ export function AdminConsole({
                 <input
                   value={cityQuery}
                   onChange={(event) => setCityQuery(event.target.value)}
-                  placeholder="Search cities…"
+                  placeholder={t("Search cities…")}
                   className="input h-9 w-52 ps-8 text-xs"
                 />
               </div>
@@ -1478,11 +1564,11 @@ export function AdminConsole({
               <table className="data">
                 <thead>
                   <tr>
-                    <th>City</th>
-                    <th>Region</th>
-                    <th>Population</th>
-                    <th>Priority</th>
-                    <th>Status</th>
+                    <th>{t("City")}</th>
+                    <th>{t("Region")}</th>
+                    <th>{t("Population")}</th>
+                    <th>{t("Priority")}</th>
+                    <th>{t("Status")}</th>
                     <th />
                   </tr>
                 </thead>
@@ -1499,7 +1585,7 @@ export function AdminConsole({
                       </td>
                       <td>
                         {city.priority ? (
-                          <span className="pill pill-warm">Priority</span>
+                          <span className="pill pill-warm">{t("Priority")}</span>
                         ) : (
                           <span className="text-[11px] text-muted">—</span>
                         )}
@@ -1522,7 +1608,7 @@ export function AdminConsole({
                             onClick={() => setCityServicesFor(city)}
                             className="btn btn-ghost btn-sm"
                           >
-                            Services
+                            {t("Services")}
                           </button>
                           <button
                             type="button"
@@ -1540,7 +1626,7 @@ export function AdminConsole({
               </table>
             </div>
             {!cityList.length ? (
-              <div className="px-4 py-10 text-center text-sm text-muted">No cities match.</div>
+              <div className="px-4 py-10 text-center text-sm text-muted">{t("No cities match.")}</div>
             ) : null}
           </div>
         </section>
@@ -1550,7 +1636,7 @@ export function AdminConsole({
         <section className="mt-4" id="activity">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <h2 className="text-xl font-semibold tracking-[-0.04em]">Activity trail</h2>
+              <h2 className="text-xl font-semibold tracking-[-0.04em]">{t("Activity trail")}</h2>
               <p className="mt-1 text-[11px] text-muted">
                 Every status change, assignment and configuration edit is attributed to
                 the signed-in actor and kept for the last {auditLogs.length} events.
@@ -1560,7 +1646,7 @@ export function AdminConsole({
               value={activityEntity}
               onChange={(event) => setActivityEntity(event.target.value)}
               className="h-9 rounded-[6px] border border-line bg-surface px-3 text-[11px] font-bold"
-              aria-label="Filter activity"
+              aria-label={t("Filter activity")}
             >
               {["all", "order", "store", "product", "driver", "city", "settings"].map(
                 (entity) => (
@@ -1612,7 +1698,7 @@ export function AdminConsole({
                 activityEntity === "all" ? true : entry.entity === activityEntity,
               ).length ? (
                 <div className="px-4 py-12 text-center text-sm text-muted">
-                  No activity recorded for this entity yet.
+                  {t("No activity recorded for this entity yet.")}
                 </div>
               ) : null}
             </div>
@@ -1625,7 +1711,7 @@ export function AdminConsole({
           <div className="card p-5">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h2 className="text-xl font-semibold tracking-[-0.04em]">Restaurant data</h2>
+                <h2 className="text-xl font-semibold tracking-[-0.04em]">{t("Restaurant data")}</h2>
                 <p className="mt-1 text-[11px] leading-5 text-muted">
                   The directory is a sealed snapshot. Menus and prices are authored demo
                   content and cannot be edited at runtime.
@@ -1639,19 +1725,19 @@ export function AdminConsole({
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
               <div className="rounded-[10px] bg-surface-2/70 p-3">
                 <div className="text-[11px] font-medium text-muted">
-                  Restaurants
+                  {t("Restaurants")}
                 </div>
                 <div className="mt-1 text-2xl font-semibold">{dataSource.restaurantCount}</div>
               </div>
               <div className="rounded-[10px] bg-surface-2/70 p-3">
                 <div className="text-[11px] font-medium text-muted">
-                  Menu items
+                  {t("Menu items")}
                 </div>
                 <div className="mt-1 text-2xl font-semibold">{dataSource.menuItemCount}</div>
               </div>
               <div className="rounded-[10px] bg-surface-2/70 p-3">
                 <div className="text-[11px] font-medium text-muted">
-                  Cities
+                  {t("Cities")}
                 </div>
                 <div className="mt-1 text-2xl font-semibold">
                   {Object.keys(dataSource.cityCounts).length}
@@ -1704,7 +1790,7 @@ export function AdminConsole({
                 disabled={busy === "data"}
                 className="btn btn-ghost btn-sm"
               >
-                <ShieldCheck size={13} /> Verify checksum
+                <ShieldCheck size={13} /> {t("Verify checksum")}
               </button>
               <button
                 type="button"
@@ -1712,7 +1798,7 @@ export function AdminConsole({
                 disabled={busy === "data"}
                 className="btn btn-ghost btn-sm"
               >
-                <RefreshCw size={13} /> Refresh from source
+                <RefreshCw size={13} /> {t("Refresh from source")}
               </button>
             </div>
           </div>
@@ -1744,7 +1830,7 @@ export function AdminConsole({
             </div>
 
             <div className="card p-5">
-              <h3 className="text-sm font-semibold">Coverage by city</h3>
+              <h3 className="text-sm font-semibold">{t("Coverage by city")}</h3>
               <div className="mt-3 space-y-1.5">
                 {Object.entries(dataSource.cityCounts).map(([city, count]) => (
                   <div
@@ -1771,7 +1857,7 @@ export function AdminConsole({
         <section className="mt-4 grid gap-4 lg:grid-cols-2" id="settings">
           <form onSubmit={saveSettings} className="card p-5">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold tracking-[-0.04em]">Platform settings</h2>
+              <h2 className="text-xl font-semibold tracking-[-0.04em]">{t("Platform settings")}</h2>
               <Settings2 size={18} className="text-brand" />
             </div>
             <p className="mt-1 text-[11px] text-muted">
@@ -1779,7 +1865,7 @@ export function AdminConsole({
             </p>
             <div className="mt-4 grid gap-3">
               <label className="block">
-                <span className="label">Brand name</span>
+                <span className="label">{t("Brand name")}</span>
                 <input
                   value={settings.brandName}
                   onChange={(event) =>
@@ -1789,7 +1875,7 @@ export function AdminConsole({
                 />
               </label>
               <label className="block">
-                <span className="label">Arabic brand name</span>
+                <span className="label">{t("Arabic brand name")}</span>
                 <input
                   value={settings.brandNameAr}
                   onChange={(event) =>
@@ -1800,7 +1886,7 @@ export function AdminConsole({
               </label>
 
               <div>
-                <span className="label">Theme preset</span>
+                <span className="label">{t("Theme preset")}</span>
                 <div className="mt-1 grid grid-cols-2 gap-2">
                   {THEME_PRESETS.map((preset) => {
                     const active = (settings.themePreset ?? "coastal") === preset.id;
@@ -1848,7 +1934,7 @@ export function AdminConsole({
 
               <div className="grid grid-cols-2 gap-3">
                 <label className="block">
-                  <span className="label">Primary colour</span>
+                  <span className="label">{t("Primary colour")}</span>
                   <div className="flex items-center gap-2 rounded-[6px] border border-line bg-surface p-1.5">
                     <input
                       type="color"
@@ -1861,7 +1947,7 @@ export function AdminConsole({
                         })
                       }
                       className="h-8 w-10 cursor-pointer rounded-[4px] border-0 bg-transparent p-0"
-                      aria-label="Primary colour"
+                      aria-label={t("Primary colour")}
                     />
                     <span className="text-[11px] font-medium uppercase text-muted">
                       {settings.primaryColor}
@@ -1869,7 +1955,7 @@ export function AdminConsole({
                   </div>
                 </label>
                 <label className="block">
-                  <span className="label">Accent colour</span>
+                  <span className="label">{t("Accent colour")}</span>
                   <div className="flex items-center gap-2 rounded-[6px] border border-line bg-surface p-1.5">
                     <input
                       type="color"
@@ -1882,7 +1968,7 @@ export function AdminConsole({
                         })
                       }
                       className="h-8 w-10 cursor-pointer rounded-[4px] border-0 bg-transparent p-0"
-                      aria-label="Accent colour"
+                      aria-label={t("Accent colour")}
                     />
                     <span className="text-[11px] font-medium uppercase text-muted">
                       {settings.accentColor ?? "#8c3a00"}
@@ -1892,7 +1978,7 @@ export function AdminConsole({
               </div>
 
               <label className="block">
-                <span className="label">Default theme</span>
+                <span className="label">{t("Default theme")}</span>
                 <select
                   value={settings.defaultTheme ?? "system"}
                   onChange={(event) =>
@@ -1903,9 +1989,9 @@ export function AdminConsole({
                   }
                   className="input"
                 >
-                  <option value="system">Follow the visitor’s device</option>
-                  <option value="light">Light by default</option>
-                  <option value="dark">Dark by default</option>
+                  <option value="system">{t("Follow the visitor’s device")}</option>
+                  <option value="light">{t("Light by default")}</option>
+                  <option value="dark">{t("Dark by default")}</option>
                 </select>
                 <span className="mt-1 block text-[10px] leading-4 text-muted">
                   A visitor’s own light/dark toggle always wins.
@@ -1927,9 +2013,9 @@ export function AdminConsole({
                     </span>
                   )}
                   <div className="min-w-0 flex-1">
-                    <div className="text-[12px] font-semibold">Logo mark</div>
+                    <div className="text-[12px] font-semibold">{t("Logo mark")}</div>
                     <div className="text-[10px] text-muted">
-                      Square PNG/JPG/WebP. Used in the header, footer and auth.
+                      {t("Square PNG/JPG/WebP. Used in the header, footer and auth.")}
                     </div>
                   </div>
                   <label className="btn btn-ghost btn-sm cursor-pointer">
@@ -1962,14 +2048,14 @@ export function AdminConsole({
                       }
                       className="btn btn-ghost btn-sm text-danger"
                     >
-                      Remove
+                      {t("Remove")}
                     </button>
                   ) : null}
                 </div>
               </div>
 
               <label className="block">
-                <span className="label">Tagline</span>
+                <span className="label">{t("Tagline")}</span>
                 <input
                   value={settings.tagline}
                   onChange={(event) => setSettings({ ...settings, tagline: event.target.value })}
@@ -1977,7 +2063,7 @@ export function AdminConsole({
                 />
               </label>
               <label className="block">
-                <span className="label">Support phone</span>
+                <span className="label">{t("Support phone")}</span>
                 <input
                   value={settings.supportPhone}
                   onChange={(event) =>
@@ -1988,7 +2074,7 @@ export function AdminConsole({
               </label>
               <div className="grid grid-cols-2 gap-3">
                 <label className="block">
-                  <span className="label">Store commission %</span>
+                  <span className="label">{t("Store commission %")}</span>
                   <input
                     type="number"
                     min={0}
@@ -2000,11 +2086,11 @@ export function AdminConsole({
                     className="input"
                   />
                   <span className="mt-1 block text-[10px] leading-4 text-muted">
-                    Merchant payout commission. Service fees below are separate.
+                    {t("Merchant payout commission. Service fees below are separate.")}
                   </span>
                 </label>
                 <label className="block">
-                  <span className="label">Default fee (MAD)</span>
+                  <span className="label">{t("Default fee (MAD)")}</span>
                   <input
                     type="number"
                     min={0}
@@ -2020,7 +2106,7 @@ export function AdminConsole({
               <div className="rounded-[8px] border border-line p-3">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className="text-[12px] font-semibold">Service commissions</div>
+                    <div className="text-[12px] font-semibold">{t("Service commissions")}</div>
                     <div className="mt-0.5 text-[10px] leading-4 text-muted">
                       Set what Wassl keeps per completed job. The percentage applies to
                       goods or fare; the fixed part is charged per order or ride.
@@ -2068,7 +2154,7 @@ export function AdminConsole({
                         </div>
                         <div className="mt-2 grid grid-cols-2 gap-2">
                           <label className="block">
-                            <span className="label !text-[10px]">Fixed (MAD)</span>
+                            <span className="label !text-[10px]">{t("Fixed (MAD)")}</span>
                             <input
                               type="number"
                               min={0}
@@ -2084,7 +2170,7 @@ export function AdminConsole({
                             />
                           </label>
                           <label className="block">
-                            <span className="label !text-[10px]">Rate (%)</span>
+                            <span className="label !text-[10px]">{t("Rate (%)")}</span>
                             <input
                               type="number"
                               min={0}
@@ -2120,9 +2206,9 @@ export function AdminConsole({
               </div>
               <div className="flex items-center justify-between rounded-[6px] bg-surface-2 p-3">
                 <div>
-                  <div className="text-[11px] font-semibold">City waitlist</div>
+                  <div className="text-[11px] font-semibold">{t("City waitlist")}</div>
                   <div className="text-[11px] text-muted">
-                    Accept store and driver applications in coming-soon cities.
+                    {t("Accept store and driver applications in coming-soon cities.")}
                   </div>
                 </div>
                 <button
@@ -2136,7 +2222,7 @@ export function AdminConsole({
                   className={`relative h-7 w-12 rounded-full transition ${
                     settings.cityWaitlistEnabled ? "bg-brand" : "bg-ink/20"
                   }`}
-                  aria-label="Toggle waitlist"
+                  aria-label={t("Toggle waitlist")}
                 >
                   <span
                     className={`absolute top-1 h-5 w-5 rounded-full bg-surface shadow transition ${
@@ -2150,7 +2236,7 @@ export function AdminConsole({
                 disabled={busy === "settings"}
                 className="btn btn-primary mt-1"
               >
-                <ShieldCheck size={15} /> Save settings
+                <ShieldCheck size={15} /> {t("Save settings")}
               </button>
             </div>
           </form>
@@ -2158,18 +2244,18 @@ export function AdminConsole({
           <div className="space-y-4">
             <div className="card p-5">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold tracking-[-0.04em]">COD reconciliation</h2>
+                <h2 className="text-lg font-semibold tracking-[-0.04em]">{t("COD reconciliation")}</h2>
                 <Banknote size={18} className="text-brand" />
               </div>
               <div className="mt-4 space-y-2 text-[13px]">
                 <div className="flex justify-between text-muted">
-                  <span>Cash held by drivers</span>
+                  <span>{t("Cash held by drivers")}</span>
                   <span className="font-semibold text-ink">
                     {money(drivers.reduce((sum, driver) => sum + driver.cashOnHand, 0))}
                   </span>
                 </div>
                 <div className="flex justify-between text-muted">
-                  <span>Delivered GMV</span>
+                  <span>{t("Delivered GMV")}</span>
                   <span className="font-semibold text-ink">{money(stats.gmv)}</span>
                 </div>
                 <div className="flex justify-between text-muted">
@@ -2179,7 +2265,7 @@ export function AdminConsole({
                   </span>
                 </div>
                 <div className="flex justify-between border-t border-line pt-2 text-base font-semibold">
-                  <span>Store payouts due</span>
+                  <span>{t("Store payouts due")}</span>
                   <span>
                     {money(
                       stats.gmv - Math.round((stats.gmv * settings.commissionRate) / 100),
@@ -2195,7 +2281,7 @@ export function AdminConsole({
             </div>
 
             <div className="card p-5">
-              <h2 className="text-sm font-semibold">Danger zone</h2>
+              <h2 className="text-sm font-semibold">{t("Danger zone")}</h2>
               <p className="mt-1 text-[11px] leading-5 text-muted">
                 Reset restores the seeded stores, drivers, demo orders and settings. Use it
                 before a demo run.
@@ -2206,7 +2292,7 @@ export function AdminConsole({
                 disabled={busy === "reset"}
                 className="btn btn-danger mt-3 w-full"
               >
-                <RotateCcw size={14} /> Reset demo data
+                <RotateCcw size={14} /> {t("Reset demo data")}
               </button>
             </div>
           </div>
@@ -2217,7 +2303,8 @@ export function AdminConsole({
 }
 
 function EntityIcon({ entity }: { entity: AuditEntry["entity"] }) {
-  if (entity === "order") return <PackageCheck size={15} />;
+
+  const { t } = useI18n();  if (entity === "order") return <PackageCheck size={15} />;
   if (entity === "store") return <StoreIcon size={15} />;
   if (entity === "driver") return <Bike size={15} />;
   if (entity === "city") return <Building2 size={15} />;
@@ -2241,6 +2328,7 @@ function StoreFormModal({
   onClose: () => void;
   onSave: (draft: StoreDraft) => Promise<void>;
 }) {
+  const { t } = useI18n();
   const [draft, setDraft] = useState<StoreDraft>(() => ({
     name: store?.name ?? "",
     nameAr: store?.nameAr ?? "",
@@ -2302,7 +2390,7 @@ function StoreFormModal({
             type="button"
             onClick={onClose}
             className="grid h-9 w-9 place-items-center rounded-[6px] border border-line text-muted hover:text-ink"
-            aria-label="Close"
+            aria-label={t("Close")}
           >
             <X size={16} />
           </button>
@@ -2310,7 +2398,7 @@ function StoreFormModal({
 
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           <label className="block">
-            <span className="label">Store name</span>
+            <span className="label">{t("Store name")}</span>
             <input
               value={draft.name}
               onChange={(event) => set("name", event.target.value)}
@@ -2321,7 +2409,7 @@ function StoreFormModal({
             />
           </label>
           <label className="block">
-            <span className="label">Arabic name</span>
+            <span className="label">{t("Arabic name")}</span>
             <input
               value={draft.nameAr}
               onChange={(event) => set("nameAr", event.target.value)}
@@ -2339,11 +2427,11 @@ function StoreFormModal({
               </span>
             )}
             <div className="min-w-0 flex-1">
-              <div className="text-[12px] font-semibold">Store cover</div>
-              <div className="text-[11px] text-muted">Shown on the storefront and search cards.</div>
+              <div className="text-[12px] font-semibold">{t("Store cover")}</div>
+              <div className="text-[11px] text-muted">{t("Shown on the storefront and search cards.")}</div>
             </div>
             <label className="btn btn-ghost btn-sm cursor-pointer">
-              Upload
+              {t("Upload")}
               <input
                 type="file"
                 accept="image/png,image/jpeg,image/webp"
@@ -2362,12 +2450,12 @@ function StoreFormModal({
             </label>
             {draft.image ? (
               <button type="button" onClick={() => set("image", undefined)} className="btn btn-ghost btn-sm text-danger">
-                Remove
+                {t("Remove")}
               </button>
             ) : null}
           </div>
           <label className="block">
-            <span className="label">City</span>
+            <span className="label">{t("City")}</span>
             <select
               value={draft.citySlug}
               onChange={(event) => set("citySlug", event.target.value)}
@@ -2382,39 +2470,39 @@ function StoreFormModal({
             </select>
           </label>
           <label className="block">
-            <span className="label">Category</span>
+            <span className="label">{t("Category")}</span>
             <select
               value={draft.category}
               onChange={(event) => set("category", event.target.value as StoreCategory)}
               className="input"
             >
-              <option value="restaurant">Restaurant</option>
-              <option value="grocery">Grocery</option>
-              <option value="pharmacy">Pharmacy</option>
-              <option value="cafe">Café</option>
-              <option value="gifts">Gifts</option>
+              <option value="restaurant">{t("Restaurant")}</option>
+              <option value="grocery">{t("Grocery")}</option>
+              <option value="pharmacy">{t("Pharmacy")}</option>
+              <option value="cafe">{t("Café")}</option>
+              <option value="gifts">{t("Gifts")}</option>
             </select>
           </label>
           <label className="block sm:col-span-2">
-            <span className="label">Tagline</span>
+            <span className="label">{t("Tagline")}</span>
             <input
               value={draft.tagline}
               onChange={(event) => set("tagline", event.target.value)}
               className="input"
-              placeholder="One line customers see on the card"
+              placeholder={t("One line customers see on the card")}
             />
           </label>
           <label className="block sm:col-span-2">
-            <span className="label">Address</span>
+            <span className="label">{t("Address")}</span>
             <input
               value={draft.address}
               onChange={(event) => set("address", event.target.value)}
               className="input"
-              placeholder="Street, building, neighbourhood"
+              placeholder={t("Street, building, neighbourhood")}
             />
           </label>
           <label className="block">
-            <span className="label">Landmark</span>
+            <span className="label">{t("Landmark")}</span>
             <input
               value={draft.landmark}
               onChange={(event) => set("landmark", event.target.value)}
@@ -2423,7 +2511,7 @@ function StoreFormModal({
             />
           </label>
           <label className="block">
-            <span className="label">Phone</span>
+            <span className="label">{t("Phone")}</span>
             <input
               value={draft.phone}
               onChange={(event) => set("phone", event.target.value)}
@@ -2434,37 +2522,37 @@ function StoreFormModal({
           </label>
           <div className="grid grid-cols-2 gap-2">
             <label className="block">
-              <span className="label">Latitude</span>
+              <span className="label">{t("Latitude")}</span>
               <input
                 value={draft.lat}
                 onChange={(event) => set("lat", event.target.value)}
                 className="input"
-                placeholder="City centre"
+                placeholder={t("City centre")}
                 inputMode="decimal"
               />
             </label>
             <label className="block">
-              <span className="label">Longitude</span>
+              <span className="label">{t("Longitude")}</span>
               <input
                 value={draft.lng}
                 onChange={(event) => set("lng", event.target.value)}
                 className="input"
-                placeholder="City centre"
+                placeholder={t("City centre")}
                 inputMode="decimal"
               />
             </label>
           </div>
           <label className="block">
-            <span className="label">Owner / contact</span>
+            <span className="label">{t("Owner / contact")}</span>
             <input
               value={draft.ownerName}
               onChange={(event) => set("ownerName", event.target.value)}
               className="input"
-              placeholder="Partner name"
+              placeholder={t("Partner name")}
             />
           </label>
           <label className="block">
-            <span className="label">Prep time (min)</span>
+            <span className="label">{t("Prep time (min)")}</span>
             <input
               type="number"
               min={5}
@@ -2475,7 +2563,7 @@ function StoreFormModal({
             />
           </label>
           <label className="block">
-            <span className="label">Minimum order (MAD)</span>
+            <span className="label">{t("Minimum order (MAD)")}</span>
             <input
               type="number"
               min={0}
@@ -2485,7 +2573,7 @@ function StoreFormModal({
             />
           </label>
           <label className="block">
-            <span className="label">Delivery fee (MAD)</span>
+            <span className="label">{t("Delivery fee (MAD)")}</span>
             <input
               type="number"
               min={0}
@@ -2496,9 +2584,9 @@ function StoreFormModal({
           </label>
           <label className="flex items-center justify-between gap-3 rounded-[6px] bg-surface-2 px-3 py-2 sm:col-span-2">
             <span>
-              <span className="block text-[11px] font-semibold">Open for orders</span>
+              <span className="block text-[11px] font-semibold">{t("Open for orders")}</span>
               <span className="block text-[11px] text-muted">
-                Leave closed while you add the menu.
+                {t("Leave closed while you add the menu.")}
               </span>
             </span>
             <input
@@ -2518,7 +2606,7 @@ function StoreFormModal({
 
         <div className="mt-4 flex justify-end gap-2">
           <button type="button" onClick={onClose} className="btn btn-ghost btn-sm">
-            Cancel
+            {t("Cancel")}
           </button>
           <button type="submit" disabled={busy} className="btn btn-primary btn-sm">
             {busy ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
@@ -2551,6 +2639,7 @@ function DriverEditModal({
     photo?: string;
   }) => Promise<void>;
 }) {
+  const { t } = useI18n();
   const [vehicle, setVehicle] = useState(driver.vehicle);
   const [plate, setPlate] = useState(driver.plate);
   const [phone, setPhone] = useState(driver.phone);
@@ -2603,7 +2692,7 @@ function DriverEditModal({
             type="button"
             onClick={onClose}
             className="grid h-9 w-9 place-items-center rounded-[6px] border border-line text-muted hover:text-ink"
-            aria-label="Close"
+            aria-label={t("Close")}
           >
             <X size={16} />
           </button>
@@ -2612,7 +2701,7 @@ function DriverEditModal({
         <div className="mt-4 grid gap-3">
           <div className="grid grid-cols-2 gap-2">
             <label className="block">
-              <span className="label">Vehicle</span>
+              <span className="label">{t("Vehicle")}</span>
               <input
                 value={vehicle}
                 onChange={(event) => setVehicle(event.target.value)}
@@ -2620,7 +2709,7 @@ function DriverEditModal({
               />
             </label>
             <label className="block">
-              <span className="label">Plate</span>
+              <span className="label">{t("Plate")}</span>
               <input
                 value={plate}
                 onChange={(event) => setPlate(event.target.value)}
@@ -2629,15 +2718,15 @@ function DriverEditModal({
             </label>
           </div>
           <label className="block">
-            <span className="label">Works as</span>
+            <span className="label">{t("Works as")}</span>
             <select
               value={kind ?? "delivery"}
               onChange={(event) => setKind(event.target.value as Driver["kind"])}
               className="input"
             >
-              <option value="delivery">Delivery courier</option>
-              <option value="taxi">Taxi driver</option>
-              <option value="both">Delivery + taxi</option>
+              <option value="delivery">{t("Delivery courier")}</option>
+              <option value="taxi">{t("Taxi driver")}</option>
+              <option value="both">{t("Delivery + taxi")}</option>
             </select>
           </label>
           <div className="flex flex-wrap items-center gap-3 rounded-[8px] border border-line p-3">
@@ -2654,9 +2743,9 @@ function DriverEditModal({
               </span>
             )}
             <div className="min-w-0 flex-1">
-              <div className="text-[12px] font-semibold">Driver photo</div>
+              <div className="text-[12px] font-semibold">{t("Driver photo")}</div>
               <div className="text-[11px] text-muted">
-                Shown to dispatch and riders when accepted.
+                {t("Shown to dispatch and riders when accepted.")}
               </div>
             </div>
             <input
@@ -2690,12 +2779,12 @@ function DriverEditModal({
                 onClick={() => setPhoto("")}
                 className="btn btn-ghost btn-sm text-danger"
               >
-                Remove
+                {t("Remove")}
               </button>
             ) : null}
           </div>
           <label className="block">
-            <span className="label">Phone</span>
+            <span className="label">{t("Phone")}</span>
             <input
               value={phone}
               onChange={(event) => setPhone(event.target.value)}
@@ -2705,7 +2794,7 @@ function DriverEditModal({
           </label>
           <div className="grid grid-cols-2 gap-2">
             <label className="block">
-              <span className="label">Cash limit (MAD)</span>
+              <span className="label">{t("Cash limit (MAD)")}</span>
               <input
                 type="number"
                 min={0}
@@ -2715,20 +2804,20 @@ function DriverEditModal({
               />
             </label>
             <label className="block">
-              <span className="label">Status</span>
+              <span className="label">{t("Status")}</span>
               <select
                 value={status}
                 onChange={(event) => setStatus(event.target.value as Driver["status"])}
                 className="input"
               >
-                <option value="offline">Offline</option>
-                <option value="available">Available</option>
-                <option value="busy">Busy</option>
+                <option value="offline">{t("Offline")}</option>
+                <option value="available">{t("Available")}</option>
+                <option value="busy">{t("Busy")}</option>
               </select>
             </label>
           </div>
           <label className="flex items-center justify-between gap-3 rounded-[6px] bg-surface-2 px-3 py-2">
-            <span className="text-[11px] font-semibold">Active courier</span>
+            <span className="text-[11px] font-semibold">{t("Active courier")}</span>
             <input
               type="checkbox"
               checked={active}
@@ -2738,7 +2827,7 @@ function DriverEditModal({
           </label>
           <label className="flex items-center justify-between gap-3 rounded-[6px] bg-surface-2 px-3 py-2">
             <span>
-              <span className="block text-[11px] font-semibold">Reset cash on hand</span>
+              <span className="block text-[11px] font-semibold">{t("Reset cash on hand")}</span>
               <span className="block text-[11px] text-muted">
                 Currently {money(driver.cashOnHand)} collected.
               </span>
@@ -2754,7 +2843,7 @@ function DriverEditModal({
 
         <div className="mt-4 flex justify-end gap-2">
           <button type="button" onClick={onClose} className="btn btn-ghost btn-sm">
-            Cancel
+            {t("Cancel")}
           </button>
           <button type="submit" disabled={busy} className="btn btn-primary btn-sm">
             {busy ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
@@ -2783,6 +2872,7 @@ function DriverPanel({
   onAdd: () => void;
   onManage: (driver: Driver) => void;
 }) {
+  const { t } = useI18n();
   const Icon = icon === "taxi" ? CarTaxiFront : Bike;
   return (
     <section className="card p-4">
@@ -2799,7 +2889,7 @@ function DriverPanel({
           </div>
         </div>
         <button type="button" onClick={onAdd} className="btn btn-primary btn-sm">
-          <Plus size={12} /> Generate credentials
+          <Plus size={12} /> {t("Generate credentials")}
         </button>
       </div>
 
@@ -2853,7 +2943,7 @@ function DriverPanel({
                 disabled={busy === driver.id}
                 className="btn btn-ghost btn-sm shrink-0"
               >
-                <Pencil size={11} /> Manage
+                <Pencil size={11} /> {t("Manage")}
               </button>
             </article>
           ))
@@ -2876,6 +2966,7 @@ function AdminOrderCard({
   onAssign,
   onAuto,
   onStatus,
+  onEta,
   compact = false,
 }: {
   order: OrderView;
@@ -2886,8 +2977,11 @@ function AdminOrderCard({
   onAssign: () => void;
   onAuto: () => void;
   onStatus: (status: OrderStatus) => void;
+  onEta: (minutes: number) => void;
   compact?: boolean;
 }) {
+  const { t } = useI18n();
+  const [etaDraft, setEtaDraft] = useState("");
   const meta = STATUS_META[order.status];
   const terminal = order.status === "delivered" || order.status === "cancelled";
   const canAssign = !terminal && !order.driverId && order.status === "ready";
@@ -2904,7 +2998,7 @@ function AdminOrderCard({
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-[13px] font-semibold">{order.code}</span>
-            <span className="pill">{meta.label}</span>
+            <span className="pill">{t(meta.label)}</span>
             {order.status === "ready" ? (
               <span className="pill pill-warm">
                 <Clock3 size={10} /> waiting dispatch
@@ -2917,7 +3011,7 @@ function AdminOrderCard({
         </div>
         <div className="text-end">
           <div className="text-base font-semibold">{money(order.total)}</div>
-          <div className="text-[11px] font-medium text-brand">COD</div>
+          <div className="text-[11px] font-medium text-brand">{t("COD")}</div>
         </div>
       </div>
 
@@ -2943,16 +3037,70 @@ function AdminOrderCard({
         <div className="mt-3 flex items-center justify-between gap-3 rounded-[6px] border border-line bg-surface-2/60 px-3 py-2">
           <div>
             <div className="text-[10px] font-semibold uppercase tracking-[0.08em] text-muted">
-              Handover code
+              {t("Handover code")}
             </div>
             <div className="text-[11px] text-muted">
-              Customer shares this at the door
+              {t("Customer shares this at the door")}
             </div>
           </div>
           <div className="font-display text-[22px] font-semibold tracking-[0.12em] text-ink tnum">
             {(order.fulfillment === "pickup" ? order.pickupCode : order.deliveryPin)
               ?.replace(/\D/g, "")
               .slice(-4)}
+          </div>
+        </div>
+      ) : null}
+
+      {!terminal ? (
+        <div className="mt-3 flex flex-wrap items-center gap-2 rounded-[6px] border border-line bg-surface px-3 py-2">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.08em] text-muted">
+            {t("Delivery estimate")}
+          </div>
+          <span className="text-[11px] font-bold text-brand">
+            {order.etaMinutes ? `${order.etaMinutes} min` : "not set"}
+          </span>
+          <div className="ms-auto flex items-center gap-1">
+            {[15, 25, 40].map((minutes) => (
+              <button
+                key={minutes}
+                type="button"
+                onClick={() => onEta(minutes)}
+                disabled={busy}
+                className={`rounded-[6px] border px-2 py-1 text-[11px] font-semibold ${
+                  order.etaMinutes === minutes
+                    ? "border-brand bg-brand-soft text-brand"
+                    : "border-line text-muted hover:border-brand hover:text-brand"
+                }`}
+              >
+                {minutes}′
+              </button>
+            ))}
+            <input
+              value={etaDraft}
+              onChange={(event) => setEtaDraft(event.target.value.replace(/\D/g, "").slice(0, 3))}
+              onKeyDown={(event) => {
+                if (event.key !== "Enter") return;
+                const minutes = Number(etaDraft);
+                if (minutes >= 1) onEta(minutes);
+                setEtaDraft("");
+              }}
+              inputMode="numeric"
+              placeholder="min"
+              aria-label={t("Custom estimate in minutes")}
+              className="h-7 w-14 rounded-[6px] border border-line bg-surface px-2 text-[11px] font-semibold"
+            />
+            <button
+              type="button"
+              onClick={() => {
+                const minutes = Number(etaDraft);
+                if (minutes >= 1) onEta(minutes);
+                setEtaDraft("");
+              }}
+              disabled={busy || !etaDraft}
+              className="h-7 rounded-[6px] bg-brand px-2 text-[11px] font-semibold text-white disabled:opacity-40"
+            >
+              Set
+            </button>
           </div>
         </div>
       ) : null}
@@ -2984,9 +3132,9 @@ function AdminOrderCard({
               value={chosenDriver || ""}
               onChange={(event) => onChooseDriver(event.target.value)}
               className="h-8 rounded-[6px] border border-line bg-surface px-2 text-[11px] font-bold"
-              aria-label="Choose driver"
+              aria-label={t("Choose driver")}
             >
-              <option value="">Choose driver…</option>
+              <option value="">{t("Choose driver…")}</option>
               {available.map((driver) => (
                 <option key={driver.id} value={driver.id}>
                   {driver.name} · {money(driver.cashOnHand)} cash
@@ -2999,7 +3147,7 @@ function AdminOrderCard({
               disabled={busy || !chosenDriver}
               className="btn btn-primary btn-sm disabled:opacity-40"
             >
-              Assign
+              {t("Assign")}
             </button>
             <button
               type="button"
@@ -3007,7 +3155,7 @@ function AdminOrderCard({
               disabled={busy}
               className="btn btn-ghost btn-sm"
             >
-              <Wand2 size={12} /> Auto
+              <Wand2 size={12} /> {t("Auto")}
             </button>
           </>
         ) : null}
@@ -3019,12 +3167,12 @@ function AdminOrderCard({
               if (event.target.value) onStatus(event.target.value as OrderStatus);
             }}
             className="ms-auto h-8 rounded-[6px] border border-line bg-surface px-2 text-[11px] font-bold text-muted"
-            aria-label="Next legal status"
+            aria-label={t("Next legal status")}
           >
-            <option value="">Next step…</option>
+            <option value="">{t("Next step…")}</option>
             {transitions.map((rule) => (
               <option key={rule.to} value={rule.to}>
-                {STATUS_META[rule.to].label}
+                {t(STATUS_META[rule.to].label)}
                 {rule.requiresReason ? " (reason required)" : ""}
               </option>
             ))}
@@ -3051,6 +3199,7 @@ function CityServicesModal({
   onClose: () => void;
   onSave: (services: Partial<Record<CityService, boolean>>) => void;
 }) {
+  const { t } = useI18n();
   const [draft, setDraft] = useState(() => cityServices(city));
   return (
     <div
@@ -3079,7 +3228,7 @@ function CityServicesModal({
             type="button"
             onClick={onClose}
             className="grid h-9 w-9 place-items-center rounded-[6px] text-muted hover:bg-surface-2 hover:text-ink"
-            aria-label="Close"
+            aria-label={t("Close")}
           >
             <X size={16} />
           </button>
@@ -3125,7 +3274,7 @@ function CityServicesModal({
 
         <div className="mt-5 flex gap-2">
           <button type="button" onClick={onClose} className="btn btn-ghost flex-1">
-            Cancel
+            {t("Cancel")}
           </button>
           <button
             type="button"

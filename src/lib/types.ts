@@ -353,6 +353,13 @@ export interface Order {
   pickupCode?: string;
   /** True when a four-digit handover is required; safe to expose to drivers. */
   handoverRequired?: boolean;
+  /**
+   * Delivery estimate in minutes. Only ever set explicitly by dispatch or by
+   * the assigned courier — never derived from a template or a distance guess.
+   */
+  etaMinutes?: number;
+  etaSetAt?: string;
+  etaSetBy?: "admin" | "driver";
   /** Customer rating submitted after delivery. */
   rating?: Rating;
   substitutionPreference?: "allow" | "refund" | "contact";
@@ -1034,6 +1041,28 @@ export interface Database {
   recurringOrders?: RecurringOrder[];
   families?: Family[];
   savedBaskets?: SavedBasket[];
+}
+
+/** Live voice call between a customer and the courier, signalled over HTTP. */
+export type CallStatus = "ringing" | "active" | "ended" | "declined" | "missed";
+export type CallRole = "customer" | "driver";
+
+/** What one API response exposes to one side of the call. */
+export interface CallView {
+  id: string;
+  orderId: string;
+  orderCode: string;
+  status: CallStatus;
+  initiatedBy: CallRole;
+  createdAt: string;
+  updatedAt: string;
+  /** Seconds left before an unanswered call is marked missed. */
+  ringSecondsLeft: number;
+  /** Remote offer/answer and trickled candidates, newest last. */
+  remoteSdp?: string;
+  remoteSdpType?: "offer" | "answer";
+  remoteCandidates: string[];
+  endedBy?: CallRole | "system";
 }
 
 /**
