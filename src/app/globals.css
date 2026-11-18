@@ -1855,3 +1855,52 @@ html.dark .tabbar a[data-active="true"] {
     padding: 20px;
   }
 }
+
+
+/* ---------------------------------------------------------------- */
+/* Live order surface                                                */
+/* ---------------------------------------------------------------- */
+
+/* Tactile controls: a press should feel like a press, not a hover. */
+.bubble-press {
+  touch-action: manipulation;
+  transition:
+    transform 170ms cubic-bezier(0.2, 0.8, 0.3, 1.2),
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease;
+}
+.bubble-press:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+.bubble-press:not(:disabled):active {
+  transform: scale(0.94);
+}
+.bubble-press:disabled {
+  transform: none;
+}
+
+.pop-in {
+  animation: wassl-pop-in 280ms cubic-bezier(0.2, 0.9, 0.3, 1.35) both;
+}
+@keyframes wassl-pop-in {
+  0% {
+    transform: scale(0.88);
+    opacity: 0.5;
+  }
+  60% {
+    transform: scale(1.07);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bubble-press:not(:disabled):hover,
+  .bubble-press:not(:disabled):active {
+    transform: none;
+  }
+}

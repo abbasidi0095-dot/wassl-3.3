@@ -97,6 +97,7 @@ import type {
   ServiceCategory,
   ServiceProvider,
   OrderStatus,
+  CityPricing,
   PlatformSettings,
   Product,
   PushSubscriptionRecord,
@@ -1543,6 +1544,9 @@ export async function createOrder(
       fulfillment === "delivery"
         ? haversineKm({ lat: store.lat, lng: store.lng }, customerPoint)
         : 0;
+    if (fulfillment === "delivery" && distanceKm > 50) {
+      throw new Error("This address is outside the delivery area for this store");
+    }
     const city = db.cities.find((item) => item.slug === store.citySlug);
     const deliveryPricing = resolvePricing("delivery", city, db.settings);
     const deliveryQuote = quote(deliveryPricing, distanceKm);
@@ -3934,10 +3938,22 @@ export async function updateCity(
     const { services, pricing, ...rest } = patch;
     Object.assign(city, rest);
     if (pricing) {
+      // Strip undefined keys: a sparse admin patch must not wipe the defaults
+      // that keep min/max/step finite.
+      const merge = (
+        current: Partial<CityPricing["delivery"]> | undefined,
+        next: Partial<CityPricing["delivery"]> | undefined,
+      ) => {
+        if (!next) return current;
+        const defined = Object.fromEntries(
+          Object.entries(next).filter(([, value]) => value !== undefined),
+        );
+        return { ...current, ...defined };
+      };
       city.pricing = {
         ...city.pricing,
-        ...(pricing.delivery ? { delivery: { ...city.pricing?.delivery, ...pricing.delivery } } : {}),
-        ...(pricing.taxi ? { taxi: { ...city.pricing?.taxi, ...pricing.taxi } } : {}),
+        delivery: merge(city.pricing?.delivery, pricing.delivery),
+        taxi: merge(city.pricing?.taxi, pricing.taxi),
       };
     }
     if (services) {

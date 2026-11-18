@@ -4,10 +4,12 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
+  ArrowUpRight,
   Banknote,
   Bike,
   Check,
   CheckCircle2,
+  ChevronDown,
   Clock3,
   MapPin,
   MessageCircle,
@@ -39,6 +41,17 @@ const STEPS: { status: string; label: string; caption: string }[] = [
   { status: "en_route", label: "On the way", caption: "Follow the live map" },
   { status: "delivered", label: "Delivered", caption: "Enjoy your order" },
 ];
+
+const PHASES: { label: string; statuses: string[] }[] = [
+  { label: "Placed", statuses: ["placed", "accepted"] },
+  { label: "Kitchen", statuses: ["preparing", "ready"] },
+  { label: "On the way", statuses: ["assigned", "picked_up", "en_route"] },
+  { label: "Delivered", statuses: ["delivered"] },
+];
+
+function firstName(name?: string) {
+  return (name ?? "").trim().split(/\s+/)[0] || "";
+}
 
 export function OrderTracking({ initial }: { initial: OrderView }) {
   const [order, setOrder] = useState(initial);
@@ -104,11 +117,19 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
   const currentIndex = STEPS.findIndex((step) => step.status === order.status);
   const cancelled = order.status === "cancelled";
   const delivered = order.status === "delivered";
-  // Only an estimate published by dispatch or the courier is shown. No guess.
-  const etaMinutes = order.etaMinutes;
+  const live = !delivered && !cancelled;
+  const eta =
+    typeof order.etaMinutes === "number" && Number.isFinite(order.etaMinutes) && order.etaMinutes > 0
+      ? Math.round(order.etaMinutes)
+      : null;
+  const etaSource = order.etaSetBy === "admin" ? "dispatch" : order.etaSetBy === "driver" ? "courier" : "";
   const canCall =
-    Boolean(order.driver) &&
-    ["assigned", "picked_up", "en_route"].includes(order.status);
+    Boolean(order.driver) && ["assigned", "picked_up", "en_route"].includes(order.status);
+  const phaseIndex = Math.max(
+    0,
+    PHASES.findIndex((phase) => phase.statuses.includes(order.status)),
+  );
+  const phasePct = cancelled ? 0 : (phaseIndex / (PHASES.length - 1)) * 100;
 
   const points = useMemo(
     () => [
@@ -155,81 +176,237 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
 
   const whatsappPhone = order.driver?.phone.replace(/[^0-9]/g, "");
   const meta = STATUS_META[order.status];
+  const driverFirstName = firstName(order.driver?.name);
+
+  const headline = delivered
+    ? "Delivered. Enjoy!"
+    : cancelled
+      ? "Order cancelled"
+      : driverFirstName && ["assigned", "picked_up", "en_route"].includes(order.status)
+        ? `${driverFirstName} is on the way`
+        : "Your order is moving";
 
   return (
-    <div>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <Link
-            href="/orders"
-            className="inline-flex items-center gap-1 text-[11px] font-bold text-muted hover:text-brand"
+    <div className="pb-6">
+      <div className="flex items-center justify-between gap-3">
+        <Link
+          href="/orders"
+          className="inline-flex items-center gap-1.5 text-[11.5px] font-semibold text-muted transition-colors hover:text-ink"
+        >
+          <ArrowLeft size={14} /> {order.fulfillment === "pickup" ? "All pickups" : "All orders"}
+        </Link>
+        <div className="flex items-center gap-2">
+          <span className="rounded-full border border-line bg-surface px-2.5 py-1 text-[10.5px] font-semibold text-muted">
+            {order.code}
+          </span>
+          <button
+            type="button"
+            onClick={() => void refresh()}
+            aria-label="Refresh the order"
+            className={`bubble-press grid h-8 w-8 place-items-center rounded-full border border-line bg-surface text-muted ${
+              refreshing ? "animate-spin" : ""
+            }`}
           >
-            <ArrowLeft size={13} /> All orders
-          </Link>
-          <div className="mt-2 flex flex-wrap items-center gap-2">
-            <h1 className="font-display text-[clamp(1.9rem,1.5rem+1.4vw,2.6rem)] font-semibold tracking-[-0.035em]">
-              {delivered ? "Delivered. Enjoy!" : cancelled ? "Order cancelled" : "Your order is moving."}
-            </h1>
-            <span className="pill">{order.code}</span>
-          </div>
-          <p className="mt-2 text-sm text-muted">
-            {order.store?.name} · {timeAgo(order.createdAt)}
-            {refreshing ? <span className="ms-2 text-brand">updating…</span> : null}
-          </p>
-        </div>
-        <div className="flex gap-2">
-          {!delivered && !cancelled ? (
-            <div className="rounded-[10px] border border-teal/15 bg-brand-soft px-4 py-2.5 text-end">
-              <div className="text-[11px] font-medium text-brand">
-                {etaMinutes ? "Estimated arrival" : "Delivery estimate"}
-              </div>
-              {etaMinutes ? (
-                <div className="text-lg font-semibold">{etaMinutes} min</div>
-              ) : (
-                <div className="text-[12px] font-semibold text-muted">
-                  Awaiting courier
-                </div>
-              )}
-              {etaMinutes && order.etaSetBy ? (
-                <div className="text-[10px] text-muted">
-                  set by {order.etaSetBy === "admin" ? "dispatch" : "courier"}
-                </div>
-              ) : null}
-            </div>
-          ) : null}
-          <button type="button" onClick={() => void refresh()} className="btn btn-ghost btn-sm self-center">
-            Refresh
+            <ArrowUpRight size={14} />
           </button>
         </div>
       </div>
 
-      {!delivered && !cancelled ? (
-        <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
+      {/* Live status band */}
+      <section className="relative mt-3 overflow-hidden rounded-[22px] bg-ink px-5 py-5 text-on-dark sm:px-7 sm:py-6">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 text-[10.5px] font-semibold uppercase tracking-[0.12em] text-white/45">
+              <span
+                className={`status-dot ${live ? "live-dot" : ""} ${
+                  cancelled ? "text-coral" : "text-signal"
+                }`}
+              />
+              {meta.label}
+            </div>
+            <h1 className="mt-2 max-w-[16ch] font-display text-[30px] font-semibold leading-[1.02] tracking-[-0.035em] sm:text-[42px]">
+              {headline}
+            </h1>
+            <p className="mt-1.5 truncate text-[12px] text-white/55">
+              {order.store?.name} · {timeAgo(order.createdAt)}
+              {order.fulfillment === "pickup" ? " · Pickup" : ""}
+            </p>
+          </div>
+
+          {live ? (
+            <div className="relative grid h-[86px] w-[86px] shrink-0 place-items-center rounded-full border border-white/15 bg-white/[0.06]">
+              {eta ? (
+                <span
+                  className="absolute inset-0 animate-ping rounded-full border border-signal/30 [animation-duration:2.6s] motion-reduce:hidden"
+                  aria-hidden
+                />
+              ) : null}
+              <div className="text-center">
+                {eta ? (
+                  <>
+                    <div className="tnum font-display text-[27px] font-semibold leading-none">
+                      {eta}
+                    </div>
+                    <div className="mt-0.5 text-[8.5px] font-semibold uppercase tracking-[0.16em] text-white/45">
+                      min
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <Clock3 size={18} className="mx-auto text-signal" />
+                    <div className="mt-1 text-[8.5px] font-semibold uppercase tracking-[0.12em] text-white/45">
+                      ETA soon
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          ) : null}
+        </div>
+
+        {!cancelled ? (
+          <div className="mt-6">
+            <div className="relative flex items-center justify-between">
+              <span className="absolute inset-x-1 top-1/2 h-[2px] -translate-y-1/2 rounded-full bg-white/12" />
+              <span
+                className="absolute start-1 top-1/2 h-[2px] -translate-y-1/2 rounded-full bg-signal transition-[width] duration-700 ease-out"
+                style={{ width: `calc(${phasePct}% - ${phasePct === 0 ? 0 : 8}px)` }}
+              />
+              {PHASES.map((phase, index) => {
+                const done = index <= phaseIndex;
+                const active = index === phaseIndex;
+                return (
+                  <div key={phase.label} className="relative z-10 flex flex-col items-center gap-2">
+                    <span
+                      className={`grid h-3.5 w-3.5 place-items-center rounded-full border-2 transition-colors ${
+                        done
+                          ? "border-signal bg-signal text-ink"
+                          : "border-white/25 bg-ink text-transparent"
+                      } ${active && live ? "ring-4 ring-signal/20" : ""}`}
+                    >
+                      <Check size={7} strokeWidth={4} />
+                    </span>
+                    <span
+                      className={`text-[9.5px] font-semibold ${
+                        active ? "text-white" : done ? "text-white/70" : "text-white/35"
+                      }`}
+                    >
+                      {phase.label}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+            <p className="mt-3 text-[11px] leading-4 text-white/50">
+              {cancelled
+                ? "This order was cancelled."
+                : `${STEPS[Math.max(0, currentIndex)].label} · ${STEPS[Math.max(0, currentIndex)].caption}`}
+              {etaSource ? ` · ${eta} min, set by ${etaSource}` : ""}
+            </p>
+          </div>
+        ) : (
+          <p className="mt-5 rounded-[12px] bg-white/[0.06] px-3 py-2.5 text-[11.5px] leading-5 text-white/60">
+            Nothing further will be charged. If you were charged, contact support below.
+          </p>
+        )}
+      </section>
+
+      <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1.06fr)_minmax(0,0.94fr)] lg:items-start">
+        {/* Courier + handover share the first left cell so the two columns balance */}
+        <div className="space-y-4 lg:col-start-1 lg:row-start-1">
+        <div>
+          {order.driver ? (
+            <div className="rounded-[18px] border border-line bg-surface p-4 shadow-[var(--shadow-float)]">
+              <div className="flex items-center gap-3">
+                {order.driver.photo ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={order.driver.photo}
+                    alt={order.driver.name}
+                    className="h-14 w-14 rounded-full object-cover"
+                  />
+                ) : (
+                  <span className="grid h-14 w-14 place-items-center rounded-full bg-brand-soft text-brand">
+                    <Bike size={22} />
+                  </span>
+                )}
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-[15px] font-semibold text-ink">
+                    {order.driver.name}
+                  </div>
+                  <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] font-medium text-muted">
+                    <span className="inline-flex items-center gap-1">
+                      <Star size={10} className="fill-saffron text-saffron" />
+                      {order.driver.rating}
+                    </span>
+                    <span className="h-1 w-1 rounded-full bg-line-strong" />
+                    <span>{order.driver.vehicle}</span>
+                    <span className="h-1 w-1 rounded-full bg-line-strong" />
+                    <span className="tnum">{order.driver.plate}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-3 flex gap-2">
+                {canCall ? (
+                  <CallDock
+                    orderId={order.id}
+                    role="customer"
+                    peerName={driverFirstName || order.driver.name}
+                    className="!h-11 !rounded-full !border-brand !bg-brand !px-4 !text-[12px] !text-on-dark"
+                  />
+                ) : (
+                  <a
+                    href={`tel:${order.driver.phone.replace(/\s/g, "")}`}
+                    className="bubble-press inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full bg-brand text-[12px] font-semibold text-on-dark"
+                  >
+                    <Phone size={14} /> {order.driver.phone}
+                  </a>
+                )}
+                {whatsappPhone ? (
+                  <a
+                    href={`https://wa.me/${whatsappPhone}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="bubble-press inline-flex h-11 items-center justify-center gap-1.5 rounded-full border border-line px-4 text-[12px] font-semibold text-ink"
+                  >
+                    <MessageCircle size={14} /> WhatsApp
+                  </a>
+                ) : null}
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3 rounded-[18px] border border-dashed border-line-strong bg-surface/60 p-4">
+              <span className="grid h-12 w-12 place-items-center rounded-full bg-surface-2 text-muted">
+                <Bike size={20} />
+              </span>
+              <div>
+                <div className="text-[13.5px] font-semibold text-ink">
+                  {live ? "Finding your courier" : "No courier assigned"}
+                </div>
+                <div className="mt-0.5 text-[11px] leading-4 text-muted">
+                  A local courier is assigned as soon as the store marks the order ready.
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {live && (order.fulfillment === "pickup" ? order.pickupCode : order.deliveryPin) ? (
           <HandoverCode
-            code={
-              order.fulfillment === "pickup" ? order.pickupCode : order.deliveryPin
-            }
+            code={order.fulfillment === "pickup" ? order.pickupCode : order.deliveryPin}
             label={order.fulfillment === "pickup" ? "Pickup code" : "Handover code"}
             note={
               order.fulfillment === "pickup"
-                ? "Show these four digits at the counter when you collect. The store cannot close the order without them."
-                : "Give these four digits to the driver only when the order is in your hands. The delivery cannot be completed without them."
+                ? "Show these four digits at the counter when you collect."
+                : "Give these four digits to the courier only when the order is in your hands."
             }
           />
-          <div className="flex flex-wrap gap-1.5 text-[11px] font-semibold lg:max-w-[180px] lg:justify-end">
-            {order.fulfillment === "pickup" ? <span className="pill">Pickup</span> : null}
-            {order.express ? <span className="pill pill-warm">Express</span> : null}
-            {order.deliveryWindow ? <span className="pill">{order.deliveryWindow}</span> : null}
-            {order.substitutionPreference ? (
-              <span className="pill">Substitution: {order.substitutionPreference}</span>
-            ) : null}
-          </div>
+        ) : null}
         </div>
-      ) : null}
 
-      <div className="mt-6 grid gap-5 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
-        <div className="space-y-4">
-          {order.price && !delivered && !cancelled ? (
+        {/* Offer */}
+        {order.price && live ? (
+          <div className="lg:col-start-2 lg:row-start-1">
             <PriceOffer
               price={order.price}
               mode="customer"
@@ -238,106 +415,192 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
               max={order.price.max}
               onUpdated={() => void refresh(true)}
             />
-          ) : null}
-
-          <div className="card overflow-hidden">
-            <MapView
-              points={points}
-              center={{ lat: order.lat, lng: order.lng }}
-              zoom={14}
-              height={365}
-              route={route}
-              followDriverId={order.driver ? "driver" : undefined}
-            />
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line bg-paper px-4 py-3">
-              <div className="flex items-center gap-2">
-                <span
-                  className={`status-dot ${delivered ? "" : "live-dot"} ${
-                    cancelled ? "text-danger" : "text-brand"
-                  }`}
-                />
-                <div>
-                  <div className="text-[11px] font-semibold">{meta.label}</div>
-                  <div className="text-[11px] font-bold text-muted">
-                    {delivered
-                      ? `Delivered at ${order.deliveredAt ? clock(order.deliveredAt) : "—"}`
-                      : cancelled
-                        ? "This order was cancelled"
-                        : "Live updates are on"}
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-1 text-[11px] font-bold text-muted">
-                <MapPin size={12} className="text-brand" />
-                {order.address} · {order.landmark}
-              </div>
-            </div>
           </div>
+        ) : null}
 
-          {order.driver ? (
-            <div className="card flex flex-wrap items-center gap-3 p-4">
-              {order.driver.photo ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={order.driver.photo}
-                  alt={order.driver.name}
-                  className="h-11 w-11 rounded-[6px] object-cover"
-                />
-              ) : (
-                <span className="grid h-11 w-11 place-items-center rounded-[6px] bg-surface-2 text-ink">
-                  <Bike size={20} />
+        {/* Map */}
+        <div className="lg:col-start-1 lg:row-start-2">
+          <div className="overflow-hidden rounded-[18px] border border-line bg-surface shadow-[var(--shadow-float)]">
+            <div className="relative">
+              <MapView
+                points={points}
+                center={{ lat: order.lat, lng: order.lng }}
+                zoom={14}
+                height={330}
+                route={route}
+                followDriverId={order.driver ? "driver" : undefined}
+              />
+              <div className="pointer-events-none absolute inset-x-3 top-3 flex items-center justify-between gap-2">
+                <span className="rounded-full bg-surface/95 px-3 py-1.5 text-[10.5px] font-semibold text-ink shadow-[var(--shadow-float)]">
+                  {meta.label}
                 </span>
-              )}
-              <div className="min-w-0 flex-1">
-                <div className="text-sm font-semibold">{order.driver.name}</div>
-                <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[11px] font-bold text-muted">
-                  <span>{order.driver.vehicle}</span>
-                  <span>·</span>
-                  <span>{order.driver.plate}</span>
-                  <span>·</span>
-                  <span className="inline-flex items-center gap-1">
-                    <Star size={10} className="fill-saffron text-saffron" />
-                    {order.driver.rating}
+                {live ? (
+                  <span className="rounded-full bg-surface/95 px-3 py-1.5 text-[10.5px] font-semibold text-brand shadow-[var(--shadow-float)]">
+                    Live
                   </span>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                {canCall ? (
-                  <CallDock orderId={order.id} role="customer" peerName={order.driver.name} />
-                ) : (
-                  <a href={`tel:${order.driver.phone.replace(/\s/g, "")}`} className="btn btn-ghost btn-sm">
-                    <Phone size={13} /> Call
-                  </a>
-                )}
-                {whatsappPhone ? (
-                  <a
-                    href={`https://wa.me/${whatsappPhone}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="btn btn-primary btn-sm"
-                  >
-                    <MessageCircle size={13} /> WhatsApp
-                  </a>
                 ) : null}
               </div>
             </div>
-          ) : (
-            <div className="card flex items-center gap-3 p-4">
-              <span className="grid h-11 w-11 place-items-center rounded-[6px] bg-surface-2 text-muted"><Bike size={20} /></span>
+            <div className="flex items-center gap-2 border-t border-line px-4 py-3 text-[11px] text-muted">
+              <MapPin size={13} className="shrink-0 text-brand" />
+              <span className="min-w-0 truncate">
+                {order.address}
+                {order.landmark ? ` · ${order.landmark}` : ""}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Receipt */}
+        <div className="lg:col-start-2 lg:row-start-2">
+          <div className="rounded-[18px] border border-line bg-surface p-4 shadow-[var(--shadow-float)] sm:p-5">
+            <div className="flex items-center justify-between">
+              <h2 className="font-display text-[17px] font-semibold tracking-[-0.02em] text-ink">
+                Receipt
+              </h2>
+              <ReceiptText size={15} className="text-muted" />
+            </div>
+            <div className="mt-0.5 text-[11px] text-muted">{order.store?.name}</div>
+            <div className="mt-3 space-y-2">
+              {order.items.map((item, index) => (
+                <div key={`${item.productId}-${index}`} className="flex items-center gap-2.5 text-[11.5px]">
+                  <ProductTile
+                    name={item.name}
+                    image={item.image}
+                    className="h-8 w-8 rounded-full"
+                    iconSize={15}
+                  />
+                  <span className="min-w-0 flex-1 font-medium">
+                    <span className="block truncate">
+                      {item.qty}× {item.name}
+                    </span>
+                    {item.options?.length ? (
+                      <span className="block truncate text-[10.5px] text-muted">
+                        {item.options.map((option) => option.optionName).join(" · ")}
+                      </span>
+                    ) : null}
+                  </span>
+                  <span className="tnum font-semibold">
+                    {money(item.price * item.qty)}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-3.5 space-y-1.5 border-t border-line pt-3 text-[12.5px]">
+              <div className="flex justify-between text-muted">
+                <span>Subtotal</span>
+                <span className="tnum font-medium text-ink">{money(order.subtotal)}</span>
+              </div>
+              <div className="flex justify-between text-muted">
+                <span>
+                  Delivery
+                  {typeof order.price?.km === "number" && Number.isFinite(order.price.km) ? (
+                    <span className="ms-1 text-[10.5px]">
+                      · {order.price.km.toFixed(1)} km
+                    </span>
+                  ) : null}
+                </span>
+                <span className="tnum font-medium text-ink">{money(order.deliveryFee)}</span>
+              </div>
+              <div className="flex items-center justify-between border-t border-line pt-2.5">
+                <span className="text-[14px] font-semibold text-ink">Total</span>
+                <span className="tnum font-display text-[20px] font-semibold text-ink">
+                  {money(order.total)}
+                </span>
+              </div>
+            </div>
+            <div className="mt-3 flex items-center gap-2.5 rounded-[12px] bg-signal-soft/60 px-3 py-2.5">
+              <Banknote size={16} className="shrink-0 text-signal-ink" />
               <div>
-                <div className="text-sm font-semibold">Finding your driver</div>
-                <div className="mt-0.5 text-[11px] font-bold text-muted">
-                  A local driver will be assigned as soon as the store marks the order ready.
+                <div className="text-[12px] font-semibold text-signal-ink">Cash on delivery</div>
+                <div className="text-[10.5px] text-signal-ink/75">
+                  {order.cashCollected ? "Cash collected" : `Pay ${money(order.total)} on arrival`}
                 </div>
               </div>
             </div>
-          )}
+          </div>
+        </div>
 
-          <div className="card p-5">
-            <h2 className="font-display text-[20px] font-semibold tracking-[-0.02em]">Order timeline</h2>
+        {/* Address */}
+        <div className="lg:col-start-2 lg:row-start-3">
+          <div className="rounded-[18px] border border-line bg-surface p-4 sm:p-5">
+            <h2 className="text-[12.5px] font-semibold text-ink">Delivery address</h2>
+            <div className="mt-2.5 flex items-start gap-2 text-[12.5px] leading-5 text-muted">
+              <MapPin size={14} className="mt-0.5 shrink-0 text-brand" />
+              <div className="min-w-0">
+                <div className="font-medium text-ink">{order.address}</div>
+                <div>{order.landmark}</div>
+                {order.notes ? <div className="mt-1 italic">“{order.notes}”</div> : null}
+              </div>
+            </div>
+            <div className="mt-2.5 flex items-center gap-2 text-[11.5px] text-muted">
+              <Phone size={13} className="text-brand" /> {order.customerPhone}
+            </div>
+            {order.scheduledFor ? (
+              <div className="mt-2 flex items-center gap-2 text-[11.5px] text-muted">
+                <Clock3 size={13} className="text-brand" /> Scheduled for{" "}
+                {new Date(order.scheduledFor).toLocaleString("en-GB", {
+                  weekday: "short",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </div>
+            ) : null}
+          </div>
+        </div>
+
+        {/* Support */}
+        <div className="lg:col-start-2 lg:row-start-4">
+          <div className="rounded-[18px] bg-ink p-4 text-on-dark sm:p-5">
+            <div className="flex items-center gap-2 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-white/40">
+              <ShieldCheck size={13} className="text-saffron" /> Wassl support
+            </div>
+            <p className="mt-2 text-[13.5px] font-semibold">Something wrong with your order?</p>
+            <p className="mt-1 text-[11px] leading-5 text-white/50">
+              Call us and we will contact the store and courier directly.
+            </p>
+            <div className="mt-3 flex gap-2">
+              <a
+                href="tel:+212660000000"
+                className="bubble-press inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full bg-signal text-[12px] font-semibold text-ink"
+              >
+                <Phone size={14} /> Call support
+              </a>
+              <StartChatButton
+                topic="support"
+                orderId={order.id}
+                storeId={order.storeId}
+                driverId={order.driverId}
+                subject={`Support · ${order.code}`}
+                label="Message"
+                className="!h-11 !rounded-full !border-white/20 !bg-transparent !px-4 !text-[12px] !text-on-dark"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Timeline */}
+        <div className="lg:col-start-1 lg:row-start-3">
+          <details className="group rounded-[18px] border border-line bg-surface p-4 sm:p-5">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 [&::-webkit-details-marker]:hidden">
+              <div>
+                <h2 className="font-display text-[17px] font-semibold tracking-[-0.02em] text-ink">
+                  Order timeline
+                </h2>
+                <p className="mt-0.5 text-[11px] text-muted">
+                  {cancelled
+                    ? "Cancelled"
+                    : `${Math.min(currentIndex + 1, STEPS.length)} of ${STEPS.length} steps · ${meta.label}`}
+                </p>
+              </div>
+              <ChevronDown
+                size={16}
+                className="shrink-0 text-muted transition-transform group-open:rotate-180"
+              />
+            </summary>
             <div className="mt-4">
               {cancelled ? (
-                <div className="rounded-[6px] bg-danger-soft p-3 text-xs font-bold text-danger">
+                <div className="rounded-[12px] bg-danger-soft p-3 text-[11.5px] font-semibold text-danger">
                   This order was cancelled. If you were charged, contact support.
                 </div>
               ) : (
@@ -366,14 +629,22 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
                         </span>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
-                            <span className={`text-[13px] ${active ? "font-semibold text-ink" : done ? "font-medium text-ink" : "text-muted/60"}`}>
+                            <span
+                              className={`text-[12.5px] ${
+                                active
+                                  ? "font-semibold text-ink"
+                                  : done
+                                    ? "font-medium text-ink"
+                                    : "text-muted/60"
+                              }`}
+                            >
                               {step.label}
                             </span>
-                            <span className="text-[11px] font-bold text-muted">
+                            <span className="tnum text-[10.5px] font-medium text-muted">
                               {event ? clock(event.at) : ""}
                             </span>
                           </div>
-                          <div className="text-[11px] text-muted">{step.caption}</div>
+                          <div className="text-[10.5px] text-muted">{step.caption}</div>
                         </div>
                       </div>
                     );
@@ -381,133 +652,24 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
                 </div>
               )}
             </div>
-          </div>
+          </details>
         </div>
-
-        <aside className="space-y-4">
-          <div className="card p-5">
-            <div className="flex items-center justify-between">
-              <h2 className="font-display text-[20px] font-semibold tracking-[-0.02em]">Receipt</h2>
-              <ReceiptText size={16} className="text-muted" />
-            </div>
-            <div className="mt-1 text-[11px] text-muted">
-              {order.store?.name}
-            </div>
-            <div className="mt-3 space-y-2">
-              {order.items.map((item, index) => (
-                <div key={`${item.productId}-${index}`} className="flex items-center gap-2 text-[11px]">
-                  <ProductTile
-                    name={item.name}
-                    image={item.image}
-                    className="h-7 w-7 rounded-[6px]"
-                    iconSize={14}
-                  />
-                  <span className="min-w-0 flex-1 font-medium">
-                    <span className="block truncate">{item.qty}× {item.name}</span>
-                    {item.options?.length ? (
-                      <span className="block truncate text-[11px] text-muted">
-                        {item.options.map((option) => option.optionName).join(" · ")}
-                      </span>
-                    ) : null}
-                  </span>
-                  <span className="font-semibold tnum">{money(item.price * item.qty)}</span>
-                </div>
-              ))}
-            </div>
-            <div className="mt-4 space-y-1.5 border-t border-line pt-3 text-[13px]">
-              <div className="flex justify-between text-muted">
-                <span>Subtotal</span>
-                <span className="font-medium text-ink tnum">{money(order.subtotal)}</span>
-              </div>
-              <div className="flex justify-between text-muted">
-                <span>Delivery</span>
-                <span className="font-medium text-ink tnum">{money(order.deliveryFee)}</span>
-              </div>
-              <div className="flex justify-between border-t border-line pt-2 text-[15px] font-semibold">
-                <span>Total</span>
-                <span className="tnum">{money(order.total)}</span>
-              </div>
-            </div>
-            <div className="mt-4 flex items-center gap-2 border-s-2 border-signal ps-3">
-              <Banknote size={16} className="text-signal" />
-              <div>
-                <div className="text-[13px] font-medium">
-                  Cash on delivery
-                </div>
-                <div className="text-[11px] text-muted">
-                  {order.cashCollected ? "Cash collected" : `Pay ${money(order.total)} on arrival`}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="card p-5">
-            <h2 className="text-[13px] font-semibold">Delivery address</h2>
-            <div className="mt-3 flex items-start gap-2 text-[13px] leading-5 text-muted">
-              <MapPin size={14} className="mt-0.5 shrink-0 text-brand" />
-              <div>
-                <div className="font-medium text-ink">{order.address}</div>
-                <div>{order.landmark}</div>
-                {order.notes ? <div className="mt-1 italic text-muted">“{order.notes}”</div> : null}
-              </div>
-            </div>
-            <div className="mt-3 flex items-center gap-2 text-[11px] text-muted">
-              <Phone size={13} className="text-brand" /> {order.customerPhone}
-            </div>
-            {order.scheduledFor ? (
-              <div className="mt-2 flex items-center gap-2 text-[11px] text-muted">
-                <Clock3 size={13} className="text-brand" /> Scheduled for{" "}
-                {new Date(order.scheduledFor).toLocaleString("en-GB", {
-                  weekday: "short",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </div>
-            ) : null}
-          </div>
-
-          <div className="rounded-[10px] bg-ink p-5 text-on-dark">
-            <div className="flex items-center gap-2 text-[11px] font-medium text-on-dark/40">
-              <ShieldCheck size={13} className="text-saffron" /> Wassl support
-            </div>
-            <p className="mt-2 text-sm font-semibold">Something wrong with your order?</p>
-            <p className="mt-1 text-[11px] leading-5 text-on-dark/50">
-              Call us and we will contact the store and driver directly.
-            </p>
-            <a href="tel:+212660000000" className="btn btn-saffron mt-4 w-full">
-              <Phone size={14} /> Call support
-            </a>
-            <div className="mt-2">
-              <StartChatButton
-                topic="support"
-                orderId={order.id}
-                storeId={order.storeId}
-                driverId={order.driverId}
-                subject={`Support · ${order.code}`}
-                label="Message support"
-                className="btn btn-ghost btn-sm w-full border-white/20 text-on-dark"
-              />
-            </div>
-          </div>
-
-          {delivered ? (
-            <>
-              <RatingPrompt
-                kind="order"
-                id={order.id}
-                initial={order.rating}
-                subject={order.store?.name}
-              />
-              {order.store?.category === "grocery" ? (
-                <OrderRefundPanel orderId={order.id} />
-              ) : null}
-              <Link href={`/store/${order.store?.slug}`} className="btn btn-ghost w-full">
-                <CheckCircle2 size={15} className="text-brand" /> Order again
-              </Link>
-            </>
-          ) : null}
-        </aside>
       </div>
+
+      {delivered ? (
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <RatingPrompt
+            kind="order"
+            id={order.id}
+            initial={order.rating}
+            subject={order.store?.name}
+          />
+          {order.store?.category === "grocery" ? <OrderRefundPanel orderId={order.id} /> : null}
+          <Link href={`/store/${order.store?.slug}`} className="btn btn-primary sm:col-span-2">
+            <CheckCircle2 size={15} /> Order again
+          </Link>
+        </div>
+      ) : null}
     </div>
   );
 }

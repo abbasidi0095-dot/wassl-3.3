@@ -3,6 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { OrderActor } from "@/lib/order-machine";
+import { resolvePricing } from "@/lib/pricing";
 
 let dataDir: string;
 const customer: OrderActor = { role: "customer", id: "user_customer_demo", name: "Mariam" };
@@ -119,6 +120,62 @@ describe("delivery bidding", () => {
     );
     expect(order.deliveryFee).toBe(30);
     expect(order.price?.base).toBe(30);
+  });
+
+  it("keeps default bounds when the admin saves a sparse city price", async () => {
+    const db = await import("@/lib/db");
+    await db.resetDatabase();
+    const city = (await db.getCities()).find((c) => c.slug === "dakhla")!;
+    const updated = await db.updateCity(
+      city.id,
+      { pricing: { delivery: { base: 9, perKm: 2, freeKm: 3.5 } } },
+      admin,
+    );
+    expect(updated.pricing?.delivery?.base).toBe(9);
+    // Sparse overrides stay sparse on disk; the resolver must still be finite.
+    expect(Number.isFinite(resolvePricing("delivery", updated).max)).toBe(true);
+
+    const product = (await db.getProducts("store_dakhla_grill")).find((p) => p.id === "product_001")!;
+    const order = await db.createOrder(
+      {
+        citySlug: "dakhla",
+        storeId: "store_dakhla_grill",
+        customerName: "Mariam",
+        customerPhone: "+212600000000",
+        address: "12 Rue de la Plage",
+        landmark: "Lighthouse",
+        lat: 23.69,
+        lng: -15.94,
+        items: [{ productId: product.id, qty: 1 }],
+      },
+      customer,
+    );
+    expect(Number.isFinite(order.price?.max)).toBe(true);
+    expect(Number.isFinite(order.price?.suggested)).toBe(true);
+    expect(Number.isFinite(order.deliveryFee)).toBe(true);
+    expect(Number.isFinite(order.total)).toBe(true);
+  });
+
+  it("refuses a delivery address thousands of kilometres away", async () => {
+    const db = await import("@/lib/db");
+    await db.resetDatabase();
+    const product = (await db.getProducts("store_dakhla_grill")).find((p) => p.id === "product_001")!;
+    await expect(
+      db.createOrder(
+        {
+          citySlug: "dakhla",
+          storeId: "store_dakhla_grill",
+          customerName: "Mariam",
+          customerPhone: "+212600000000",
+          address: "12 Rue de la Plage",
+          landmark: "Lighthouse",
+          lat: 45.44,
+          lng: 4.38,
+          items: [{ productId: product.id, qty: 1 }],
+        },
+        customer,
+      ),
+    ).rejects.toThrow(/outside the delivery area/i);
   });
 
   it("blocks bidding on a closed order", async () => {

@@ -36,6 +36,20 @@ describe("flat + per-km pricing", () => {
     expect(pricing.freeKm).toBe(DEFAULT_DELIVERY.freeKm);
   });
 
+  it("never emits NaN when a city override is sparse", () => {
+    const pricing = resolvePricing("delivery", {
+      pricing: { delivery: { base: 8, max: undefined, step: undefined } },
+    });
+    expect(Number.isFinite(pricing.max)).toBe(true);
+    expect(Number.isFinite(pricing.step)).toBe(true);
+    expect(pricing.max).toBeGreaterThanOrEqual(pricing.min);
+
+    const q = quote(pricing, Number.NaN);
+    expect(Number.isFinite(q.km)).toBe(true);
+    expect(Number.isFinite(q.suggested)).toBe(true);
+    expect(q.suggested).toBeGreaterThan(0);
+  });
+
   it("keeps offers at or above the suggestion and under the ceiling", () => {
     expect(clampOffer(DEFAULT_DELIVERY, 5, 12)).toBe(12);
     expect(clampOffer(DEFAULT_DELIVERY, 18, 12)).toBe(18);

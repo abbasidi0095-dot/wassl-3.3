@@ -46,16 +46,24 @@ export const DEFAULT_TAXI: ServicePricing = {
   allowCounter: true,
 };
 
+/** Coerce anything to a usable number. Stored pricing must never reach the UI as NaN. */
+function count(value: unknown, fallback: number): number {
+  const parsed = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
 function withDefaults(base: ServicePricing, override?: Partial<ServicePricing>): ServicePricing {
   const merged = { ...base, ...(override ?? {}) };
+  const min = Math.max(0, Math.round(count(merged.min, base.min)));
   return {
-    ...merged,
-    base: Math.max(0, Math.round(merged.base)),
-    perKm: Math.max(0, Math.round(merged.perKm * 100) / 100),
-    freeKm: Math.max(0, Math.round(merged.freeKm * 100) / 100),
-    min: Math.max(0, Math.round(merged.min)),
-    max: Math.max(1, Math.round(merged.max)),
-    step: Math.max(1, Math.round(merged.step)),
+    enabled: typeof merged.enabled === "boolean" ? merged.enabled : base.enabled,
+    allowCounter: typeof merged.allowCounter === "boolean" ? merged.allowCounter : base.allowCounter,
+    base: Math.max(0, Math.round(count(merged.base, base.base))),
+    perKm: Math.max(0, Math.round(count(merged.perKm, base.perKm) * 100) / 100),
+    freeKm: Math.max(0, Math.round(count(merged.freeKm, base.freeKm) * 100) / 100),
+    min,
+    max: Math.max(min, 1, Math.round(count(merged.max, base.max))),
+    step: Math.max(1, Math.round(count(merged.step, base.step))),
   };
 }
 
@@ -77,7 +85,10 @@ export function roundTo(value: number, step: number) {
 }
 
 export function quote(config: ServicePricing, distanceKm: number): PriceQuote {
-  const km = Math.max(0, Math.round(distanceKm * 100) / 100);
+  // A bad coordinate used to produce thousands of kilometres and a NaN quote.
+  // Keep the distance finite so the maths can never leak NaN into the UI.
+  const safeDistance = Number.isFinite(distanceKm) ? distanceKm : 0;
+  const km = Math.max(0, Math.min(1000, Math.round(safeDistance * 100) / 100));
   const billableKm = Math.max(0, Math.round((km - config.freeKm) * 100) / 100);
   const distanceFee = roundTo(billableKm * config.perKm, config.step);
   const raw = config.base + distanceFee;
