@@ -1558,11 +1558,16 @@ export async function createOrder(
       throw new Error("This address is outside the store's delivery zone");
     }
     const minimum = fees?.minOrder ?? store.minOrder;
+    // Express and night surcharges stay on top of the flat + km price.
+    const surcharges: { label: string; amount: number }[] = [];
+    if (fees?.expressFee) surcharges.push({ label: "Express", amount: fees.expressFee });
+    if (fees?.nightFee) surcharges.push({ label: "Night", amount: fees.nightFee });
+    const surchargeTotal = surcharges.reduce((sum, item) => sum + item.amount, 0);
     const baseDeliveryFee =
       fulfillment === "pickup"
         ? 0
         : deliveryPricing.enabled
-          ? deliveryQuote.suggested
+          ? deliveryQuote.suggested + surchargeTotal
           : (fees?.deliveryFee ?? store.deliveryFee);
 
     type PreparedLine = {
@@ -1781,6 +1786,7 @@ export async function createOrder(
               suggested: deliveryQuote.suggested,
               current: deliveryFee,
               max: deliveryQuote.max,
+              addons: surcharges.length ? surcharges : undefined,
               currency: "MAD",
               history: [
                 {

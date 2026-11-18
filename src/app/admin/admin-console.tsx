@@ -3276,7 +3276,7 @@ function CityServicesModal({
         <div className="flex items-start justify-between gap-3">
           <div>
             <h2 className="font-display text-[24px] font-semibold tracking-[-0.03em]">
-              {city.name} services
+              {city.name} {t("services & pricing")}
             </h2>
             <p className="mt-1 text-[11px] leading-5 text-muted">
               Enable each service only when supply and operations are ready.

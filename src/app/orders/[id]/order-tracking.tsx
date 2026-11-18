@@ -229,6 +229,17 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
 
       <div className="mt-6 grid gap-5 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
         <div className="space-y-4">
+          {order.price && !delivered && !cancelled ? (
+            <PriceOffer
+              price={order.price}
+              mode="customer"
+              endpoint={`/api/orders/${order.id}/offer`}
+              step={5}
+              max={order.price.max}
+              onUpdated={() => void refresh(true)}
+            />
+          ) : null}
+
           <div className="card overflow-hidden">
             <MapView
               points={points}
@@ -262,17 +273,6 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
               </div>
             </div>
           </div>
-
-          {order.price && !delivered && !cancelled ? (
-            <PriceOffer
-              price={order.price}
-              mode="customer"
-              endpoint={`/api/orders/${order.id}/offer`}
-              step={5}
-              max={order.price.max}
-              onUpdated={() => void refresh(true)}
-            />
-          ) : null}
 
           {order.driver ? (
             <div className="card flex flex-wrap items-center gap-3 p-4">

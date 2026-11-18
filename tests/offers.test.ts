@@ -91,6 +91,36 @@ describe("delivery bidding", () => {
     expect(accepted.deliveryFee).toBe(counter);
   });
 
+  it("prices new orders from the city override", async () => {
+    const db = await import("@/lib/db");
+    await db.resetDatabase();
+    const city = (await db.getCities()).find((c) => c.slug === "dakhla")!;
+    const updated = await db.updateCity(
+      city.id,
+      { pricing: { delivery: { base: 30, perKm: 0, freeKm: 3.5 } } },
+      admin,
+    );
+    expect(updated.pricing?.delivery?.base).toBe(30);
+
+    const product = (await db.getProducts("store_dakhla_grill")).find((p) => p.id === "product_001")!;
+    const order = await db.createOrder(
+      {
+        citySlug: "dakhla",
+        storeId: "store_dakhla_grill",
+        customerName: "Mariam",
+        customerPhone: "+212600000000",
+        address: "12 Rue de la Plage",
+        landmark: "Lighthouse",
+        lat: 23.69,
+        lng: -15.94,
+        items: [{ productId: product.id, qty: 1 }],
+      },
+      customer,
+    );
+    expect(order.deliveryFee).toBe(30);
+    expect(order.price?.base).toBe(30);
+  });
+
   it("blocks bidding on a closed order", async () => {
     const { db, order } = await seed();
     await db.updateOrderStatus(order.id, "cancelled", admin, { note: "test" });

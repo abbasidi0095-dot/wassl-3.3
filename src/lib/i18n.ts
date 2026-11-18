@@ -1164,6 +1164,11 @@ const fr: Record<string, string> = {
   "Per km (MAD)": "Par km (MAD)",
   "Free km": "Km inclus",
   "Save pricing for this city": "Enregistrer la tarification",
+  "Suggest {amount} MAD": "Proposer {amount} MAD",
+  "The customer can accept or raise their offer.": "Le client peut accepter ou augmenter son offre.",
+  "Or raise my offer instead": "Ou augmenter mon offre",
+  "services & pricing": "services et tarifs",
+  "Night": "Nuit",
 };
 
 const es: Record<string, string> = {
@@ -1500,6 +1505,7 @@ const es: Record<string, string> = {
   "Top rated": "Mejor valorados",
   "All stores": "Todas las tiendas",
   Express: "Express",
+  Night: "Noche",
   "Night delivery": "Entrega nocturna",
   "Min. {amount}": "Mín. {amount}",
   "{amount} delivery": "Entrega {amount}",
@@ -2304,6 +2310,10 @@ const es: Record<string, string> = {
   "Per km (MAD)": "Por km (MAD)",
   "Free km": "Km incluidos",
   "Save pricing for this city": "Guardar tarifas",
+  "Suggest {amount} MAD": "Proponer {amount} MAD",
+  "The customer can accept or raise their offer.": "El cliente puede aceptar o subir su oferta.",
+  "Or raise my offer instead": "O subir mi oferta",
+  "services & pricing": "servicios y tarifas",
 };
 
 const ar: Record<string, string> = {
@@ -2638,6 +2648,7 @@ const ar: Record<string, string> = {
   "Top rated": "الأعلى تقييماً",
   "All stores": "كل المتاجر",
   Express: "سريع",
+  Night: "ليلي",
   "Night delivery": "توصيل ليلي",
   "Min. {amount}": "الحد الأدنى {amount}",
   "{amount} delivery": "توصيل {amount}",
@@ -3441,6 +3452,10 @@ const ar: Record<string, string> = {
   "Per km (MAD)": "لكل كم (درهم)",
   "Free km": "كم مشمولة",
   "Save pricing for this city": "حفظ التسعير",
+  "Suggest {amount} MAD": "اقترح {amount} درهم",
+  "The customer can accept or raise their offer.": "يمكن للعميل القبول أو رفع عرضه.",
+  "Or raise my offer instead": "أو ارفع عرضي بدلاً من ذلك",
+  "services & pricing": "الخدمات والتسعير",
 };
 
 const DICTIONARIES: Record<Exclude<Locale, "en">, Record<string, string>> = {

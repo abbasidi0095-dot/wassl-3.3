@@ -46,6 +46,8 @@ export interface PriceSnapshot {
   current: number;
   /** Ceiling the platform accepts for this city/service. */
   max?: number;
+  /** Express or night surcharges already applied to `current`. */
+  addons?: { label: string; amount: number }[];
   currency: "MAD";
   history: { at: string; by: "customer" | "driver" | "admin"; amount: number; note?: string }[];
   counter?: { amount: number; driverId: string; at: string; note?: string };
