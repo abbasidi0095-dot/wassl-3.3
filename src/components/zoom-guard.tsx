@@ -15,7 +15,9 @@ export function ZoomGuard() {
       const target = event.target as HTMLElement | null;
       if (
         target?.closest(
-          "[data-allow-zoom], .maplibregl-map, .maplibregl-canvas, input, textarea, select, [contenteditable='true']",
+          // Controls keep their second tap: only page chrome is guarded, so a
+          // quick double tap on a real button still registers twice.
+          "[data-allow-zoom], .maplibregl-map, .maplibregl-canvas, button, a, label, input, textarea, select, summary, [role='button'], [contenteditable='true']",
         )
       ) {
         last = 0;
