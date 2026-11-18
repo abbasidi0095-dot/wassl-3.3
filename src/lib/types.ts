@@ -17,6 +17,40 @@ export type CityService =
   | "services"
   | "business";
 
+export interface ServicePricing {
+  enabled: boolean;
+  /** Flat price in MAD. */
+  base: number;
+  /** MAD added per kilometre beyond `freeKm`. */
+  perKm: number;
+  /** Kilometres covered by the flat price. */
+  freeKm: number;
+  min: number;
+  max: number;
+  step: number;
+  allowCounter: boolean;
+}
+
+export interface CityPricing {
+  delivery?: Partial<ServicePricing>;
+  taxi?: Partial<ServicePricing>;
+}
+
+/** The price a customer offered and a courier can accept or counter. */
+export interface PriceSnapshot {
+  base: number;
+  perKm: number;
+  freeKm: number;
+  km: number;
+  suggested: number;
+  current: number;
+  /** Ceiling the platform accepts for this city/service. */
+  max?: number;
+  currency: "MAD";
+  history: { at: string; by: "customer" | "driver" | "admin"; amount: number; note?: string }[];
+  counter?: { amount: number; driverId: string; at: string; note?: string };
+}
+
 export interface City {
   id: string;
   slug: string;
@@ -31,6 +65,8 @@ export interface City {
   launchStatus: CityStatus;
   /** Per-service activation. Missing keys fall back to safe defaults. */
   services?: Partial<Record<CityService, boolean>>;
+  /** City overrides for flat + per-km pricing. */
+  pricing?: CityPricing;
   /** Migration marker for service defaults. */
   servicesVersion?: number;
 }
@@ -360,6 +396,8 @@ export interface Order {
   etaMinutes?: number;
   etaSetAt?: string;
   etaSetBy?: "admin" | "driver";
+  /** Flat + per-km quote and the customer's standing offer. */
+  price?: PriceSnapshot;
   /** Customer rating submitted after delivery. */
   rating?: Rating;
   substitutionPreference?: "allow" | "refund" | "contact";
@@ -423,6 +461,8 @@ export interface PlatformSettings {
   /** What Wassl keeps on each completed service. */
   commissions?: ServiceCommissions;
   defaultDeliveryFee: number;
+  /** Platform-wide flat + per-km defaults, overridable per city. */
+  pricing?: CityPricing;
   primaryColor: string;
   accentColor?: string;
   themePreset?: "coastal" | "aero" | "midnight" | "sand" | "custom";
@@ -490,6 +530,8 @@ export interface TaxiRide {
   driverPhoto?: string;
   vehicle?: string;
   plate?: string;
+  /** Flat + per-km quote and the rider's standing offer. */
+  price?: PriceSnapshot;
   /** Four-digit handover code the customer shares before the trip is closed. */
   verificationCode?: string;
   /** Safe driver-facing flag; the code itself is never sent to drivers. */

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { CartProvider } from "@/components/cart-provider";
 import { LocaleProvider } from "@/components/locale-provider";
+import { ZoomGuard } from "@/components/zoom-guard";
 import { LiveActivityProvider } from "@/components/live-activity-provider";
 import { OngoingTracker } from "@/components/ongoing-tracker";
 import { NativeShell } from "@/components/native-shell";
@@ -65,6 +66,11 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  // Keep the app at a fixed scale: accidental double-tap zoom used to leave the
+  // layout stuck until the tab was closed. Maps opt back in with their own
+  // gestures via [data-allow-zoom].
+  maximumScale: 1,
+  userScalable: false,
   viewportFit: "cover",
   colorScheme: "light",
   themeColor: "#2447E0",
@@ -120,6 +126,7 @@ export default async function RootLayout({
           }}
         >
         <LocaleProvider initialLocale={locale}>
+        <ZoomGuard />
           <SplashIntro />
           <ScrollToTop />
           <LiveActivityProvider>

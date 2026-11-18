@@ -25,6 +25,7 @@ import { MapView } from "@/components/map-view";
 import { OrderRefundPanel } from "./order-refund-panel";
 import { StartChatButton } from "@/components/start-chat-button";
 import { CallDock } from "@/components/call-dock";
+import { PriceOffer } from "@/components/price-offer";
 import { RatingPrompt } from "@/components/rating-prompt";
 import { useLiveEvents } from "@/lib/use-live-events";
 
@@ -261,6 +262,17 @@ export function OrderTracking({ initial }: { initial: OrderView }) {
               </div>
             </div>
           </div>
+
+          {order.price && !delivered && !cancelled ? (
+            <PriceOffer
+              price={order.price}
+              mode="customer"
+              endpoint={`/api/orders/${order.id}/offer`}
+              step={5}
+              max={order.price.max}
+              onUpdated={() => void refresh(true)}
+            />
+          ) : null}
 
           {order.driver ? (
             <div className="card flex flex-wrap items-center gap-3 p-4">

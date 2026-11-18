@@ -72,7 +72,7 @@ import type { DataSourceStatus } from "@/lib/data-source";
 import type { OperationalAlert } from "@/lib/alerts";
 import { getOpenState } from "@/lib/hours";
 import { availableTransitions } from "@/lib/order-machine";
-import { STATUS_META } from "@/lib/types";
+import { STATUS_META, type CityPricing } from "@/lib/types";
 import { categoryLabel, money, timeAgo } from "@/lib/utils";
 import { MapView, type MapPoint } from "@/components/map-view";
 import { useLiveEvents } from "@/lib/use-live-events";
@@ -491,6 +491,28 @@ export function AdminConsole({
       );
       setCityServicesFor(null);
       setToast(`${city.name} services updated`);
+    } finally {
+      setBusy("");
+    }
+  }
+
+  async function saveCityPricing(city: City, pricing: CityPricing) {
+    setBusy(city.id);
+    try {
+      const response = await fetch("/api/admin/cities", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cityId: city.id, pricing }),
+      });
+      const data = (await response.json()) as { city?: City; error?: string };
+      if (!response.ok || !data.city) {
+        setToast(data.error || "Could not save the pricing");
+        return;
+      }
+      setCities((current) =>
+        current.map((item) => (item.id === city.id ? data.city! : item)),
+      );
+      setToast(`${city.name} pricing saved`);
     } finally {
       setBusy("");
     }
@@ -950,6 +972,7 @@ export function AdminConsole({
           busy={busy === cityServicesFor.id}
           onClose={() => setCityServicesFor(null)}
           onSave={(services) => saveCityServices(cityServicesFor, services)}
+          onSavePricing={(pricing) => saveCityPricing(cityServicesFor, pricing)}
         />
       ) : null}
 
@@ -3193,14 +3216,50 @@ function CityServicesModal({
   busy,
   onClose,
   onSave,
+  onSavePricing,
 }: {
   city: City;
   busy: boolean;
   onClose: () => void;
   onSave: (services: Partial<Record<CityService, boolean>>) => void;
+  onSavePricing: (pricing: CityPricing) => void;
 }) {
   const { t } = useI18n();
   const [draft, setDraft] = useState(() => cityServices(city));
+  const [delivery, setDelivery] = useState({
+    base: String(city.pricing?.delivery?.base ?? 12),
+    perKm: String(city.pricing?.delivery?.perKm ?? 3),
+    freeKm: String(city.pricing?.delivery?.freeKm ?? 3.5),
+  });
+  const [taxi, setTaxi] = useState({
+    base: String(city.pricing?.taxi?.base ?? 15),
+    perKm: String(city.pricing?.taxi?.perKm ?? 5),
+    freeKm: String(city.pricing?.taxi?.freeKm ?? 3.5),
+  });
+  const bookingFee = Number(delivery.base || 0) + 4 * Number(delivery.perKm || 0);
+  const taxiSample = Number(taxi.base || 0) + 4 * Number(taxi.perKm || 0);
+
+  function field(
+    label: string,
+    value: string,
+    onChange: (value: string) => void,
+    step = "1",
+  ) {
+    return (
+      <label className="block">
+        <span className="text-[10px] font-semibold text-muted">{t(label)}</span>
+        <input
+          type="number"
+          inputMode="decimal"
+          min="0"
+          step={step}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          className="input mt-1 h-9 text-[12px] tnum"
+        />
+      </label>
+    );
+  }
   return (
     <div
       className="fixed inset-0 z-[80] grid place-items-center overflow-y-auto bg-ink/55 p-4"
@@ -3270,6 +3329,63 @@ function CityServicesModal({
               </span>
             </label>
           ))}
+        </div>
+
+        <div className="mt-5 rounded-[8px] border border-line bg-surface-2/40 p-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.06em] text-muted">
+                {t("Pricing")}
+              </div>
+              <p className="mt-0.5 text-[10.5px] leading-4 text-muted">
+                {t("Flat price, plus per km beyond the included distance.")}
+              </p>
+            </div>
+            <div className="text-end text-[10px] font-semibold text-brand tnum">
+              4 km → {Math.round(bookingFee)} / {Math.round(taxiSample)} MAD
+            </div>
+          </div>
+
+          <div className="mt-3 grid grid-cols-2 gap-3">
+            <div>
+              <div className="text-[10px] font-semibold text-ink">{t("Delivery")}</div>
+              <div className="mt-1.5 space-y-1.5">
+                {field("Flat (MAD)", delivery.base, (value) => setDelivery((d) => ({ ...d, base: value })))}
+                {field("Per km (MAD)", delivery.perKm, (value) => setDelivery((d) => ({ ...d, perKm: value })), "0.5")}
+                {field("Free km", delivery.freeKm, (value) => setDelivery((d) => ({ ...d, freeKm: value })), "0.5")}
+              </div>
+            </div>
+            <div>
+              <div className="text-[10px] font-semibold text-ink">{t("Taxi")}</div>
+              <div className="mt-1.5 space-y-1.5">
+                {field("Flat (MAD)", taxi.base, (value) => setTaxi((d) => ({ ...d, base: value })))}
+                {field("Per km (MAD)", taxi.perKm, (value) => setTaxi((d) => ({ ...d, perKm: value })), "0.5")}
+                {field("Free km", taxi.freeKm, (value) => setTaxi((d) => ({ ...d, freeKm: value })), "0.5")}
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() =>
+              onSavePricing({
+                delivery: {
+                  base: Number(delivery.base) || 0,
+                  perKm: Number(delivery.perKm) || 0,
+                  freeKm: Number(delivery.freeKm) || 0,
+                },
+                taxi: {
+                  base: Number(taxi.base) || 0,
+                  perKm: Number(taxi.perKm) || 0,
+                  freeKm: Number(taxi.freeKm) || 0,
+                },
+              })
+            }
+            className="mt-3 h-9 w-full rounded-[6px] border border-brand text-[11.5px] font-semibold text-brand transition-colors hover:bg-brand-soft disabled:opacity-40"
+          >
+            {t("Save pricing for this city")}
+          </button>
         </div>
 
         <div className="mt-5 flex gap-2">

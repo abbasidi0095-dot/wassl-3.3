@@ -27,6 +27,7 @@ import { clock, distanceKm, money, timeAgo } from "@/lib/utils";
 import { MapView, type MapPoint } from "@/components/map-view";
 import { HandoverPrompt } from "@/components/handover-code";
 import { CallDock } from "@/components/call-dock";
+import { PriceOffer } from "@/components/price-offer";
 import { useLiveEvents } from "@/lib/use-live-events";
 
 type Action = { label: string; status: string; icon: typeof Bike };
@@ -539,6 +540,20 @@ export function DriverDashboard({
                           </div>
                         </div>
                       </div>
+
+                      {order.price ? (
+                        <div className="mt-3">
+                          <PriceOffer
+                            compact
+                            price={order.price}
+                            mode="driver"
+                            endpoint={`/api/orders/${order.id}/offer`}
+                            step={5}
+                            max={order.price.max}
+                            onUpdated={() => void refresh(true)}
+                          />
+                        </div>
+                      ) : null}
 
                       <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-line pt-3 text-[11px]">
                         <span className="inline-flex items-center gap-1 font-semibold text-muted">

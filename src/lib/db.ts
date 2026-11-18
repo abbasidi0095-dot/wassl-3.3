@@ -19,7 +19,8 @@ import {
   OTP_TTL_MS,
   type VerificationFailure,
 } from "./email-verification";
-import { estimateTaxiFare, haversineKm, TAXI_TRANSITIONS } from "./taxi";
+import { haversineKm, TAXI_TRANSITIONS } from "./taxi";
+import { quote, resolvePricing, roundTo } from "./pricing";
 import { maskPhone, normalizeMoroccanPhone } from "./phone";
 import type { PhoneOtpChannel } from "./types";
 import { groceryAvailability, groceryFees, grocerySettings, resolveProductStock } from "./grocery";
@@ -1539,9 +1540,12 @@ export async function createOrder(
       lng: fulfillment === "pickup" ? store.lng : input.lng,
     };
     const distanceKm =
-      isGrocery && fulfillment === "delivery"
+      fulfillment === "delivery"
         ? haversineKm({ lat: store.lat, lng: store.lng }, customerPoint)
         : 0;
+    const city = db.cities.find((item) => item.slug === store.citySlug);
+    const deliveryPricing = resolvePricing("delivery", city, db.settings);
+    const deliveryQuote = quote(deliveryPricing, distanceKm);
     const fees =
       isGrocery && fulfillment === "delivery"
         ? groceryFees({
@@ -1557,7 +1561,9 @@ export async function createOrder(
     const baseDeliveryFee =
       fulfillment === "pickup"
         ? 0
-        : fees?.deliveryFee ?? store.deliveryFee;
+        : deliveryPricing.enabled
+          ? deliveryQuote.suggested
+          : (fees?.deliveryFee ?? store.deliveryFee);
 
     type PreparedLine = {
       item: NonNullable<Order["items"][number]>;
@@ -1764,6 +1770,27 @@ export async function createOrder(
       subtotal,
       deliveryFee,
       total,
+      price:
+        fulfillment === "pickup"
+          ? undefined
+          : {
+              base: deliveryQuote.base,
+              perKm: deliveryQuote.perKm,
+              freeKm: deliveryQuote.freeKm,
+              km: deliveryQuote.km,
+              suggested: deliveryQuote.suggested,
+              current: deliveryFee,
+              max: deliveryQuote.max,
+              currency: "MAD",
+              history: [
+                {
+                  at: nowIso,
+                  by: "customer",
+                  amount: deliveryFee,
+                  note: "Suggested price",
+                },
+              ],
+            },
       promoCode: promo?.ok ? promo.quote.code : undefined,
       discount: discount || undefined,
       promotionDiscount: groceryPromotion.discount || undefined,
@@ -2105,6 +2132,238 @@ export async function setOrderEta(
       status: order.status,
     });
     return order;
+  });
+}
+
+export type OfferActor = {
+  role: "customer" | "driver" | "admin";
+  id?: string;
+  driverId?: string;
+  name?: string;
+};
+
+function priceBounds(config: ReturnType<typeof resolvePricing>, snapshot: NonNullable<Order["price"]>) {
+  return {
+    floor: snapshot.current,
+    suggested: snapshot.suggested,
+    ceiling: Math.max(snapshot.current, config.max),
+    step: config.step,
+  };
+}
+
+/**
+ * inDrive-style bidding on a delivery: the customer raises the offer, or a
+ * courier proposes a higher price. Nothing can move below the suggestion.
+ */
+export async function setOrderOffer(
+  orderId: string,
+  input: { amount?: number; acceptCounter?: boolean; counter?: boolean },
+  actor: OfferActor,
+): Promise<Order> {
+  return mutate((db) => {
+    const order = db.orders.find(
+      (item) => item.id === orderId || item.code.toLowerCase() === orderId.toLowerCase(),
+    );
+    if (!order) throw new OrderRuleError("not_found", "Order not found");
+    if (order.status === "delivered" || order.status === "cancelled") {
+      throw new OrderRuleError("illegal_transition", "This order is closed");
+    }
+    if (actor.role === "driver" && order.driverId && order.driverId !== actor.driverId) {
+      throw new OrderRuleError("wrong_driver", "This delivery belongs to another courier");
+    }
+
+    const city = db.cities.find((item) => item.slug === order.citySlug);
+    const config = resolvePricing("delivery", city, db.settings);
+    if (!config.enabled) throw new OrderRuleError("pricing_disabled", "Bidding is closed in this city");
+    if (!config.allowCounter && actor.role === "driver" && input.counter) {
+      throw new OrderRuleError("counter_disabled", "Couriers cannot counter in this city");
+    }
+
+    const now = new Date().toISOString();
+    const snapshot: NonNullable<Order["price"]> =
+      order.price ?? {
+        base: config.base,
+        perKm: config.perKm,
+        freeKm: config.freeKm,
+        km: 0,
+        suggested: order.deliveryFee,
+        current: order.deliveryFee,
+        currency: "MAD",
+        history: [{ at: now, by: "customer", amount: order.deliveryFee }],
+      };
+
+    const ceiling = Math.max(snapshot.current, config.max);
+
+    if (actor.role === "driver" && input.counter) {
+      const amount = roundTo(Number(input.amount ?? 0), config.step);
+      if (!Number.isFinite(amount) || amount <= snapshot.current) {
+        throw new OrderRuleError("invalid_offer", "Suggest more than the current price");
+      }
+      if (amount > ceiling) {
+        throw new OrderRuleError("invalid_offer", `Stay under ${ceiling} MAD`);
+      }
+      snapshot.counter = {
+        amount,
+        driverId: actor.driverId ?? "",
+        at: now,
+        note: actor.name,
+      };
+      order.price = snapshot;
+      order.updatedAt = now;
+      pushEvent(order, order.status, `Courier suggests ${amount} MAD`);
+      recordAudit(db, {
+        actorRole: "driver",
+        actorId: actor.id,
+        actorName: actor.name,
+        action: "order.counter_offer",
+        entity: "order",
+        entityId: order.id,
+        summary: `${order.code}: counter ${snapshot.current} → ${amount} MAD`,
+      });
+      publish({
+        type: "order",
+        orderId: order.id,
+        storeId: order.storeId,
+        citySlug: order.citySlug,
+        driverId: order.driverId,
+        status: order.status,
+      });
+      return order;
+    }
+
+    if (input.acceptCounter) {
+      if (!snapshot.counter) throw new OrderRuleError("no_counter", "No counter to accept");
+      const accepted = snapshot.counter.amount;
+      snapshot.current = accepted;
+      snapshot.history.push({ at: now, by: "customer", amount: accepted, note: "Counter accepted" });
+      snapshot.counter = undefined;
+    } else {
+      const requested = Number(input.amount ?? 0);
+      if (!Number.isFinite(requested) || requested <= 0) {
+        throw new OrderRuleError("invalid_offer", "Enter an amount");
+      }
+      const amount = roundTo(requested, config.step);
+      if (amount < snapshot.current) {
+        throw new OrderRuleError("invalid_offer", "You can only raise the price");
+      }
+      if (amount > ceiling) throw new OrderRuleError("invalid_offer", `Stay under ${ceiling} MAD`);
+      snapshot.current = amount;
+      snapshot.counter = undefined;
+      snapshot.history.push({ at: now, by: actor.role === "admin" ? "admin" : "customer", amount });
+    }
+
+    const delta = snapshot.current - order.deliveryFee;
+    order.deliveryFee = snapshot.current;
+    order.total = Math.max(0, order.total + delta);
+    order.price = snapshot;
+    order.updatedAt = now;
+    pushEvent(order, order.status, `Offer updated to ${snapshot.current} MAD`);
+    recordAudit(db, {
+      actorRole: actor.role,
+      actorId: actor.id,
+      actorName: actor.name,
+      action: "order.offer",
+      entity: "order",
+      entityId: order.id,
+      summary: `${order.code}: offer → ${snapshot.current} MAD`,
+    });
+    publish({
+      type: "order",
+      orderId: order.id,
+      storeId: order.storeId,
+      citySlug: order.citySlug,
+      driverId: order.driverId,
+      status: order.status,
+    });
+    return order;
+  });
+}
+
+/** Same bidding rules for a taxi ride. */
+export async function setRideOffer(
+  rideId: string,
+  input: { amount?: number; acceptCounter?: boolean; counter?: boolean },
+  actor: OfferActor,
+): Promise<TaxiRide> {
+  return mutate((db) => {
+    const ride = (db.taxiRides ?? []).find((item) => item.id === rideId);
+    if (!ride) throw new OrderRuleError("not_found", "Ride not found");
+    if (ride.status === "completed" || ride.status === "cancelled") {
+      throw new OrderRuleError("illegal_transition", "This ride is closed");
+    }
+    if (actor.role === "driver" && ride.driverId && ride.driverId !== actor.driverId) {
+      throw new OrderRuleError("wrong_driver", "This ride belongs to another driver");
+    }
+
+    const city = db.cities.find((item) => item.slug === ride.citySlug);
+    const config = resolvePricing("taxi", city, db.settings);
+    if (!config.enabled) throw new OrderRuleError("pricing_disabled", "Bidding is closed in this city");
+
+    const now = new Date().toISOString();
+    const snapshot: NonNullable<TaxiRide["price"]> = ride.price ?? {
+      base: config.base,
+      perKm: config.perKm,
+      freeKm: config.freeKm,
+      km: ride.distanceKm,
+      suggested: ride.fare,
+      current: ride.fare,
+      currency: "MAD",
+      history: [{ at: now, by: "customer", amount: ride.fare }],
+    };
+    const ceiling = Math.max(snapshot.current, config.max);
+
+    if (actor.role === "driver" && input.counter) {
+      const amount = roundTo(Number(input.amount ?? 0), config.step);
+      if (!Number.isFinite(amount) || amount <= snapshot.current) {
+        throw new OrderRuleError("invalid_offer", "Suggest more than the current fare");
+      }
+      if (amount > ceiling) throw new OrderRuleError("invalid_offer", `Stay under ${ceiling} MAD`);
+      snapshot.counter = { amount, driverId: actor.driverId ?? "", at: now, note: actor.name };
+      ride.price = snapshot;
+      ride.updatedAt = now;
+      recordAudit(db, {
+        actorRole: "driver",
+        actorId: actor.id,
+        actorName: actor.name,
+        action: "taxi.counter_offer",
+        entity: "taxi",
+        entityId: ride.id,
+        summary: `${ride.id}: counter ${snapshot.current} → ${amount} MAD`,
+      });
+      return ride;
+    }
+
+    if (input.acceptCounter) {
+      if (!snapshot.counter) throw new OrderRuleError("no_counter", "No counter to accept");
+      snapshot.current = snapshot.counter.amount;
+      snapshot.history.push({ at: now, by: "customer", amount: snapshot.current, note: "Counter accepted" });
+      snapshot.counter = undefined;
+    } else {
+      const requested = Number(input.amount ?? 0);
+      if (!Number.isFinite(requested) || requested <= 0) {
+        throw new OrderRuleError("invalid_offer", "Enter an amount");
+      }
+      const amount = roundTo(requested, config.step);
+      if (amount < snapshot.current) throw new OrderRuleError("invalid_offer", "You can only raise the fare");
+      if (amount > ceiling) throw new OrderRuleError("invalid_offer", `Stay under ${ceiling} MAD`);
+      snapshot.current = amount;
+      snapshot.counter = undefined;
+      snapshot.history.push({ at: now, by: "customer", amount });
+    }
+
+    ride.fare = snapshot.current;
+    ride.price = snapshot;
+    ride.updatedAt = now;
+    recordAudit(db, {
+      actorRole: actor.role,
+      actorId: actor.id,
+      actorName: actor.name,
+      action: "taxi.offer",
+      entity: "taxi",
+      entityId: ride.id,
+      summary: `${ride.id}: fare → ${snapshot.current} MAD`,
+    });
+    return ride;
   });
 }
 
@@ -3315,6 +3574,8 @@ export async function createTaxiRide(
     if (!city) throw new Error("City not found");
     if (!actor.id) throw new Error("Please sign in to request a ride");
     const user = db.users.find((candidate) => candidate.id === actor.id);
+    const taxiPricing = resolvePricing("taxi", city, db.settings);
+    const taxiQuote = quote(taxiPricing, distanceKm);
 
     const now = new Date().toISOString();
     const ride: TaxiRide = {
@@ -3330,7 +3591,20 @@ export async function createTaxiRide(
       dropoffLat: input.dropoffLat,
       dropoffLng: input.dropoffLng,
       distanceKm: Math.round(distanceKm * 100) / 100,
-      fare: estimateTaxiFare(distanceKm),
+      fare: taxiQuote.suggested,
+      price: {
+        base: taxiQuote.base,
+        perKm: taxiQuote.perKm,
+        freeKm: taxiQuote.freeKm,
+        km: taxiQuote.km,
+        suggested: taxiQuote.suggested,
+        current: taxiQuote.suggested,
+        max: taxiQuote.max,
+        currency: "MAD",
+        history: [
+          { at: now, by: "customer", amount: taxiQuote.suggested, note: "Suggested price" },
+        ],
+      },
       status: "requested",
       rideType: input.rideType ?? "local",
       scheduledFor: input.scheduledFor,
@@ -3643,7 +3917,7 @@ export async function updateProductDetails(
 
 export async function updateCity(
   cityId: string,
-  patch: Partial<Pick<City, "launchStatus" | "active" | "services">>,
+  patch: Partial<Pick<City, "launchStatus" | "active" | "services" | "pricing">>,
   actor: OrderActor,
 ): Promise<City> {
   return mutate((db) => {
@@ -3651,8 +3925,15 @@ export async function updateCity(
     if (!city) throw new Error("City not found");
     const beforeServices = JSON.stringify(city.services ?? {});
     const before = `${city.launchStatus}/${city.active}`;
-    const { services, ...rest } = patch;
+    const { services, pricing, ...rest } = patch;
     Object.assign(city, rest);
+    if (pricing) {
+      city.pricing = {
+        ...city.pricing,
+        ...(pricing.delivery ? { delivery: { ...city.pricing?.delivery, ...pricing.delivery } } : {}),
+        ...(pricing.taxi ? { taxi: { ...city.pricing?.taxi, ...pricing.taxi } } : {}),
+      };
+    }
     if (services) {
       city.services = { ...city.services, ...sanitizeCityServices(services) };
     }

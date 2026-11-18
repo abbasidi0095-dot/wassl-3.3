@@ -292,7 +292,8 @@ html {
   text-size-adjust: 100%;
   overscroll-behavior-y: none;
   scroll-padding-top: 96px;
-  touch-action: pan-x pan-y;
+  /* Zoom stays locked: no pinch, no double-tap zoom. */
+  touch-action: manipulation;
 }
 
 @media (prefers-reduced-motion: no-preference) {
