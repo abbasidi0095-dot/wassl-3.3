@@ -88,7 +88,9 @@ export function quote(config: ServicePricing, distanceKm: number): PriceQuote {
   // A bad coordinate used to produce thousands of kilometres and a NaN quote.
   // Keep the distance finite so the maths can never leak NaN into the UI.
   const safeDistance = Number.isFinite(distanceKm) ? distanceKm : 0;
-  const km = Math.max(0, Math.min(1000, Math.round(safeDistance * 100) / 100));
+  // Bill at most an hour's drive: a foreign pin must never turn into a
+  // four-figure quote even though the order is still allowed.
+  const km = Math.max(0, Math.min(60, Math.round(safeDistance * 100) / 100));
   const billableKm = Math.max(0, Math.round((km - config.freeKm) * 100) / 100);
   const distanceFee = roundTo(billableKm * config.perKm, config.step);
   const raw = config.base + distanceFee;

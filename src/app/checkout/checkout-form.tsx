@@ -23,6 +23,7 @@ import { useCart } from "@/components/cart-provider";
 import { MapView } from "@/components/map-view";
 import { ProductTile } from "@/components/product-icon";
 import { quotePromo, type PromoQuote } from "@/lib/promos";
+import { haversineKm } from "@/lib/taxi";
 import { money } from "@/lib/utils";
 import { useI18n } from "@/components/locale-provider";
 
@@ -34,6 +35,10 @@ type AddressSuggestion = {
   lat: number;
   lng: number;
 };
+
+/** A geocoded suggestion further than this from the store is not a delivery
+ *  address for it. We keep the customer's pin instead of teleporting the map. */
+const ADDRESS_PIN_RADIUS_KM = 25;
 
 type SavedAddress = {
   id: string;
@@ -87,6 +92,8 @@ export function CheckoutForm({
   const [addressToken, setAddressToken] = useState("");
   const prefilledAddress = useRef(false);
   const initialPin = useRef(pin);
+  /** Every manual address choice bumps this so a slow GPS fix cannot win. */
+  const locateToken = useRef(0);
 
   const promoResult = promo
     ? quotePromo(promo.code, {
@@ -201,10 +208,25 @@ export function CheckoutForm({
   }, [address]);
 
   function chooseSuggestion(suggestion: AddressSuggestion) {
+    // A GPS fix that is still in flight must not overwrite what was just picked.
+    locateToken.current += 1;
+    setLocating(false);
+    setPinError("");
     applyingAddress.current = true;
     setAddress(suggestion.address);
     setLandmark(suggestion.landmark || suggestion.label.split(",").slice(0, 2).join(", "));
-    setPin({ lat: suggestion.lat, lng: suggestion.lng });
+    const hasPoint =
+      Number.isFinite(suggestion.lat) && Number.isFinite(suggestion.lng);
+    const nearStore =
+      Boolean(store) &&
+      hasPoint &&
+      haversineKm(
+        { lat: store!.storeLat, lng: store!.storeLng },
+        { lat: suggestion.lat, lng: suggestion.lng },
+      ) <= ADDRESS_PIN_RADIUS_KM;
+    // Only move the pin for an address this store can actually deliver to.
+    // A suggestion from another city keeps the pin the customer already set.
+    if (nearStore) setPin({ lat: suggestion.lat, lng: suggestion.lng });
     setSuggestions([]);
     window.setTimeout(() => {
       applyingAddress.current = false;
@@ -216,10 +238,13 @@ export function CheckoutForm({
       setPinError(t("Location is not available in this browser."));
       return;
     }
+    const token = locateToken.current + 1;
+    locateToken.current = token;
     setLocating(true);
     setPinError("");
     navigator.geolocation.getCurrentPosition(
       (position) => {
+        if (token !== locateToken.current) return;
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
         setPin({ lat, lng });
@@ -230,13 +255,19 @@ export function CheckoutForm({
         )
           .then((response) => (response.ok ? response.json() : null))
           .then((data: { address?: string; landmark?: string } | null) => {
+            if (token !== locateToken.current) return;
             if (!data?.address) return;
+            applyingAddress.current = true;
             setAddress(data.address);
             setLandmark(data.landmark || "");
+            window.setTimeout(() => {
+              applyingAddress.current = false;
+            }, 700);
           })
           .catch(() => undefined);
       },
       () => {
+        if (token !== locateToken.current) return;
         setPinError(t("Location permission was denied. Move the pin manually."));
         setLocating(false);
       },
@@ -244,22 +275,40 @@ export function CheckoutForm({
     );
   }
 
+  /** Saved pins can be stale (a trip, a browser GPS fix in another country).
+   *  Keep the text, but only adopt coordinates this store can deliver to. */
+  function savedPinIsLocal(entry: SavedAddress) {
+    if (!store) return false;
+    if (!Number.isFinite(entry.lat) || !Number.isFinite(entry.lng)) return false;
+    return (
+      haversineKm(
+        { lat: store.storeLat, lng: store.storeLng },
+        { lat: entry.lat, lng: entry.lng },
+      ) <= ADDRESS_PIN_RADIUS_KM
+    );
+  }
+
   function applySavedAddress(entry: SavedAddress) {
+    locateToken.current += 1;
+    setLocating(false);
     setName(entry.name);
     setPhone(entry.phone);
     setAddress(entry.address);
     setLandmark(entry.landmark);
-    setPin({ lat: entry.lat, lng: entry.lng });
+    if (savedPinIsLocal(entry)) setPin({ lat: entry.lat, lng: entry.lng });
   }
 
   /** Auto-fill on load without overwriting anything the customer typed first. */
   function prefillSavedAddress(entry: SavedAddress) {
+    locateToken.current += 1;
     setName((current) => current || entry.name);
     setPhone((current) => current || entry.phone);
     setAddress((current) => current || entry.address);
     setLandmark((current) => current || entry.landmark);
     setPin((current) =>
-      current.lat === initialPin.current.lat && current.lng === initialPin.current.lng
+      savedPinIsLocal(entry) &&
+      current.lat === initialPin.current.lat &&
+      current.lng === initialPin.current.lng
         ? { lat: entry.lat, lng: entry.lng }
         : current,
     );
@@ -395,7 +444,10 @@ export function CheckoutForm({
               center={{ lat: pin.lat, lng: pin.lng }}
               zoom={14}
               height={200}
-              onPick={(lat, lng) => setPin({ lat, lng })}
+              onPick={(lat, lng) => {
+                locateToken.current += 1;
+                setPin({ lat, lng });
+              }}
             />
           </div>
           <div className="mt-2.5 flex items-center gap-2 text-[11px] text-muted tnum">

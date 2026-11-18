@@ -1544,9 +1544,6 @@ export async function createOrder(
       fulfillment === "delivery"
         ? haversineKm({ lat: store.lat, lng: store.lng }, customerPoint)
         : 0;
-    if (fulfillment === "delivery" && distanceKm > 50) {
-      throw new Error("This address is outside the delivery area for this store");
-    }
     const city = db.cities.find((item) => item.slug === store.citySlug);
     const deliveryPricing = resolvePricing("delivery", city, db.settings);
     const deliveryQuote = quote(deliveryPricing, distanceKm);

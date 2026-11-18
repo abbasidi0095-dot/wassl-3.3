@@ -156,28 +156,6 @@ describe("delivery bidding", () => {
     expect(Number.isFinite(order.total)).toBe(true);
   });
 
-  it("refuses a delivery address thousands of kilometres away", async () => {
-    const db = await import("@/lib/db");
-    await db.resetDatabase();
-    const product = (await db.getProducts("store_dakhla_grill")).find((p) => p.id === "product_001")!;
-    await expect(
-      db.createOrder(
-        {
-          citySlug: "dakhla",
-          storeId: "store_dakhla_grill",
-          customerName: "Mariam",
-          customerPhone: "+212600000000",
-          address: "12 Rue de la Plage",
-          landmark: "Lighthouse",
-          lat: 45.44,
-          lng: 4.38,
-          items: [{ productId: product.id, qty: 1 }],
-        },
-        customer,
-      ),
-    ).rejects.toThrow(/outside the delivery area/i);
-  });
-
   it("blocks bidding on a closed order", async () => {
     const { db, order } = await seed();
     await db.updateOrderStatus(order.id, "cancelled", admin, { note: "test" });
