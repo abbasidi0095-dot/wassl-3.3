@@ -5,7 +5,7 @@ import { LoginForm } from "./login-form";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = { title: "Sign in · Wassl" };
+export const metadata = { title: "Sign in" };
 
 export default async function LoginPage({
   searchParams,

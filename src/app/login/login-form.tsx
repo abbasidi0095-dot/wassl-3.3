@@ -1,21 +1,24 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
+  Bike,
+  CarTaxiFront,
   Eye,
   EyeOff,
+  Lock,
   Loader2,
+  Mail,
   ShieldCheck,
+  ShoppingBag,
+  Store,
 } from "lucide-react";
-import { Logo } from "@/components/logo";
 import { useI18n } from "@/components/locale-provider";
-import { LanguageSwitcher } from "@/components/language-switcher";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { AuthButton, AuthShell } from "@/components/auth-shell";
 
 export function LoginForm({
   next,
@@ -80,177 +83,142 @@ export function LoginForm({
   }
 
   return (
-    <main className="grid min-h-screen bg-paper lg:grid-cols-[1.02fr_0.98fr]">
-      <section className="relative hidden overflow-hidden bg-ink p-10 text-on-dark lg:flex lg:flex-col lg:justify-between">
-        <Image
-          src="/images/stores/moroccan-2.jpg"
-          alt=""
-          fill
-          priority
-          sizes="50vw"
-          className="object-cover opacity-30"
-        />
-        <div className="absolute inset-0 bg-ink/60" aria-hidden="true" />
+    <AuthShell variant="login">
+      <p className="eyebrow">{t("Welcome back")}</p>
+      <h2 className="display mt-2 text-[clamp(1.9rem,1.5rem+1.2vw,2.6rem)]">
+        {t("Sign in")}
+      </h2>
+      <p className="mt-3 text-[13px] leading-6 text-muted">
+        {t("Use the email and password you signed up with.")}
+      </p>
 
-        <div className="relative">
-          <Logo light />
-        </div>
+      <form onSubmit={submit} className="mt-7 space-y-4">
+        <label className="block">
+          <span className="label">{t("Email")}</span>
+          <span className="relative block">
+            <Mail
+              size={16}
+              className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 text-muted"
+            />
+            <input
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              className="input h-12 ps-10"
+              placeholder="you@example.ma"
+              autoComplete="email"
+              autoFocus
+              required
+            />
+          </span>
+        </label>
 
-        <div className="relative max-w-[30rem]">
-          <h1 className="display text-[clamp(2.8rem,1.6rem+3.4vw,4.6rem)]">
-            {t("One platform.")}
-            <br />
-            {t("Every side of")}
-            <br />
-            {t("delivery.")}
-          </h1>
-          <p className="mt-6 max-w-md text-[14px] leading-6 opacity-60">
-            {t(
-              "Customers track orders, stores manage their menu, drivers run their route and operations keeps the city moving — all from the same sign-in.",
-            )}
-          </p>
-          <dl className="mt-8 grid grid-cols-3 gap-4 border-t border-white/20 pt-5">
-            {[
-              ["4", t("workspaces")],
-              ["COD", t("cash flow")],
-              ["Live", t("GPS tracking")],
-            ].map(([value, label]) => (
-              <div key={label}>
-                <dt className="tnum font-display text-[22px] font-semibold leading-none">
-                  {value}
-                </dt>
-                <dd className="mt-1.5 text-[11px] leading-4 opacity-50">{label}</dd>
-              </div>
-            ))}
-          </dl>
-        </div>
-
-        <p className="relative text-[11px] opacity-40">
-          {t("Customer, store, driver and operations accounts")}
-        </p>
-      </section>
-
-      <section className="flex min-h-screen items-center justify-center px-5 py-10 sm:px-10">
-        <div className="w-full max-w-[400px]">
-          <div className="mb-10 flex items-center justify-between lg:hidden">
-            <Logo />
-            <Link
-              href="/"
-              className="inline-flex items-center gap-1 text-[13px] text-muted"
-            >
-              <ArrowLeft size={13} className="rtl:-scale-x-100" /> {t("Storefront")}
-            </Link>
-          </div>
-
-          <div className="mb-6 flex items-center justify-end gap-2">
-            <LanguageSwitcher />
-            <ThemeToggle />
-          </div>
-
-          <p className="text-[13px] text-muted">{t("Welcome back")}</p>
-          <h2 className="display mt-2 text-[clamp(2rem,1.6rem+1.4vw,2.7rem)]">
-            {t("Sign in")}
-          </h2>
-          <p className="mt-3 text-[13px] leading-6 text-muted">
-            {t(
-              "Use the email and password you signed up with. New customers, stores and drivers can create an account in a minute.",
-            )}
-          </p>
-
-          <form onSubmit={submit} className="mt-7 space-y-4">
-            <label className="block">
-              <span className="label">{t("Email")}</span>
-              <input
-                type="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                className="input"
-                placeholder="you@example.ma"
-                autoComplete="email"
-                autoFocus
-                required
-              />
-            </label>
-
-            <label className="block">
-              <span className="label">{t("Password")}</span>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  className="input pe-11"
-                  placeholder={t("Your password")}
-                  autoComplete="current-password"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((value) => !value)}
-                  className="absolute end-1 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-[4px] text-muted hover:bg-surface-2 hover:text-ink"
-                  aria-label={
-                    showPassword ? t("Hide password") : t("Show password")
-                  }
-                >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
-            </label>
-
-            {error ? (
-              <p className="border-s-2 border-danger ps-3 text-[13px] leading-5 text-danger">
-                {error}
-              </p>
-            ) : null}
-
+        <label className="block">
+          <span className="label">{t("Password")}</span>
+          <span className="relative block">
+            <Lock
+              size={16}
+              className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 text-muted"
+            />
+            <input
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              className="input h-12 ps-10 pe-12"
+              placeholder={t("Your password")}
+              autoComplete="current-password"
+              required
+            />
             <button
-              type="submit"
-              disabled={!canSubmit || loading}
-              className="btn btn-primary w-full disabled:opacity-50"
+              type="button"
+              onClick={() => setShowPassword((value) => !value)}
+              className="absolute end-1.5 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-[4px] text-muted transition-colors hover:bg-surface-2 hover:text-ink"
+              aria-label={showPassword ? t("Hide password") : t("Show password")}
             >
-              {loading ? (
-                <Loader2 size={16} className="animate-spin" />
-              ) : (
-                <ShieldCheck size={16} />
-              )}
-              {loading ? t("Signing in…") : t("Sign in")}
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
-          </form>
+          </span>
+        </label>
 
-          <div className="mt-8 border-t border-line pt-5">
-            <p className="text-[13px] text-muted">{t("New to Wassl?")}</p>
-            <div className="mt-2 flex flex-wrap gap-x-5 gap-y-2">
-              {[
-                { href: "/signup", label: t("Customer") },
-                { href: "/signup/store", label: t("Store owner") },
-                { href: "/signup/driver", label: t("Delivery driver") },
-                { href: "/signup/taxi", label: t("Taxi driver") },
-              ].map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="inline-flex items-center gap-1 text-[13px] font-medium text-brand"
-                >
-                  {item.label}
-                  <ArrowRight size={11} className="rtl:-scale-x-100" />
-                </Link>
-              ))}
-            </div>
-            <p className="mt-4 text-[11px] leading-5 text-muted">
-              {t(
-                "Store owner and driver accounts are activated after a Wassl operator approves them. Admin accounts are provisioned by operations only.",
-              )}
-            </p>
-          </div>
+        {error ? (
+          <p className="rounded-[6px] border border-danger/25 bg-danger-soft px-3 py-2 text-[12px] font-medium leading-5 text-danger">
+            {error}
+          </p>
+        ) : null}
 
-          <div className="mt-8 flex items-center justify-between text-[11px] text-muted">
-            <Link href="/" className="inline-flex items-center gap-1 hover:text-ink">
-              <ArrowLeft size={12} className="rtl:-scale-x-100" /> {t("Back to storefront")}
-            </Link>
-            <span>Wassl · {t("Southern Morocco")}</span>
-          </div>
+        <div className="pt-1">
+          <AuthButton
+            loading={loading}
+            disabled={!canSubmit}
+            icon={
+              loading ? (
+                <Loader2 size={17} className="animate-spin" />
+              ) : (
+                <ArrowRight size={17} className="rtl:-scale-x-100" />
+              )
+            }
+          >
+            {loading ? t("Signing in…") : t("Sign in")}
+          </AuthButton>
         </div>
-      </section>
-    </main>
+      </form>
+
+      <div className="mt-7 flex items-center gap-3">
+        <span className="h-px flex-1 bg-line" />
+        <span className="text-[11px] font-semibold text-muted">
+          {t("No account yet?")}
+        </span>
+        <span className="h-px flex-1 bg-line" />
+      </div>
+
+      <div className="mt-4 grid gap-2 sm:grid-cols-2">
+        {[
+          { href: "/signup", label: t("Customer"), hint: t("Order food and groceries"), icon: ShoppingBag },
+          { href: "/signup/store", label: t("Store owner"), hint: t("Sell on Wassl"), icon: Store },
+          { href: "/signup/driver", label: t("Courier"), hint: t("Deliver by bike or car"), icon: Bike },
+          { href: "/signup/taxi", label: t("Taxi driver"), hint: t("Drive local rides"), icon: CarTaxiFront },
+        ].map((item) => {
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="group flex items-center gap-3 rounded-[6px] border border-line bg-surface px-3 py-3 text-start outline-none transition-[border-color,transform] duration-200 ease-out hover:-translate-y-0.5 hover:border-brand focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-paper motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+            >
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[4px] bg-brand-soft text-brand">
+                <Icon size={16} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-[12.5px] font-semibold text-ink">
+                  {item.label}
+                </span>
+                <span className="block truncate text-[10.5px] text-muted">
+                  {item.hint}
+                </span>
+              </span>
+              <ArrowRight
+                size={14}
+                className="shrink-0 text-muted transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-brand rtl:-scale-x-100 rtl:group-hover:-translate-x-0.5"
+              />
+            </Link>
+          );
+        })}
+      </div>
+
+      <p className="mt-6 flex items-start gap-2 text-[11px] leading-5 text-muted">
+        <ShieldCheck size={14} className="mt-0.5 shrink-0 text-brand" />
+        {t(
+          "Store and courier accounts open after a Wassl operator checks your details. Customers are active immediately.",
+        )}
+      </p>
+
+      <Link
+        href="/"
+        className="mt-6 inline-flex items-center gap-1.5 text-[11px] font-semibold text-muted transition-colors hover:text-ink lg:hidden"
+      >
+        <ArrowLeft size={12} className="rtl:-scale-x-100" />
+        {t("Back to storefront")}
+      </Link>
+    </AuthShell>
   );
 }

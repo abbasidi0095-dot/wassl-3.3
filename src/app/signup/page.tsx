@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { SignupShell } from "./signup-shell";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Create your account · Wassl" };
+export const metadata = { title: "Create your account" };
 
 export default async function SignupPage({
   searchParams,
