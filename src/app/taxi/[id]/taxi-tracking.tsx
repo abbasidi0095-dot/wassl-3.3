@@ -15,6 +15,7 @@ import {
 import { MapView } from "@/components/map-view";
 import { HandoverCode } from "@/components/handover-code";
 import { useI18n } from "@/components/locale-provider";
+import { PriceOffer } from "@/components/price-offer";
 import type { TaxiRide } from "@/lib/types";
 import { TAXI_STATUS_ORDER, TAXI_STATUS_TEXT } from "@/lib/taxi-status";
 import { money } from "@/lib/utils";
@@ -163,6 +164,19 @@ export function TaxiTracking({ ride: initialRide, role }: { ride: TaxiRide; role
           </div>
         </div>
       </div>
+
+      {ride.price && ride.status !== "completed" && ride.status !== "cancelled" ? (
+        <div className="mt-4">
+          <PriceOffer
+            price={ride.price}
+            mode="customer"
+            endpoint={`/api/taxi/rides/${ride.id}/offer`}
+            step={5}
+            max={ride.price.max}
+            onUpdated={() => void refresh()}
+          />
+        </div>
+      ) : null}
 
       <div className="space-y-4">
         {ride.status === "completed" ? (

@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { HandoverPrompt } from "@/components/handover-code";
 import { useI18n } from "@/components/locale-provider";
+import { PriceOffer } from "@/components/price-offer";
 import type { Driver, TaxiRide, TaxiStatus } from "@/lib/types";
 import { TAXI_STATUS_TEXT } from "@/lib/taxi-status";
 import { money } from "@/lib/utils";
@@ -165,6 +166,19 @@ export function DriverTaxiQueue({
                     <span className="pill">{t(TAXI_STATUS_TEXT[ride.status])}</span>
                     <span className="text-sm font-semibold">{money(ride.fare)}</span>
                   </div>
+                  {ride.price && ride.status === "requested" ? (
+                    <div className="mt-3">
+                      <PriceOffer
+                        compact
+                        price={ride.price}
+                        mode="driver"
+                        endpoint={`/api/taxi/rides/${ride.id}/offer`}
+                        step={5}
+                        max={ride.price.max}
+                        onUpdated={() => void refresh()}
+                      />
+                    </div>
+                  ) : null}
                   <div className="mt-3 space-y-2 text-sm">
                     <div className="flex items-start gap-2">
                       <CircleDot size={14} className="mt-0.5 shrink-0 text-brand" />
